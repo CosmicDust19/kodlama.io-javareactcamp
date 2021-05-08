@@ -4,11 +4,11 @@ import entities.abstracts.Entity;
 
 public class User implements Entity {
 
-    int id;
-    String firstName;
-    String lastName;
-    String email;
-    String password;
+    private int id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
 
     public User() {
     }
