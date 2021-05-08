@@ -45,8 +45,7 @@ public class UserCheckManager implements UserCheckService {
 
     @Override
     public boolean isValidEmailFormat(String email) {
-        String emailRegex = "^[A-Z0-9._]+@[A-Z0-9.]+\\.[A-Z]{2,6}$";
-        //String emailRegex2= "^\\w+([.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$";
+        String emailRegex= "^\\w+(\\.\\w+)*@[a-zA-Z]+(\\.\\w{2,6})+$";
         Pattern pattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
         if (email == null) {
             System.out.println("Wrong email format!");
