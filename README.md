@@ -1,13 +1,14 @@
-# Intellij IDEA - Mernis Service Integration
+###Intelij IDEA - Mernis Service Integration
 
-![](https://i.resmim.net/i/1-163.png)
 
-![](https://i.resmim.net/i/2-117.png)
+![1](https://user-images.githubusercontent.com/74824916/117548088-a142ca00-b03b-11eb-8ce3-9a0b0f495973.png)
 
-![](https://www.resimyukle.org/images/2021/05/05/41d09088bebb8e8edbb1024303f546b0.png)
+![2](https://user-images.githubusercontent.com/74824916/117548090-a1db6080-b03b-11eb-9de6-769a612fcf6b.png)
 
-![](https://www.resimyukle.org/images/2021/05/05/a85380e6c6a0496f81c01416cab4abf2.png)
+![3](https://user-images.githubusercontent.com/74824916/117548091-a1db6080-b03b-11eb-9a9f-265989c1898d.png)
 
-![](https://www.resimyukle.org/images/2021/05/05/398ab7dd8511b93048dc880efb853942.png)
+![4](https://user-images.githubusercontent.com/74824916/117548093-a273f700-b03b-11eb-9596-325b9b6b167a.png)
 
-![](https://www.resimyukle.org/images/2021/05/05/83b04df070cd53b519c76c9c5c51b454.png)
+![5](https://user-images.githubusercontent.com/74824916/117548094-a273f700-b03b-11eb-8fd8-c1fd4ee627e0.png)
+
+![6](https://user-images.githubusercontent.com/74824916/117548086-a0aa3380-b03b-11eb-997a-83da894c9d0a.png)
