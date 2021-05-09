@@ -11,15 +11,12 @@ import java.util.regex.Pattern;
 public class UserCheckManager implements UserCheckService {
 
     private AuthService authService;
-    private final EmailService emailService;
 
-    public UserCheckManager(EmailService emailService) {
-        this.emailService = emailService;
+    public UserCheckManager() {
     }
 
-    public UserCheckManager(AuthService authService, EmailService emailService) {
+    public UserCheckManager(AuthService authService) {
         this.authService = authService;
-        this.emailService = emailService;
     }
 
     @Override
@@ -45,8 +42,8 @@ public class UserCheckManager implements UserCheckService {
 
     @Override
     public boolean isValidEmailFormat(String email) {
-        String emailRegex= "^\\w+(\\.\\w+)*@[a-zA-Z]+(\\.\\w{2,6})+$";
-        Pattern pattern = Pattern.compile(emailRegex, Pattern.CASE_INSENSITIVE);
+        String emailRegex = "^\\w+(\\.\\w+)*@[a-zA-Z]+(\\.\\w{2,6})+$";
+        Pattern pattern = Pattern.compile(emailRegex);
         if (email == null) {
             System.out.println("Wrong email format!");
             return false;
@@ -65,19 +62,14 @@ public class UserCheckManager implements UserCheckService {
 
     @Override
     public boolean isValidUser(User user, UserDao userDao) {
-        if (authService != null) return authService.isValidUser();
         if (!isValidFirstName(user.getFirstName())) return false;
         else if (!isValidLastName(user.getLastName())) return false;
         else if (!isValidEmailFormat(user.getEmail())) return false;
-        else if (!isValidPassword(user.getPassword())) return false;
-        else if (isUsedEmail(user.getEmail(), userDao)) return false;
-        emailService.sendVerificationMail(user.getEmail());
-        System.out.println("Verified✓");
-        return true;
+        else return isValidPassword(user.getPassword());
     }
 
     @Override
-    public boolean isCorrectLoginInput(String email, String password, UserDao userDao) {
+    public boolean isValidLogin(String email, String password, UserDao userDao) {
         if (authService != null) return authService.isValidUser();
         User user = userDao.getByEmail(email);
         if (user == null) {
@@ -88,5 +80,19 @@ public class UserCheckManager implements UserCheckService {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean isThereAnyChange(User user, User oldUSer) {
+        return !(user.getFirstName().equals(oldUSer.getFirstName()) &&
+                user.getLastName().equals(oldUSer.getLastName()) &&
+                user.getEmail().equals(oldUSer.getEmail()) &&
+                user.getPassword().equals(oldUSer.getPassword()));
+    }
+
+    @Override
+    public boolean tryAuthService() {
+        if (authService != null) return authService.isValidUser();
+        return false;
     }
 }

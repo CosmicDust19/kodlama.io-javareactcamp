@@ -16,6 +16,9 @@ public interface UserCheckService {
 
     boolean isValidUser(User user, UserDao userDao);
 
-    boolean isCorrectLoginInput(String email, String password, UserDao userDao);
+    boolean isValidLogin(String email, String password, UserDao userDao);
 
+    boolean isThereAnyChange(User user, User oldUSer);
+
+    boolean tryAuthService();
 }

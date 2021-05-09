@@ -13,14 +13,16 @@ public class HibernateUserDao implements UserDao {
     @Override
     public void add(User user) {
         System.out.println("Saved to database by hibernate: " + user.getEmail());
-        usersInDatabase.add(user);
+        usersInDatabase.add(new User(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                user.getPassword())); // cloning user to another reference to simulate database (representative)
     }
 
     @Override
-    public void update(User user) {
+    public void update(User user, User userOld) {
+        usersInDatabase.remove(userOld); // representative
+        usersInDatabase.add(new User(user.getId(), user.getFirstName(), user.getLastName(), user.getEmail(),
+                user.getPassword())); // cloning user to another reference to simulate database (representative)
         System.out.println("Updated by hibernate: " + user.getEmail());
-        usersInDatabase.remove(getById(user.getId())); // representative
-        usersInDatabase.add(user); // representative
     }
 
     @Override
