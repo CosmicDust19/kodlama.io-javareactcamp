@@ -6,8 +6,8 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@Table(name = "jobs")
-public class Job {
+@Table(name = "positions")
+public class Position {
 
     @Id
     @GeneratedValue
@@ -20,17 +20,13 @@ public class Job {
     @Column(name = "detail")
     private String detail;
 
-    @Column(name = "sector_name")
-    private String sectorName;
-
-    public Job(int id, String title, String detail, String sectorName) {
+    public Position(int id, String title, String detail) {
         this.id = id;
         this.title = title;
         this.detail = detail;
-        this.sectorName = sectorName;
     }
 
-    public Job() {
+    public Position() {
 
     }
 }

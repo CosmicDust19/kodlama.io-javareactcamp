@@ -1,5 +1,7 @@
-### ERD
+### ER Diagram
 
-![](https://user-images.githubusercontent.com/74824916/117799094-72566f00-b25a-11eb-8e7c-689d90b984e3.png)
+![](https://user-images.githubusercontent.com/74824916/118031657-73c58b80-b36f-11eb-97bd-81bbaf769745.png)
 
-![](https://user-images.githubusercontent.com/74824916/117799158-7da99a80-b25a-11eb-9446-52c66578a5ab.png)
+
+###### Less Detail
+![](https://user-images.githubusercontent.com/74824916/118031946-c606ac80-b36f-11eb-9597-b7855574ee36.png)

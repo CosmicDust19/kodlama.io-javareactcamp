@@ -11,7 +11,7 @@ public class Candidate {
 
     @Id
     @GeneratedValue
-    @Column(name = "employee_id")
+    @Column(name = "id")
     private int employee_id;
 
     @Column(name = "first_name")
@@ -23,18 +23,14 @@ public class Candidate {
     @Column(name = "nationality_id")
     private int nationalityId;
 
-    @Column(name = "job_id")
-    private int jobId;
-
     @Column(name = "birth_year")
     private int birthYear;
 
-    public Candidate(int employee_id, String firstName, String lastName, int nationalityId, int jobId, int birthYear) {
+    public Candidate(int employee_id, String firstName, String lastName, int nationalityId, int birthYear) {
         this.employee_id = employee_id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.nationalityId = nationalityId;
-        this.jobId = jobId;
         this.birthYear = birthYear;
     }
 
