@@ -24,5 +24,5 @@
 ### That's all...
 
 ###### ────────────────────────────────────────────────
-#### I will ask something, Is there any different and more efficient way to take information that if email caught to unique key constraint in the database. (Please See. UserManager Row: 44 and 72)
-###### We can contact via LinkedIn: https://www.linkedin.com/feed/?trk=opento_lp or Discord: CosmicDust#4917
+#### I will ask something, Is there any different and more efficient way to take information that if email caught to unique key constraint in the database. (Please See. [UserManager](https://github.com/CosmicDust19/kodlama.io-javacamp/blob/master/lecture5-hw1-with-postgresql/src/business/concretes/UserManager.java) Row: 44 and 72)
+###### We can contact via [LinkedIn](https://www.linkedin.com/in/semih-kayan/) or Discord: CosmicDust#4917
