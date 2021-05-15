@@ -1,4 +1,4 @@
-#### InteliJ IDEA - Mernis Service Integration
+#### IntelliJ IDEA - Mernis Service Integration
 
 
 ![1](https://user-images.githubusercontent.com/74824916/117548088-a142ca00-b03b-11eb-8ce3-9a0b0f495973.png)
