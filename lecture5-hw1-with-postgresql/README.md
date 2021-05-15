@@ -1,4 +1,4 @@
-### If you wanna try the codes: 
+### If you wanna try: 
 
 ### 1) Paste this into the query tool:
 
