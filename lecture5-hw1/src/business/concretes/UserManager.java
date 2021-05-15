@@ -23,24 +23,19 @@ public class UserManager implements UserService {
         if (userCheckService.tryAuthService()) {
             userDao.add(user);
             System.out.println("Registration Successful");
-            return;
         } else if ((userCheckService.isValidUser(user, userDao) && !userCheckService.isUsedEmail(user.getEmail(), userDao))) {
             emailService.sendVerificationMail(user.getEmail());
             System.out.println("Verified✓");
             userDao.add(user);
             System.out.println("Registration Successful");
-            return;
-        }
-        System.out.println("Registration Failed");
+        } else System.out.println("Registration Failed");
     }
 
     @Override
     public void login(String email, String password) {
         if (userCheckService.isValidLogin(email, password, userDao)) {
             System.out.println("User logged in...");
-            return;
-        }
-        System.out.println("Login Failed");
+        } else System.out.println("Login Failed");
     }
 
     @Override
@@ -48,7 +43,6 @@ public class UserManager implements UserService {
         User oldUser = userDao.getById(user.getId());
         if (oldUser == null) {
             System.out.println("Update Failed : User id does not match any of user in our database!");
-            return;
         } else if(userCheckService.tryAuthService()){
             System.out.println("Because you approved by google, you cannot change your infos for now :(");
         } else if (!userCheckService.isThereAnyChange(user,oldUser)){
@@ -60,9 +54,7 @@ public class UserManager implements UserService {
             }
             userDao.update(user, oldUser);
             System.out.println("Update Successful");
-            return;
-        }
-        System.out.println("Update Failed");
+        } else System.out.println("Update Failed");
     }
 
     @Override
@@ -70,9 +62,7 @@ public class UserManager implements UserService {
         if (userDao.getById(user.getId()) != null) {
             userDao.delete(user);
             System.out.println("Delete Successful");
-            return;
-        }
-        System.out.println("Delete Failed: There is no such a user...");
+        } else System.out.println("Delete Failed: There is no such a user...");
     }
 
 

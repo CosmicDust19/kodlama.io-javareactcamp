@@ -2,7 +2,6 @@ package business.concretes;
 
 import business.abstracts.UserCheckService;
 import core.abstracts.AuthService;
-import core.abstracts.EmailService;
 import dataAccess.abstracts.UserDao;
 import entities.concretes.User;
 
@@ -47,20 +46,11 @@ public class UserCheckManager implements UserCheckService {
         if (email == null) {
             System.out.println("Wrong email format!");
             return false;
-        } else if (!pattern.matcher(email).matches()) {
+        } else if (!pattern.matcher(email).matches()){
             System.out.println("Wrong email format!");
             return false;
         }
         return true;
-    }
-
-    @Override
-    public boolean isUsedEmail(String email, UserDao userDao) {
-        if (userDao.getByEmail(email) != null) {
-            System.out.println("Email is used before!");
-            return true;
-        }
-        return false;
     }
 
     @Override
@@ -75,7 +65,7 @@ public class UserCheckManager implements UserCheckService {
     public boolean isValidLogin(String email, String password, UserDao userDao) {
         if (authService != null) return authService.isValidUser();
         User user = userDao.getByEmail(email);
-        if (user == null) {
+        if (user.getPassword() == null) {
             System.out.println("Incorrect e-mail!");
             return false;
         } else if (!user.getPassword().equals(password)) {
@@ -86,12 +76,17 @@ public class UserCheckManager implements UserCheckService {
     }
 
     @Override
-    public boolean isThereAnyChange(User user, User oldUSer) {
-        return !(user.getFirstName().equals(oldUSer.getFirstName()) &&
-                user.getLastName().equals(oldUSer.getLastName()) &&
-                user.getEmail().equals(oldUSer.getEmail()) &&
-                user.getPassword().equals(oldUSer.getPassword()));
+    public boolean isThereAnyChange(User user, User userOld) {
+        if (user.getFirstName().equals(userOld.getFirstName()) &&
+                user.getLastName().equals(userOld.getLastName()) &&
+                user.getEmail().equals(userOld.getEmail()) &&
+                user.getPassword().equals(userOld.getPassword())){
+            System.out.println("No change detected");
+            return false;
+        }
+        return true;
     }
+
 
     @Override
     public boolean tryAuthService() {
