@@ -1,3 +1,5 @@
+### If you wanna try the codes: 
+
 ### 1) Paste this into the query tool:
 
 ######
@@ -18,5 +20,5 @@
 ######
 
 ### 2) Add the postgre driver to your project
-######If you need, steps are in the init-postgre-driver file
+###### If you need, steps are in the init-postgre-driver file
 ### That's all...
