@@ -1,7 +1,7 @@
 PostgreSQL JDBC 4.2 Driver, 42.2.20 : https://jdbc.postgresql.org/download/postgresql-42.2.20.jar
 
 ### Eclipse
-###### Paste the postgre driver into the project file
+###### Paste the postgresql driver (.jar file) into the project file
 ###### Project name (right click) > build path > configure build path > libraries > add JARs > choose the driver
 
 ### IntelliJ IDEA
