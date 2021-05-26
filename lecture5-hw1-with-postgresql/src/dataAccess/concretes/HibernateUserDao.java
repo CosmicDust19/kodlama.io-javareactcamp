@@ -15,7 +15,7 @@ public class HibernateUserDao implements UserDao {
 
     @Override
     public void add(User user) throws SQLException {
-        String sql = "insert into users (first_name,last_name,email,password) values " +
+        String sql = "insert into users (first_name, last_name, email, password) values " +
                 "('" + user.getFirstName() + "','" + user.getLastName() + "','" + user.getEmail() + "','" + user.getPassword() + "')";
         statement.executeUpdate(sql);
         System.out.println("Saved to database by hibernate: " + user.getEmail());
@@ -33,7 +33,7 @@ public class HibernateUserDao implements UserDao {
     public void delete(int id) throws SQLException {
         String sql = "delete from users where id = " + id;
         statement.execute(sql);
-        System.out.println("Deleted by hibernate.\nDeleted user id: " + id);
+        System.out.println("Deleted by hibernate.");
     }
 
     @Override
