@@ -5,10 +5,7 @@ import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.entities.concretes.Candidate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,7 +26,7 @@ public class CandicatesController {
     }
 
     @PostMapping("/add")
-    public Result add(Candidate candidate){
+    public Result add(@RequestBody Candidate candidate){
         return candidateService.add(candidate);
     }
 }

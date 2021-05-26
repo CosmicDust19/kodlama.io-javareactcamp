@@ -1,12 +1,12 @@
 package com.hrms.hw.core.adapters;
 
 import mernis.KPSPublicLocator;
+import org.springframework.stereotype.Component;
 
-import javax.xml.rpc.ServiceException;
-
+@Component
 public class MernisServiceAdapter {
 
-    public boolean isNatIdReal(String TCNO, String name, String surname, short birthYear) throws ServiceException {
+    public boolean isNatIdReal(String TCNO, String name, String surname, short birthYear) {
 
         try {
             return new KPSPublicLocator().getKPSPublicSoap().TCKimlikNoDogrula(Long.parseLong(TCNO), name, surname, birthYear);

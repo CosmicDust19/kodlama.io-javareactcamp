@@ -1,10 +1,7 @@
 package com.hrms.hw.business.concretes;
 
 import com.hrms.hw.business.abstracts.SystemEmployeeService;
-import com.hrms.hw.core.utilities.results.DataResult;
-import com.hrms.hw.core.utilities.results.Result;
-import com.hrms.hw.core.utilities.results.SuccessDataResult;
-import com.hrms.hw.core.utilities.results.SuccessResult;
+import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.SystemEmployeeDao;
 import com.hrms.hw.entities.concretes.SystemEmployee;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +26,14 @@ public class SystemEmployeeManager implements SystemEmployeeService {
 
     @Override
     public Result add(SystemEmployee systemEmployee) {
-        systemEmployeeDao.save(systemEmployee);
-        return new SuccessResult("System Employee Saved");
+
+        try {
+            systemEmployeeDao.save(systemEmployee);
+            return new SuccessResult("System Employee Saved");
+        } catch (Exception exception){
+            exception.printStackTrace();
+            return new ErrorResult("Registration Failed");
+        }
+
     }
 }

@@ -6,10 +6,7 @@ import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.entities.concretes.Employer;
 import com.hrms.hw.entities.concretes.SystemEmployee;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -30,7 +27,7 @@ public class SystemEmployeesController {
     }
 
     @PostMapping("/add")
-    public Result add(SystemEmployee systemEmployee){
+    public Result add(@RequestBody SystemEmployee systemEmployee){
         return systemEmployeeService.add(systemEmployee);
     }
 }

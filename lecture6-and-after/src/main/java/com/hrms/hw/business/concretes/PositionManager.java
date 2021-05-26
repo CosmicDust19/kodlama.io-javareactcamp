@@ -1,10 +1,7 @@
 package com.hrms.hw.business.concretes;
 
 import com.hrms.hw.business.abstracts.PositionService;
-import com.hrms.hw.core.utilities.results.DataResult;
-import com.hrms.hw.core.utilities.results.Result;
-import com.hrms.hw.core.utilities.results.SuccessDataResult;
-import com.hrms.hw.core.utilities.results.SuccessResult;
+import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.PositionDao;
 import com.hrms.hw.entities.concretes.Position;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +26,15 @@ public class PositionManager implements PositionService {
 
     @Override
     public Result add(Position position) {
-        positionDao.save(position);
-        return new SuccessResult("Position Saved");
+
+        try {
+            positionDao.save(position);
+            return new SuccessResult("Position Saved");
+        } catch (Exception exception){
+            exception.printStackTrace();
+            return new ErrorResult("Registration Failed");
+        }
+
     }
 
 
