@@ -7,12 +7,13 @@ import com.hrms.hw.core.adapters.MernisServiceAdapter;
 import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.CandidateDao;
 import com.hrms.hw.entities.concretes.Candidate;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
+@AllArgsConstructor
 @Service
 public class CandidateManager implements CandidateService {
 
@@ -21,35 +22,29 @@ public class CandidateManager implements CandidateService {
     private final MernisServiceAdapter mernisServiceAdapter;
     private final EmailService emailService;
 
-    @Autowired
-    public CandidateManager(CandidateDao candidateDao, CandidateCheckService candidateCheckService, MernisServiceAdapter mernisServiceAdapter, EmailService emailService) {
-        this.candidateDao = candidateDao;
-        this.candidateCheckService = candidateCheckService;
-        this.mernisServiceAdapter = mernisServiceAdapter;
-        this.emailService = emailService;
-    }
-
     @Override
     public DataResult<List<Candidate>> getAll() {
         return new SuccessDataResult<>("Success", candidateDao.findAll());
     }
 
-    public Result add(Candidate candidate){
+    public Result register(Candidate candidate, String passwordRepeat){
 
         if(!candidateCheckService.areAllFieldsFilled(candidate)){
             return new ErrorResult("There is empty fields!");
+        } else if(!candidate.getPassword().equals(passwordRepeat)){
+            return new ErrorResult("Password repetition mismatch");
         } else if (mernisServiceAdapter.isNatIdReal(candidate.getNationalityId(),
                 candidate.getFirstName(), candidate.getLastName(), candidate.getBirthYear())){
-            return new ErrorResult("Incompatible Nationality ID, Name, Surname, Birth Year!");
+            return new ErrorResult("Incompatible Nationality ID, Name, Surname And Birth Year!");
         }
 
         try {
-            candidateDao.save(candidate);
             emailService.sendVerificationMail(candidate.getEmail());
-            return new SuccessResult("Candidate Saved");
+            candidateDao.save(candidate);
+            return new SuccessResult("Email verified...\nCandidate Saved.");
         } catch (Exception exception){
             exception.printStackTrace();
-            return new ErrorResult("Registration Failed");
+            return new ErrorResult("An Error Has Occurred - Registration Failed");
         }
 
     }

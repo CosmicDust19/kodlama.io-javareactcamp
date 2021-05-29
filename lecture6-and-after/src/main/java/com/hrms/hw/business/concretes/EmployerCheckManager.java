@@ -15,8 +15,9 @@ public class EmployerCheckManager implements EmployerCheckService {
 
     @Override
     public boolean isCompatibleWebSiteAndEmail(Employer employer){
-        String emailDomain = employer.getEmail().split("@")[0].toLowerCase();
-        String webSiteDomain = employer.getWebSite().split("\\.")[1].toLowerCase();
+        // I am not sure about where the domain is :)
+        String emailDomain = employer.getEmail().split("@")[0];
+        String webSiteDomain = employer.getWebSite().split("\\.")[1];
         return emailDomain.equals(webSiteDomain);
     }
 

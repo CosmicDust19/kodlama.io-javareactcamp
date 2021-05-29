@@ -26,7 +26,7 @@ public class CandicatesController {
     }
 
     @PostMapping("/add")
-    public Result add(@RequestBody Candidate candidate){
-        return candidateService.add(candidate);
+    public Result add(@RequestBody Candidate candidate, @RequestParam String passwordRepeat){
+        return candidateService.register(candidate, passwordRepeat);
     }
 }

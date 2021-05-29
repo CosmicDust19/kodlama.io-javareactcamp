@@ -14,7 +14,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "candidates")
-@PrimaryKeyJoinColumn(name = "id", referencedColumnName = "id")
+@PrimaryKeyJoinColumn(name = "candidate_id", referencedColumnName = "id")
 public class Candidate extends User {
 
     @Column(name = "first_name")
