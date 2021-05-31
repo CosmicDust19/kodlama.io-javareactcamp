@@ -1,7 +1,5 @@
 package com.hrms.hw.entities.concretes;
 
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,11 +34,9 @@ public class JobAdvertisement {
     @JoinColumn(name = "city_id")
     private City city;
 
-    @JsonIgnore
     @Column(name = "min_salary")
     private double minSalary;
 
-    @JsonIgnore
     @Column(name = "max_salary")
     private double maxSalary;
 
@@ -50,12 +46,13 @@ public class JobAdvertisement {
     @Column(name = "application_deadline")
     private LocalDate applicationDeadline;
 
-    @JsonIgnore
     @Column(name = "is_active")
     private boolean activationStatus;
 
-    @JsonIgnore
     @Column(name = "created_at")
     private LocalDate createdAt;
+
+    @Column(name = "last_modified_at")
+    private LocalDate lastModifiedAt;
 
 }

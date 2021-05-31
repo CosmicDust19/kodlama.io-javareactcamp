@@ -7,13 +7,13 @@ import com.hrms.hw.core.adapters.MernisServiceAdapter;
 import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.CandidateDao;
 import com.hrms.hw.entities.concretes.Candidate;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class CandidateManager implements CandidateService {
 
@@ -28,20 +28,20 @@ public class CandidateManager implements CandidateService {
     }
 
     public Result register(Candidate candidate, String passwordRepeat){
-
         if(!candidateCheckService.areAllFieldsFilled(candidate)){
             return new ErrorResult("There is empty fields!");
         } else if(!candidate.getPassword().equals(passwordRepeat)){
             return new ErrorResult("Password repetition mismatch");
-        } else if (mernisServiceAdapter.isNatIdReal(candidate.getNationalityId(),
+        } else if (!mernisServiceAdapter.isRealPerson(candidate.getNationalityId(),
                 candidate.getFirstName(), candidate.getLastName(), candidate.getBirthYear())){
-            return new ErrorResult("Incompatible Nationality ID, Name, Surname And Birth Year!");
+            return new ErrorResult("Mernis verification failed");
         }
 
         try {
+            candidate.setCreatedAt(LocalDate.now());
             emailService.sendVerificationMail(candidate.getEmail());
             candidateDao.save(candidate);
-            return new SuccessResult("Email verified...\nCandidate Saved.");
+            return new SuccessResult("Email verified...  Candidate Saved.");
         } catch (Exception exception){
             exception.printStackTrace();
             return new ErrorResult("An Error Has Occurred - Registration Failed");

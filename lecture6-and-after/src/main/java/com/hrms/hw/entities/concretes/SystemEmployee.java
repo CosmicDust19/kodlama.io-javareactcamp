@@ -23,10 +23,4 @@ public class SystemEmployee extends User {
     @Column(name = "last_name")
     private String lastName;
 
-    public SystemEmployee(int id, String email, String password, String firstName, String lastName){
-        super(id,email,password);
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
 }

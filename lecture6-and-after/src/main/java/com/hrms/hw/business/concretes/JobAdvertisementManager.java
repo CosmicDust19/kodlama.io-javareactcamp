@@ -6,18 +6,25 @@ import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.core.utilities.results.SuccessDataResult;
 import com.hrms.hw.core.utilities.results.SuccessResult;
 import com.hrms.hw.dataAccess.abstracts.JobAdvertisementDao;
+import com.hrms.hw.entities.concretes.City;
+import com.hrms.hw.entities.concretes.Employer;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
-import lombok.AllArgsConstructor;
+import com.hrms.hw.entities.concretes.Position;
+import com.hrms.hw.entities.concretes.dtos.JobAdvertisementAddDto;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class JobAdvertisementManager implements JobAdvertisementService {
 
     private final JobAdvertisementDao jobAdvertisementDao;
+    private final ModelMapper modelMapper;
 
     @Override
     public DataResult<List<JobAdvertisement>> getAll() {
@@ -26,7 +33,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
 
     @Override
     public DataResult<List<JobAdvertisement>> getAllActives() {
-        return new SuccessDataResult<>("Job Advertisements Have Listed.", jobAdvertisementDao.findAllByActivationStatusTrue());
+        return new SuccessDataResult<>("All active job advertisements have been listed.", jobAdvertisementDao.findAllByActivationStatusTrue());
     }
 
     @Override
@@ -41,19 +48,24 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     }
 
     @Override
-    public DataResult<List<JobAdvertisement>> getByActiveTrueAndEmployer_Id(int employerId) {
+    public DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(int employerId) {
         return new SuccessDataResult<>("Success", jobAdvertisementDao.getByActivationStatusTrueAndEmployer_Id(employerId));
     }
 
     @Override
-    public Result add(JobAdvertisement jobAdvertisement) {
+    public Result add(JobAdvertisementAddDto jobAdvertisementAddDto) {
+        JobAdvertisement jobAdvertisement = modelMapper.map(jobAdvertisementAddDto, JobAdvertisement.class);
+        jobAdvertisement.setEmployer(new Employer(jobAdvertisementAddDto.getEmployerId()));
+        jobAdvertisement.setPosition(new Position(jobAdvertisementAddDto.getPositionId()));
+        jobAdvertisement.setCity(new City(jobAdvertisementAddDto.getCityId()));
+        jobAdvertisement.setCreatedAt(LocalDate.now());
         jobAdvertisementDao.save(jobAdvertisement);
         return new SuccessResult("Advertisement has been added successfully.");
     }
 
     @Override
-    public Result updateActivationStatus(boolean isActive, int jobAdvertisementId) {
-        jobAdvertisementDao.updateActivationStatus(isActive, jobAdvertisementId);
+    public Result updateActivationStatus(boolean activationStatus, int jobAdvertisementId) {
+        jobAdvertisementDao.updateActivationStatus(activationStatus, jobAdvertisementId);
         return new SuccessResult("Advertisement's activation status has been updated successfully");
     }
 

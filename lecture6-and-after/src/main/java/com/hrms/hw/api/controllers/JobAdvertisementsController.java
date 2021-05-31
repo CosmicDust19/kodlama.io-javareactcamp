@@ -4,14 +4,15 @@ import com.hrms.hw.business.abstracts.JobAdvertisementService;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
-import lombok.AllArgsConstructor;
+import com.hrms.hw.entities.concretes.dtos.JobAdvertisementAddDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
-@RequestMapping(name = "api/job-advertisements")
+@RequestMapping(name = "api/jobAdvertisements")
 public class JobAdvertisementsController {
 
     private final JobAdvertisementService jobAdvertisementService;
@@ -31,19 +32,19 @@ public class JobAdvertisementsController {
         return jobAdvertisementService.getAllActivesSortedByDate(sortDirection);
     }
 
-    @GetMapping("getByActivationStatusAndEmployerId")
-    DataResult<List<JobAdvertisement>> getByActiveTrueAndEmployer_Id(@RequestParam int employerId) {
-        return jobAdvertisementService.getByActiveTrueAndEmployer_Id(employerId);
+    @GetMapping("getByActivationStatusTrueAndEmployerId")
+    DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(@RequestParam int employerId) {
+        return jobAdvertisementService.getByActivationStatusTrueAndEmployer_Id(employerId);
     }
 
     @PostMapping("add")
-    Result add(@RequestBody JobAdvertisement jobAdvertisement) {
-        return jobAdvertisementService.add(jobAdvertisement);
+    Result add(@RequestBody JobAdvertisementAddDto jobAdvertisementAddDto) {
+        return jobAdvertisementService.add(jobAdvertisementAddDto);
     }
 
     @PostMapping("updateActivationStatus")
-    Result updateActivationStatus(@RequestParam boolean isActive, @RequestParam int jobAdvertisementId) {
-        return jobAdvertisementService.updateActivationStatus(isActive, jobAdvertisementId);
+    Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int jobAdvertisementId) {
+        return jobAdvertisementService.updateActivationStatus(activationStatus, jobAdvertisementId);
     }
 
 }

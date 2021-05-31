@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MernisServiceAdapter {
 
-    public boolean isNatIdReal(String TCNO, String name, String surname, short birthYear) {
+    public boolean isRealPerson(String TCNO, String name, String surname, short birthYear) {
 
         try {
             return new KPSPublicLocator().getKPSPublicSoap().TCKimlikNoDogrula(Long.parseLong(TCNO), name, surname, birthYear);

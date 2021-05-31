@@ -3,23 +3,19 @@ package com.hrms.hw.api.controllers;
 import com.hrms.hw.business.abstracts.SystemEmployeeService;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.Result;
-import com.hrms.hw.entities.concretes.Employer;
 import com.hrms.hw.entities.concretes.SystemEmployee;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/system_employees")
 public class SystemEmployeesController {
 
     private final SystemEmployeeService systemEmployeeService;
 
-    @Autowired
-    public SystemEmployeesController(SystemEmployeeService systemEmployeeService) {
-        this.systemEmployeeService = systemEmployeeService;
-    }
 
     @GetMapping("/getall")
     public DataResult<List<SystemEmployee>> getAll(){

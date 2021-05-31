@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -24,17 +25,10 @@ public class Candidate extends User {
     private String lastName;
 
     @Column(name = "nationality_id")
+    @Size(min = 11, max = 11)
     private String nationalityId;
 
     @Column(name = "birth_year")
     private short birthYear;
-
-    public Candidate(int id, String email, String password, String firstName, String lastName, String nationalityId, short birthYear){
-        super(id,email,password);
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.nationalityId = nationalityId;
-        this.birthYear = birthYear;
-    }
 
 }

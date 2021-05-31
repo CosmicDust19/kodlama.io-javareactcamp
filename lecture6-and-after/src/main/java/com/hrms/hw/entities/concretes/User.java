@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.time.LocalDate;
 
 @Data
@@ -19,10 +20,12 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     @Column(name = "id")
     private int id;
 
     @Column(name = "email")
+    @Email
     private String email;
 
     @Column(name = "password")
@@ -32,4 +35,7 @@ public class User {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
+    public User (int id){
+        this.id = id;
+    }
 }

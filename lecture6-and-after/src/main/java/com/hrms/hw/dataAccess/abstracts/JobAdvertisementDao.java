@@ -3,10 +3,16 @@ package com.hrms.hw.dataAccess.abstracts;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
+@Transactional
+@Repository
 public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Integer> {
 
     List<JobAdvertisement> findAllByActivationStatusTrue();
@@ -15,7 +21,8 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
 
     List<JobAdvertisement> getByActivationStatusTrueAndEmployer_Id(int employerId);
 
-    @Query("Update JobAdvertisement Set activationStatus =: activationStatus where id =: jobAdvertisementId")
-    void updateActivationStatus(boolean activationStatus, int jobAdvertisementId);
+    @Modifying
+    @Query("update JobAdvertisement j set j.activationStatus = :activationStatus where j.id = :jobAdvertisementId")
+    void updateActivationStatus(@Param(value = "activationStatus") boolean activationStatus, @Param(value = "jobAdvertisementId") int jobAdvertisementId);
 
 }

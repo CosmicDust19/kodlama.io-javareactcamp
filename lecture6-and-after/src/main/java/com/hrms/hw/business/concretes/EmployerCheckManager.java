@@ -9,15 +9,20 @@ public class EmployerCheckManager implements EmployerCheckService {
 
     @Override
     public boolean areAllFieldsFilled(Employer employer) {
-        return employer.getId() != 0 && employer.getEmail() != null && employer.getPassword() != null && employer.getCompanyName() != null
-                && employer.getWebSite() != null && employer.getPhoneNumber() != null;
+        return employer.getEmail() != null && employer.getPassword() != null && employer.getCompanyName() != null
+                && employer.getWebsite() != null && employer.getPhoneNumber() != null;
     }
 
+    //not working
     @Override
-    public boolean isCompatibleWebSiteAndEmail(Employer employer){
-        // I am not sure about where the domain is :)
-        String emailDomain = employer.getEmail().split("@")[0];
-        String webSiteDomain = employer.getWebSite().split("\\.")[1];
+    public boolean isCompatibleWebSiteAndEmail(Employer employer) {
+        String[] tempArr = employer.getEmail().split("@");
+
+        //to avoid ArrayIndexOutOfBoundsException
+        if (tempArr.length < 2) return false;
+
+        String emailDomain = tempArr[1];
+        String webSiteDomain = employer.getWebsite().substring(4);
         return emailDomain.equals(webSiteDomain);
     }
 
