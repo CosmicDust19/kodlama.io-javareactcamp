@@ -5,8 +5,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -14,17 +17,22 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 
+@EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "positions")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class Position {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "positions_id_generator")
+    // i am starting the sequence from 26 because i inserted some positions to the table for the testing purposes
+    @SequenceGenerator(name = "positions_id_generator", sequenceName = "positions_id_seq", allocationSize = 1, initialValue = 26)
+    @JsonIgnore
     @Column(name = "id")
-    private int id;
+    private short id;
 
-    @Column(name = "title")
+    @NotBlank(message = "This field can't be empty.")
+    @Column(name = "title", unique = true)
     private String title;
 
     @Column(name = "detail")
@@ -35,10 +43,11 @@ public class Position {
     private List<JobAdvertisement> jobAdvertisements;
 
     @JsonIgnore
+    @CreatedDate
     @Column(name = "created_at")
     private LocalDate createdAt;
 
-    public Position(int id) {
+    public Position(short id) {
         this.id = id;
     }
 }

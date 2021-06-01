@@ -1,9 +1,8 @@
 package com.hrms.hw.api.controllers;
 
-import com.hrms.hw.business.abstracts.UserService;
+import com.hrms.hw.business.concretes.CityManager;
 import com.hrms.hw.core.utilities.results.DataResult;
-import com.hrms.hw.entities.concretes.User;
-import com.hrms.hw.entities.concretes.dtos.UserAddDto;
+import com.hrms.hw.entities.concretes.City;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,16 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users")
-public class UsersController {
+@RequestMapping("/api/cities")
+@RequiredArgsConstructor
+public class CitiesController {
 
-    private final UserService<User, UserAddDto> userService;
+    private final CityManager cityManager;
 
     @GetMapping("/getAll")
-    public DataResult<List<User>> getAll(){
-        return userService.getAll();
+    public DataResult<List<City>> getAll(){
+        return cityManager.getAll();
     }
-
 }

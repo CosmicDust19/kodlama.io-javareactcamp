@@ -1,12 +1,8 @@
 package com.hrms.hw.business.abstracts;
 
 import com.hrms.hw.entities.concretes.Employer;
-import org.springframework.stereotype.Service;
+import com.hrms.hw.entities.concretes.dtos.EmployerAddDto;
 
-@Service
-public interface EmployerCheckService {
-
-    boolean areAllFieldsFilled(Employer employer);
-
-    boolean isCompatibleWebSiteAndEmail(Employer employer);
+public interface EmployerCheckService extends UserCheckService<Employer> {
+    boolean isCompatibleWebSiteAndEmail(EmployerAddDto employerAddDto);
 }

@@ -1,10 +1,7 @@
 package com.hrms.hw.business.concretes;
 
 import com.hrms.hw.business.abstracts.JobAdvertisementService;
-import com.hrms.hw.core.utilities.results.DataResult;
-import com.hrms.hw.core.utilities.results.Result;
-import com.hrms.hw.core.utilities.results.SuccessDataResult;
-import com.hrms.hw.core.utilities.results.SuccessResult;
+import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.JobAdvertisementDao;
 import com.hrms.hw.entities.concretes.City;
 import com.hrms.hw.entities.concretes.Employer;
@@ -16,11 +13,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class JobAdvertisementManager implements JobAdvertisementService {
 
     private final JobAdvertisementDao jobAdvertisementDao;
@@ -55,10 +51,9 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public Result add(JobAdvertisementAddDto jobAdvertisementAddDto) {
         JobAdvertisement jobAdvertisement = modelMapper.map(jobAdvertisementAddDto, JobAdvertisement.class);
-        jobAdvertisement.setEmployer(new Employer(jobAdvertisementAddDto.getEmployerId()));
-        jobAdvertisement.setPosition(new Position(jobAdvertisementAddDto.getPositionId()));
-        jobAdvertisement.setCity(new City(jobAdvertisementAddDto.getCityId()));
-        jobAdvertisement.setCreatedAt(LocalDate.now());
+        jobAdvertisement.setEmployer(new Employer(jobAdvertisementAddDto.getEmployer()));
+        jobAdvertisement.setPosition(new Position(jobAdvertisementAddDto.getPosition()));
+        jobAdvertisement.setCity(new City(jobAdvertisementAddDto.getCity()));
         jobAdvertisementDao.save(jobAdvertisement);
         return new SuccessResult("Advertisement has been added successfully.");
     }
@@ -68,5 +63,4 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         jobAdvertisementDao.updateActivationStatus(activationStatus, jobAdvertisementId);
         return new SuccessResult("Advertisement's activation status has been updated successfully");
     }
-
 }

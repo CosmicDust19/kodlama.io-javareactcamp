@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -18,17 +17,16 @@ import javax.validation.constraints.Size;
 @PrimaryKeyJoinColumn(name = "candidate_id", referencedColumnName = "id")
 public class Candidate extends User {
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "nationality_id")
-    @Size(min = 11, max = 11)
+    @Column(name = "nationality_id", nullable = false, unique = true)
     private String nationalityId;
 
-    @Column(name = "birth_year")
+    @Column(name = "birth_year", nullable = false)
     private short birthYear;
 
 }

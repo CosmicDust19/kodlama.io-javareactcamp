@@ -1,9 +1,6 @@
 package com.hrms.hw.entities.concretes.dtos;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
@@ -13,25 +10,32 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class JobAdvertisementAddDto {
 
-    private int employerId;
+    @Positive(message = "Please enter a positive integer (Employer id).")
+    private int employer;
 
-    private int positionId;
+    @Positive(message = "Please enter a positive integer (Position id).")
+    private short position;
 
-    @NotBlank
+    @NotBlank(message = "This field can't be empty.")
     private String jobDescription;
 
-    private int cityId;
+    @Positive(message = "Please enter a positive integer (City id).")
+    private short city;
 
-    @PositiveOrZero
-    private double minSalary;
+    //If i do not declare this variable in a nullable type,
+    //when i execute getAll method, it can throw an error
+    //because this field may be null in the database.
+    @PositiveOrZero(message = "This field should be positive and is not required (zero will be ignored)")
+    private Integer minSalary;
 
-    @PositiveOrZero
-    private double maxSalary;
+    //The same can be said for this field.
+    @PositiveOrZero(message = "This field should be positive and is not required (zero will be ignored)")
+    private Integer maxSalary;
 
-    @Positive
+    @Positive(message = "The number of people to be recruited must be positive.")
     private short numberOfPeopleToBeHired;
 
-    @NotEmpty
-    @Future
+    @Future(message = "This field must be a date in the future.")
     private LocalDate applicationDeadline;
+
 }

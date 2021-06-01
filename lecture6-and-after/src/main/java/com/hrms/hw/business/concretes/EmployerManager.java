@@ -6,26 +6,21 @@ import com.hrms.hw.core.abstracts.EmailService;
 import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.EmployerDao;
 import com.hrms.hw.entities.concretes.Employer;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.hrms.hw.entities.concretes.dtos.EmployerAddDto;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EmployerManager implements EmployerService {
 
     private final EmployerDao employerDao;
     private final EmployerCheckService employerCheckService;
     private final EmailService emailService;
-
-    @Autowired
-    public EmployerManager(EmployerDao employerDao, EmployerCheckService employerCheckService, EmailService emailService) {
-        this.employerDao = employerDao;
-        this.employerCheckService = employerCheckService;
-        this.emailService = emailService;
-    }
+    private final ModelMapper modelMapper;
 
     @Override
     public DataResult<List<Employer>> getAll() {
@@ -33,25 +28,30 @@ public class EmployerManager implements EmployerService {
     }
 
     @Override
-    public Result add(Employer employer) {
+    public Result add(EmployerAddDto employerAddDto) {
 
-        if (!employerCheckService.areAllFieldsFilled(employer)) {
-            return new ErrorResult("There is empty fields");
-        } else if (!employerCheckService.isCompatibleWebSiteAndEmail(employer)) {
+        if (!employerCheckService.isCompatibleWebSiteAndEmail(employerAddDto)) {
             return new ErrorResult("Incompatible Web Site & E-mail!");
+        } else if (!employerAddDto.getPassword().equals(employerAddDto.getPasswordRepeat())){
+            return new ErrorResult("Password repetition mismatch");
         }
 
+        simplifyPhoneNumber(employerAddDto);
+        Employer employer = modelMapper.map(employerAddDto, Employer.class);
+        emailService.sendVerificationMail(employerAddDto.getEmail());
+
         try {
-            employer.setCreatedAt(LocalDate.now());
-            emailService.sendVerificationMail(employer.getEmail());
             employerDao.save(employer);
             return new SuccessResult("Employer Saved, your account will be available after our employees confirmed you.");
         } catch (Exception exception) {
             exception.printStackTrace();
-            return new ErrorResult("Registration Failed");
+            return new ErrorResult("An Error Has Occurred - Registration Failed");
         }
-
     }
 
-
+    public void simplifyPhoneNumber(EmployerAddDto employerAddDto){
+        String simplePhone = employerAddDto.getPhoneNumber().replaceAll("[\\s-]","");
+        if (simplePhone.length() > 11 && simplePhone.charAt(0) != '+') simplePhone = "+" + simplePhone;
+        employerAddDto.setPhoneNumber(simplePhone);
+    }
 }

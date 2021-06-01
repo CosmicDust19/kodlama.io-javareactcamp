@@ -4,18 +4,19 @@ import com.hrms.hw.business.abstracts.SystemEmployeeService;
 import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.SystemEmployeeDao;
 import com.hrms.hw.entities.concretes.SystemEmployee;
+import com.hrms.hw.entities.concretes.dtos.SystemEmployeesAddDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class SystemEmployeeManager implements SystemEmployeeService {
 
     private final SystemEmployeeDao systemEmployeeDao;
+    private final ModelMapper modelMapper;
 
     @Override
     public DataResult<List<SystemEmployee>> getAll() {
@@ -23,16 +24,14 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     }
 
     @Override
-    public Result add(SystemEmployee systemEmployee) {
-
+    public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
+        SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
         try {
-            systemEmployee.setCreatedAt(LocalDate.now());
             systemEmployeeDao.save(systemEmployee);
             return new SuccessResult("System Employee Saved");
         } catch (Exception exception){
             exception.printStackTrace();
             return new ErrorResult("Registration Failed");
         }
-
     }
 }

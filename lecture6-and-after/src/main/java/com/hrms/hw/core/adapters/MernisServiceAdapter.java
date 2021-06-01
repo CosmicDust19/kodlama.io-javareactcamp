@@ -6,10 +6,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class MernisServiceAdapter {
 
-    public boolean isRealPerson(String TCNO, String name, String surname, short birthYear) {
+    public boolean isRealPerson(String tcno, String name, String surname, short birthYear) {
 
         try {
-            return new KPSPublicLocator().getKPSPublicSoap().TCKimlikNoDogrula(Long.parseLong(TCNO), name, surname, birthYear);
+            return new KPSPublicLocator().getKPSPublicSoap().TCKimlikNoDogrula(Long.parseLong(tcno), name, surname, birthYear);
         } catch (Exception exception) {
             exception.printStackTrace();
             return false;

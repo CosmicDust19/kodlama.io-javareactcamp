@@ -2,49 +2,67 @@ package com.hrms.hw.api.controllers;
 
 import com.hrms.hw.business.abstracts.JobAdvertisementService;
 import com.hrms.hw.core.utilities.results.DataResult;
+import com.hrms.hw.core.utilities.results.ErrorDataResult;
 import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
 import com.hrms.hw.entities.concretes.dtos.JobAdvertisementAddDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping(name = "api/jobAdvertisements")
+@RequestMapping("/api/jobAdvertisements")
 public class JobAdvertisementsController {
 
     private final JobAdvertisementService jobAdvertisementService;
 
-    @GetMapping("getAll")
-    DataResult<List<JobAdvertisement>> getAll() {
+    @GetMapping("/getAll")
+    public DataResult<List<JobAdvertisement>> getAll() {
         return jobAdvertisementService.getAll();
     }
 
-    @GetMapping("getAllActives")
-    DataResult<List<JobAdvertisement>> getAllActives() {
+    @GetMapping("/getAllActives")
+    public DataResult<List<JobAdvertisement>> getAllActives() {
         return jobAdvertisementService.getAllActives();
     }
 
-    @GetMapping("getAllActivesSortedByDate")
-    DataResult<List<JobAdvertisement>> getAllActivesSortedByDate(@RequestParam int sortDirection) {
+    @GetMapping("/getAllActivesSortedByDate")
+    public DataResult<List<JobAdvertisement>> getAllActivesSortedByDate(@RequestParam int sortDirection) {
         return jobAdvertisementService.getAllActivesSortedByDate(sortDirection);
     }
 
-    @GetMapping("getByActivationStatusTrueAndEmployerId")
-    DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(@RequestParam int employerId) {
+    @GetMapping("/getByActivationStatusTrueAndEmployerId")
+    public DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(@RequestParam int employerId) {
         return jobAdvertisementService.getByActivationStatusTrueAndEmployer_Id(employerId);
     }
 
-    @PostMapping("add")
-    Result add(@RequestBody JobAdvertisementAddDto jobAdvertisementAddDto) {
-        return jobAdvertisementService.add(jobAdvertisementAddDto);
+    @PostMapping("/add")
+    public ResponseEntity<?> add(@Valid @RequestBody JobAdvertisementAddDto jobAdvertisementAddDto) {
+        return ResponseEntity.ok(jobAdvertisementService.add(jobAdvertisementAddDto));
     }
 
-    @PostMapping("updateActivationStatus")
-    Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int jobAdvertisementId) {
+    @PostMapping("/updateActivationStatus")
+    public Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int jobAdvertisementId) {
         return jobAdvertisementService.updateActivationStatus(activationStatus, jobAdvertisementId);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions){
+        Map<String,String> validationErrors = new HashMap<>();
+        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()){
+            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        return new ErrorDataResult<>("Error", validationErrors);
     }
 
 }

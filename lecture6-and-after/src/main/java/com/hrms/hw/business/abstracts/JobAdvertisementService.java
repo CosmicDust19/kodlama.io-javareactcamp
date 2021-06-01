@@ -4,11 +4,9 @@ import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
 import com.hrms.hw.entities.concretes.dtos.JobAdvertisementAddDto;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface JobAdvertisementService {
 
     DataResult<List<JobAdvertisement>> getAll();

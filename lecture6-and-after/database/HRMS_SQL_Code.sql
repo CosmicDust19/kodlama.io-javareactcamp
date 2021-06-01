@@ -4,7 +4,7 @@ CREATE SCHEMA public;
 
 CREATE TABLE public.users
 (
-    id                serial                         NOT NULL,
+    id                integer                        NOT NULL,
     email             character varying(100)         NOT NULL,
     password          character varying(100)         NOT NULL,
     is_email_verified boolean                        NOT NULL DEFAULT FALSE,
@@ -15,9 +15,9 @@ CREATE TABLE public.users
 
 CREATE TABLE public.system_employees
 (
-    system_employee_id integer                NOT NULL,
-    first_name         character varying(100) NOT NULL,
-    last_name          character varying(100) NOT NULL,
+    system_employee_id integer               NOT NULL,
+    first_name         character varying(50) NOT NULL,
+    last_name          character varying(50) NOT NULL,
     CONSTRAINT pk_system_employees PRIMARY KEY (system_employee_id),
     CONSTRAINT fk_system_employees_id_users_id FOREIGN KEY (system_employee_id)
         REFERENCES public.users (id) MATCH SIMPLE
@@ -27,11 +27,11 @@ CREATE TABLE public.system_employees
 
 CREATE TABLE public.candidates
 (
-    candidate_id   integer                NOT NULL,
-    first_name     character varying(100) NOT NULL,
-    last_name      character varying(100) NOT NULL,
-    nationality_id character varying(11)  NOT NULL,
-    birth_year     smallint               NOT NULL,
+    candidate_id   integer               NOT NULL,
+    first_name     character varying(50) NOT NULL,
+    last_name      character varying(50) NOT NULL,
+    nationality_id character varying(11) NOT NULL,
+    birth_year     smallint              NOT NULL,
     CONSTRAINT pk_candidates PRIMARY KEY (candidate_id),
     CONSTRAINT uk_candidates_nationality_id UNIQUE (nationality_id),
     CONSTRAINT fk_candidates_candidate_id_users_id FOREIGN KEY (candidate_id)
@@ -45,8 +45,10 @@ CREATE TABLE public.employers
     employer_id  integer                NOT NULL,
     company_name character varying(100) NOT NULL,
     website      character varying(200) NOT NULL,
-    phone_number character varying(15)  NOT NULL,
+    phone_number character varying(22)  NOT NULL,
     CONSTRAINT pk_employers PRIMARY KEY (employer_id),
+    CONSTRAINT uk_employers_company_name UNIQUE (company_name),
+    CONSTRAINT uk_employers_website UNIQUE (website),
     CONSTRAINT fk_employers_employer_id_users_id FOREIGN KEY (employer_id)
         REFERENCES public.users (id) MATCH SIMPLE
         ON UPDATE CASCADE
@@ -67,7 +69,7 @@ CREATE TABLE public.employers_verifications
 
 CREATE TABLE public.positions
 (
-    id         smallserial                    NOT NULL,
+    id         smallint                       NOT NULL,
     title      character varying(100)         NOT NULL,
     detail     character varying(200),
     created_at timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
@@ -77,7 +79,7 @@ CREATE TABLE public.positions
 
 CREATE TABLE public.cities
 (
-    id   smallserial           NOT NULL,
+    id   smallint              NOT NULL,
     name character varying(50) NOT NULL,
     CONSTRAINT pk_cities PRIMARY KEY (id),
     CONSTRAINT uk_cities_name UNIQUE (name)
@@ -85,19 +87,20 @@ CREATE TABLE public.cities
 
 CREATE TABLE public.job_advertisements
 (
-    id                           serial                         NOT NULL,
-    employer_id                  integer                        NOT NULL,
-    position_id                  smallint                       NOT NULL,
-    job_description              text                           NOT NULL,
-    city_id                      smallint                       NOT NULL,
-    min_salary                   double precision               NOT NULL,
-    max_salary                   double precision               NOT NULL,
-    number_of_people_to_be_hired smallint                       NOT NULL,
+    id                           integer  NOT NULL,
+    employer_id                  integer  NOT NULL,
+    position_id                  smallint NOT NULL,
+    job_description              text     NOT NULL,
+    city_id                      smallint NOT NULL,
+    min_salary                   integer  NOT NULL,
+    max_salary                   integer  NOT NULL,
+    number_of_people_to_be_hired smallint NOT NULL,
     application_deadline         date,
-    is_active                    boolean                        NOT NULL DEFAULT TRUE,
-    created_at                   timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
+    is_active                    boolean  NOT NULL              DEFAULT TRUE,
+    created_at                   timestamp(0) without time zone DEFAULT current_timestamp,
     last_modified_at             timestamp(0) without time zone,
     CONSTRAINT pk_job_advertisements PRIMARY KEY (id),
+    CONSTRAINT uk_job_advertisements_emp_pos_desc_city UNIQUE (employer_id, position_id, job_description, city_id),
     CONSTRAINT fk_job_advertisements_employer_id_employers_employer_id FOREIGN KEY (employer_id)
         REFERENCES public.employers (employer_id) MATCH SIMPLE
         ON UPDATE CASCADE

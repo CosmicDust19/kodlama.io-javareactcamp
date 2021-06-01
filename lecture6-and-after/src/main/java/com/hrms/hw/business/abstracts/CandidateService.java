@@ -1,16 +1,7 @@
 package com.hrms.hw.business.abstracts;
 
-import com.hrms.hw.core.utilities.results.DataResult;
-import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.entities.concretes.Candidate;
-import org.springframework.stereotype.Service;
+import com.hrms.hw.entities.concretes.dtos.CandidateAddDto;
 
-import java.util.List;
-
-@Service
-public interface CandidateService {
-
-    DataResult<List<Candidate>> getAll();
-
-    Result register(Candidate candidate, String passwordRepeat);
+public interface CandidateService extends UserService<Candidate, CandidateAddDto>{
 }

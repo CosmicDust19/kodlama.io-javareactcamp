@@ -22,13 +22,13 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class Employer extends User {
 
-    @Column(name = "company_name")
+    @Column(name = "company_name", nullable = false, unique = true)
     private String companyName;
 
-    @Column(name = "website")
+    @Column(name = "website", nullable = false, unique = true)
     private String website;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
     @JsonIgnore

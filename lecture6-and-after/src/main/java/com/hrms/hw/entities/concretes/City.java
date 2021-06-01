@@ -19,18 +19,20 @@ import java.util.List;
 public class City {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cities_id_generator")
+    @SequenceGenerator(name = "cities_id_generator", sequenceName = "cities_id_seq", allocationSize = 1, initialValue = 82)
+    @JsonIgnore
     @Column(name = "id")
-    private int id;
+    private short id;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
 
     @JsonIgnore
     @OneToMany(mappedBy = "city")
     private List<JobAdvertisement> jobAdvertisements;
 
-    public City(int id) {
+    public City(short id) {
         this.id = id;
     }
 
