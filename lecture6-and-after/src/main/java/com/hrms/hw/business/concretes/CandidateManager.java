@@ -35,17 +35,9 @@ public class CandidateManager implements CandidateService {
         } else if (!candidateAddDto.getPassword().equals(candidateAddDto.getPasswordRepeat())) {
             return new ErrorResult("Password repetition mismatch.");
         }
-
         Candidate candidate = modelMapper.map(candidateAddDto, Candidate.class);
         emailService.sendVerificationMail(candidateAddDto.getEmail());
-
-        try {
-            candidateDao.save(candidate);
-            return new SuccessResult("Email verified...  Candidate Saved.");
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            return new ErrorResult("An Error Has Occurred - Registration Failed");
-        }
-
+        candidateDao.save(candidate);
+        return new SuccessResult("Email verified...  Candidate Saved.");
     }
 }

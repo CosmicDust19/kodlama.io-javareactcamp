@@ -28,4 +28,5 @@ public class CandidateAddDto extends UserAddDto{
     @Min(value = 1900, message = "Please enter your birth year properly")
     @Max(value = 2030, message = "Please enter your birth year properly")
     private short birthYear;
+
 }

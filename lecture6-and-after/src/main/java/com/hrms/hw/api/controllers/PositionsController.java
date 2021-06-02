@@ -24,20 +24,20 @@ public class PositionsController {
     private final PositionService positionService;
 
     @GetMapping("/getAll")
-    public DataResult<List<Position>> getAll(){
+    public DataResult<List<Position>> getAll() {
         return positionService.getAll();
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody Position position){
+    public ResponseEntity<?> add(@Valid @RequestBody Position position) {
         return ResponseEntity.ok(positionService.add(position));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions){
-        Map<String,String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()){
+    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
+        Map<String, String> validationErrors = new HashMap<>();
+        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
             validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
         return new ErrorDataResult<>("Error", validationErrors);

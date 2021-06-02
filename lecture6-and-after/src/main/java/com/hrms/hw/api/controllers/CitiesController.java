@@ -18,7 +18,7 @@ public class CitiesController {
     private final CityManager cityManager;
 
     @GetMapping("/getAll")
-    public DataResult<List<City>> getAll(){
+    public DataResult<List<City>> getAll() {
         return cityManager.getAll();
     }
 }

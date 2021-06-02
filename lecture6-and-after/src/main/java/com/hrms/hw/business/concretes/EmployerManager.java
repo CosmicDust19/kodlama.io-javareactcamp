@@ -29,24 +29,16 @@ public class EmployerManager implements EmployerService {
 
     @Override
     public Result add(EmployerAddDto employerAddDto) {
-
         if (!employerCheckService.isCompatibleWebSiteAndEmail(employerAddDto)) {
             return new ErrorResult("Incompatible Web Site & E-mail!");
         } else if (!employerAddDto.getPassword().equals(employerAddDto.getPasswordRepeat())){
             return new ErrorResult("Password repetition mismatch");
         }
-
         simplifyPhoneNumber(employerAddDto);
         Employer employer = modelMapper.map(employerAddDto, Employer.class);
         emailService.sendVerificationMail(employerAddDto.getEmail());
-
-        try {
-            employerDao.save(employer);
-            return new SuccessResult("Employer Saved, your account will be available after our employees confirmed you.");
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            return new ErrorResult("An Error Has Occurred - Registration Failed");
-        }
+        employerDao.save(employer);
+        return new SuccessResult("Employer Saved, your account will be available after our employees confirmed you.");
     }
 
     public void simplifyPhoneNumber(EmployerAddDto employerAddDto){

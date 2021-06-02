@@ -1,5 +1,6 @@
 package com.hrms.hw.entities.concretes;
 
+import com.hrms.hw.core.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "system_employees")
-@PrimaryKeyJoinColumn(name = "system_employee_id", referencedColumnName = "id")
+@PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
 public class SystemEmployee extends User {
 
     @Column(name = "first_name")

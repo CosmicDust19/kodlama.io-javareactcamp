@@ -1,6 +1,7 @@
 package com.hrms.hw.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.AssertTrue;
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +19,7 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "job_advertisements")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class JobAdvertisement {
 
     @Id
@@ -61,10 +61,10 @@ public class JobAdvertisement {
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private LocalDate createdAt;
 
     @LastModifiedDate
     @Column(name = "last_modified_at")
-    private Date lastModifiedAt;
+    private LocalDate lastModifiedAt;
 
 }

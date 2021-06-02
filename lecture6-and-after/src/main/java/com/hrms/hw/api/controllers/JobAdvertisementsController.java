@@ -46,7 +46,7 @@ public class JobAdvertisementsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody JobAdvertisementAddDto jobAdvertisementAddDto) {
+    public ResponseEntity<?> add(@RequestBody @Valid JobAdvertisementAddDto jobAdvertisementAddDto) {
         return ResponseEntity.ok(jobAdvertisementService.add(jobAdvertisementAddDto));
     }
 
@@ -57,9 +57,9 @@ public class JobAdvertisementsController {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions){
-        Map<String,String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()){
+    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
+        Map<String, String> validationErrors = new HashMap<>();
+        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
             validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
         return new ErrorDataResult<>("Error", validationErrors);

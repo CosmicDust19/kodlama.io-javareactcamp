@@ -22,12 +22,7 @@ public class PositionManager implements PositionService {
 
     @Override
     public Result add(Position position) {
-        try {
-            positionDao.save(position);
-            return new SuccessResult("Position Saved");
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            return new ErrorResult("Registration Failed");
-        }
+        positionDao.save(position);
+        return new SuccessResult("Position Saved");
     }
 }

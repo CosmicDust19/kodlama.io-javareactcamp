@@ -25,20 +25,20 @@ public class SystemEmployeesController {
     private final SystemEmployeeService systemEmployeeService;
 
     @GetMapping("/getAll")
-    public DataResult<List<SystemEmployee>> getAll(){
+    public DataResult<List<SystemEmployee>> getAll() {
         return systemEmployeeService.getAll();
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody SystemEmployeesAddDto systemEmployeesAddDto){
+    public ResponseEntity<?> add(@Valid @RequestBody SystemEmployeesAddDto systemEmployeesAddDto) {
         return ResponseEntity.ok(systemEmployeeService.add(systemEmployeesAddDto));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions){
-        Map<String,String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()){
+    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
+        Map<String, String> validationErrors = new HashMap<>();
+        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
             validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
         return new ErrorDataResult<>("Error", validationErrors);

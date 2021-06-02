@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 @Data
@@ -25,7 +27,9 @@ public class City {
     @Column(name = "id")
     private short id;
 
-    @Column(name = "name", unique = true)
+    @NotBlank(message = "This field can't be empty.")
+    @Pattern(regexp = "\\w+", message = "Please enter city name properly.")
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @JsonIgnore

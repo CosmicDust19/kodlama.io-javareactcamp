@@ -2,6 +2,7 @@ package com.hrms.hw.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hrms.hw.core.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "employers")
-@PrimaryKeyJoinColumn(name = "employer_id", referencedColumnName = "id")
+@PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class Employer extends User {
 
@@ -30,6 +31,10 @@ public class Employer extends User {
 
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
+
+    @JsonIgnore
+    @Column(name = "is_system_verified", nullable = false)
+    private boolean isSystemVerified;
 
     @JsonIgnore
     @OneToMany(mappedBy = "employer")
