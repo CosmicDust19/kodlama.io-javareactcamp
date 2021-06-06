@@ -1,24 +1,45 @@
 package com.hrms.hw.api.controllers;
 
-import com.hrms.hw.business.concretes.CityManager;
+import com.hrms.hw.business.abstracts.CityService;
 import com.hrms.hw.core.utilities.results.DataResult;
+import com.hrms.hw.core.utilities.results.ErrorDataResult;
 import com.hrms.hw.entities.concretes.City;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/cities")
 @RequiredArgsConstructor
 public class CitiesController {
 
-    private final CityManager cityManager;
+    private final CityService cityService;
 
     @GetMapping("/getAll")
     public DataResult<List<City>> getAll() {
-        return cityManager.getAll();
+        return cityService.getAll();
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> add(@Valid @RequestBody City city) {
+        return ResponseEntity.ok(cityService.add(city));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
+        Map<String, String> validationErrors = new HashMap<>();
+        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
+            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        }
+        return new ErrorDataResult<>("Error", validationErrors);
     }
 }

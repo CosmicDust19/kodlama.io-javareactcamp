@@ -6,8 +6,8 @@ import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.core.utilities.results.SuccessDataResult;
 import com.hrms.hw.core.utilities.results.SuccessResult;
 import com.hrms.hw.dataAccess.abstracts.CandidateCvDao;
-import com.hrms.hw.entities.concretes.CandidateCv;
-import com.hrms.hw.entities.concretes.dtos.CandidateCvAddDto;
+import com.hrms.hw.entities.concretes.*;
+import com.hrms.hw.entities.concretes.dtos.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,15 @@ public class CandidateCvManager implements CandidateCvService {
     @Override
     public Result add(CandidateCvAddDto candidateCvAddDto) {
         CandidateCv candidateCv = modelMapper.map(candidateCvAddDto, CandidateCv.class);
-        candidateCv.setCandidateId(candidateCvAddDto.getCandidateId());
+
+        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getCandidate().getId());
+        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getPosition().getId());
+        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getQuitYear());
+        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getStartYear());
+        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getWorkPlace());
+
         candidateCvDao.save(candidateCv);
         return new SuccessResult("Success");
     }
+
 }

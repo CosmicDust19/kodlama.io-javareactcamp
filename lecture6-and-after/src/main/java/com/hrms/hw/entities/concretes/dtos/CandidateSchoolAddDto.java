@@ -13,20 +13,17 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 public class CandidateSchoolAddDto {
 
-    @Positive
     private int candidateId;
 
-    @Positive
     private int schoolId;
 
-    @Positive
     private short departmentId;
 
-    @Min(value = 1900)
-    @Max(value = 2030)
+    @Min(value = 1900, message = "invalid school start year")
+    @Max(value = 2030, message = "invalid school start year")
     private short schoolStartYear;
 
-    @Min(value = 1900)
-    @Max(value = 2030)
-    private short graduationYear;
+    @Min(value = 1900, message = "invalid graduation year")
+    @Max(value = 2030, message = "invalid graduation year")
+    private Short graduationYear;
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
@@ -12,17 +13,22 @@ import java.util.List;
 @NoArgsConstructor
 public class CandidateCvAddDto {
 
-    @Positive(message = "Please enter a positive integer (Candidate id).")
     private int candidateId;
+
+    private String title;
 
     private String coverLetter;
 
+    @Valid
     private List<CandidateJobExperienceAddDto> candidateJobExperiences;
 
+    @Valid
     private List<CandidateLanguageAddDto> candidateLanguages;
 
+    @Valid
     private List<CandidateSchoolAddDto> candidateSchools;
 
-    private List<CandidateSoftwareKnowledgeAddDto> candidateSoftwareKnowledgeList;
+    @Valid
+    private List<CandidateSkillAddDto> candidateSkills;
 
 }

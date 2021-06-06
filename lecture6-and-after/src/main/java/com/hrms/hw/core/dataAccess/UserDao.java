@@ -1,4 +1,4 @@
-package com.hrms.hw.dataAccess.abstracts;
+package com.hrms.hw.core.dataAccess;
 
 
 import com.hrms.hw.core.entities.User;

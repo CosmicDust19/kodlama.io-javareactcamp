@@ -37,7 +37,6 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
     @Override
     public Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto) {
         CandidateJobExperience candidateJobExperience = modelMapper.map(candidateJobExperienceAddDto, CandidateJobExperience.class);
-        candidateJobExperience.setCandidateIdPositionId(candidateJobExperienceAddDto.getCandidateId(), candidateJobExperienceAddDto.getPositionId());
         candidateJobExperienceDao.save(candidateJobExperience);
         return new SuccessResult("Success");
     }

@@ -36,8 +36,6 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     @Override
     public Result add(CandidateSchoolAddDto candidateSchoolAddDto) {
         CandidateSchool candidateSchool = modelMapper.map(candidateSchoolAddDto, CandidateSchool.class);
-        candidateSchool.setCandidateIdSchoolIdDepartmentId(candidateSchoolAddDto.getCandidateId(),
-                candidateSchoolAddDto.getSchoolId(), candidateSchoolAddDto.getDepartmentId());
         candidateSchoolDao.save(candidateSchool);
         return new SuccessResult("Success");
     }

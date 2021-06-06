@@ -1,6 +1,6 @@
 package com.hrms.hw.api.controllers;
 
-import com.hrms.hw.business.abstracts.UserService;
+import com.hrms.hw.core.business.UserService;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.entities.User;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
 package com.hrms.hw.entities.concretes.dtos;
 
+import com.hrms.hw.core.entities.UserAddDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,13 +13,13 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SystemEmployeesAddDto extends UserAddDto{
+public class SystemEmployeesAddDto extends UserAddDto {
 
-    @NotBlank(message = "This field can't be empty.")
-    @Size(min = 2, max = 50, message = "Please enter your real first name.")
+    @NotBlank(message = "cannot be empty")
+    @Size(min = 2, max = 50, message = "invalid first name")
     private String firstName;
 
-    @NotBlank(message = "This field can't be empty.")
-    @Size(min = 2, max = 50, message = "Please enter your real last name.")
+    @NotBlank(message = "cannot be empty")
+    @Size(min = 2, max = 50, message = "invalid last name")
     private String lastName;
 }

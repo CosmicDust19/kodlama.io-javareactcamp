@@ -12,12 +12,10 @@ import javax.validation.constraints.Positive;
 @NoArgsConstructor
 public class CandidateLanguageAddDto {
 
-    @Positive(message = "Please enter a positive integer (CV id).")
     private int candidateId;
 
-    @Positive(message = "Please enter a positive integer (Language id).")
     private short languageId;
 
-    @Pattern(regexp = "[ABC][12]", message = "Please enter a english level according to the common european framework (A1, A2 etc.)")
+    @Pattern(regexp = "[ABC][12]", message = "not a english level according to the common european framework (A1, A2 etc.)")
     private String languageLevel;
 }

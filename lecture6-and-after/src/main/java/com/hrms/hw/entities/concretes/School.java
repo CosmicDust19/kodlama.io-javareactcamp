@@ -24,12 +24,8 @@ public class School {
     @Column(name = "id")
     private int id;
 
-    @NotBlank(message = "This field can't be empty.")
-    @Pattern(regexp = "\\w+", message = "Please enter the school name properly.")
+    @NotBlank(message = "cannot be empty.")
+    @Pattern(regexp = "\\w+", message = "invalid school name")
     @Column(name = "name", nullable = false, unique = true)
     private String name;
-
-    public School(int id) {
-        this.id = id;
-    }
 }

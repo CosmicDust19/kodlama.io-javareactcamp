@@ -1,10 +1,9 @@
 package com.hrms.hw.api.controllers;
 
-import com.hrms.hw.business.abstracts.CandidateSoftwareKnowledgeService;
+import com.hrms.hw.business.abstracts.SkillService;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.ErrorDataResult;
-import com.hrms.hw.entities.concretes.CandidateSoftwareKnowledge;
-import com.hrms.hw.entities.concretes.dtos.CandidateSoftwareKnowledgeAddDto;
+import com.hrms.hw.entities.concretes.Skill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +17,20 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/cvsSoftwareKnowledge")
+@RequestMapping("/api/softwareKnowledge")
 @RequiredArgsConstructor
-public class CandidateSoftwareKnowledgeController {
+public class SkillsController {
 
-    private final CandidateSoftwareKnowledgeService candidateSoftwareKnowledgeService;
+    private final SkillService skillService;
 
     @GetMapping("/getAll")
-    public DataResult<List<CandidateSoftwareKnowledge>> getAll() {
-        return candidateSoftwareKnowledgeService.getAll();
+    public DataResult<List<Skill>> getAll() {
+        return skillService.getAll();
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody CandidateSoftwareKnowledgeAddDto candidateSoftwareKnowledgeAddDto) {
-        return ResponseEntity.ok(candidateSoftwareKnowledgeService.add(candidateSoftwareKnowledgeAddDto));
+    public ResponseEntity<?> add(@Valid @RequestBody Skill skill) {
+        return ResponseEntity.ok(skillService.add(skill));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

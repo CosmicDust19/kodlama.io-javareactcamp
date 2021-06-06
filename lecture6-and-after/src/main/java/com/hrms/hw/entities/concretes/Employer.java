@@ -34,13 +34,10 @@ public class Employer extends User {
 
     @JsonIgnore
     @Column(name = "is_system_verified", nullable = false)
-    private boolean isSystemVerified;
+    private boolean isSystemVerified = false;
 
     @JsonIgnore
     @OneToMany(mappedBy = "employer")
     private List<JobAdvertisement> jobAdvertisements;
 
-    public Employer(int id) {
-        super.setId(id);
-    }
 }

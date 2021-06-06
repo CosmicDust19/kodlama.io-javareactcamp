@@ -1,10 +1,10 @@
 package com.hrms.hw.api.controllers;
 
-import com.hrms.hw.business.abstracts.CandidateCvService;
+import com.hrms.hw.business.abstracts.CandidateSkillService;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.ErrorDataResult;
-import com.hrms.hw.entities.concretes.CandidateCv;
-import com.hrms.hw.entities.concretes.dtos.*;
+import com.hrms.hw.entities.concretes.CandidateSkill;
+import com.hrms.hw.entities.concretes.dtos.CandidateSkillAddDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +18,20 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/cvs")
+@RequestMapping("/api/cvsSoftwareKnowledge")
 @RequiredArgsConstructor
-public class CandidateCvsController {
+public class CandidateSkillsController {
 
-    private final CandidateCvService candidateCvService;
+    private final CandidateSkillService candidateSkillService;
 
     @GetMapping("/getAll")
-    public DataResult<List<CandidateCv>> getAll() {
-        return candidateCvService.getAll();
+    public DataResult<List<CandidateSkill>> getAll() {
+        return candidateSkillService.getAll();
     }
 
-    @PostMapping(value = "/add")
-    public ResponseEntity<?> add(@Valid @RequestBody CandidateCvAddDto candidateCvAddDto) {
-        return ResponseEntity.ok(candidateCvService.add(candidateCvAddDto));
+    @PostMapping("/add")
+    public ResponseEntity<?> add(@Valid @RequestBody CandidateSkillAddDto candidateSkillAddDto) {
+        return ResponseEntity.ok(candidateSkillService.add(candidateSkillAddDto));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

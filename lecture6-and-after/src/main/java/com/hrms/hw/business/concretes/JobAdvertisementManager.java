@@ -3,10 +3,7 @@ package com.hrms.hw.business.concretes;
 import com.hrms.hw.business.abstracts.JobAdvertisementService;
 import com.hrms.hw.core.utilities.results.*;
 import com.hrms.hw.dataAccess.abstracts.JobAdvertisementDao;
-import com.hrms.hw.entities.concretes.City;
-import com.hrms.hw.entities.concretes.Employer;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
-import com.hrms.hw.entities.concretes.Position;
 import com.hrms.hw.entities.concretes.dtos.JobAdvertisementAddDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -51,9 +48,6 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public Result add(JobAdvertisementAddDto jobAdvertisementAddDto) {
         JobAdvertisement jobAdvertisement = modelMapper.map(jobAdvertisementAddDto, JobAdvertisement.class);
-        jobAdvertisement.setEmployer(new Employer(jobAdvertisementAddDto.getEmployer()));
-        jobAdvertisement.setPosition(new Position(jobAdvertisementAddDto.getPosition()));
-        jobAdvertisement.setCity(new City(jobAdvertisementAddDto.getCity()));
         jobAdvertisementDao.save(jobAdvertisement);
         return new SuccessResult("Advertisement has been added successfully.");
     }

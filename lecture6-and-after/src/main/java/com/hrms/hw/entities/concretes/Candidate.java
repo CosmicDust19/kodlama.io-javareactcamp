@@ -54,9 +54,6 @@ public class Candidate extends User {
     private List<CandidateSchool> candidateSchools;
 
     @OneToMany(mappedBy = "candidate")
-    private List<CandidateSoftwareKnowledge> candidateSoftwareKnowledgeList;
+    private List<CandidateSkill> candidateSkillList;
 
-    public Candidate(int id) {
-        super(id);
-    }
 }

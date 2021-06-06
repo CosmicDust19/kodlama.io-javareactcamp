@@ -18,14 +18,14 @@ import java.time.LocalDate;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "job_advertisements")
+@Table(name = "job_advertisements",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"employer_id", "position_id", "job_description", "city_id"})})
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class JobAdvertisement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "job_advertisements_id_generator")
     @SequenceGenerator(name = "job_advertisements_id_generator", sequenceName = "job_advertisements_id_seq", allocationSize = 1)
-    @JsonIgnore
     @Column(name = "id")
     private int id;
 
@@ -33,14 +33,14 @@ public class JobAdvertisement {
     @JoinColumn(name = "employer_id", nullable = false)
     private Employer employer;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "position_id", nullable = false)
     private Position position;
 
     @Column(name = "job_description", nullable = false)
     private String jobDescription;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
 

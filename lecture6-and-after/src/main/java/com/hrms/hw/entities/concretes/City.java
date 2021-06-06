@@ -27,17 +27,13 @@ public class City {
     @Column(name = "id")
     private short id;
 
-    @NotBlank(message = "This field can't be empty.")
-    @Pattern(regexp = "\\w+", message = "Please enter city name properly.")
+    @NotBlank(message = "cannot be empty")
+    @Pattern(regexp = "\\w+", message = "invalid city name")
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @JsonIgnore
     @OneToMany(mappedBy = "city")
     private List<JobAdvertisement> jobAdvertisements;
-
-    public City(short id) {
-        this.id = id;
-    }
 
 }

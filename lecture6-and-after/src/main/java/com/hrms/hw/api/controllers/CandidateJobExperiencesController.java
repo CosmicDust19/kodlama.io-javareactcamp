@@ -29,6 +29,11 @@ public class CandidateJobExperiencesController {
         return candidateJobExperienceService.getAll();
     }
 
+    @GetMapping("/getAllSortedDesc")
+    public DataResult<List<CandidateJobExperience>> getAllSortedDesc() {
+        return candidateJobExperienceService.getAllSortedDesc();
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateJobExperienceAddDto candidateJobExperienceAddDto) {
         return ResponseEntity.ok(candidateJobExperienceService.add(candidateJobExperienceAddDto));

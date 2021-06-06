@@ -1,9 +1,9 @@
 package com.hrms.hw.api.controllers;
 
-import com.hrms.hw.business.abstracts.SoftwareKnowledgeService;
+import com.hrms.hw.business.abstracts.DepartmentService;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.ErrorDataResult;
-import com.hrms.hw.entities.concretes.SoftwareKnowledge;
+import com.hrms.hw.entities.concretes.Department;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +17,20 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/softwareKnowledge")
+@RequestMapping("/api/departments")
 @RequiredArgsConstructor
-public class SoftwareKnowledgeController {
+public class DepartmentsController {
 
-    private final SoftwareKnowledgeService softwareKnowledgeService;
+    private final DepartmentService departmentService;
 
     @GetMapping("/getAll")
-    public DataResult<List<SoftwareKnowledge>> getAll() {
-        return softwareKnowledgeService.getAll();
+    public DataResult<List<Department>> getAll() {
+        return departmentService.getAll();
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody SoftwareKnowledge softwareKnowledge) {
-        return ResponseEntity.ok(softwareKnowledgeService.add(softwareKnowledge));
+    public ResponseEntity<?> add(@Valid @RequestBody Department department) {
+        return ResponseEntity.ok(departmentService.add(department));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -1,5 +1,6 @@
 package com.hrms.hw.business.abstracts;
 
+import com.hrms.hw.core.business.UserCheckService;
 import com.hrms.hw.entities.concretes.Employer;
 import com.hrms.hw.entities.concretes.dtos.EmployerAddDto;
 

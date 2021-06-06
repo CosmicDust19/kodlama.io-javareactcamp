@@ -30,7 +30,6 @@ public class CandidateLanguageManager implements CandidateLanguageService {
     @Override
     public Result add(CandidateLanguageAddDto candidateLanguageAddDto) {
         CandidateLanguage candidateLanguage = modelMapper.map(candidateLanguageAddDto, CandidateLanguage.class);
-        candidateLanguage.setCandidateIdLanguageId(candidateLanguageAddDto.getCandidateId(), candidateLanguageAddDto.getLanguageId());
         candidateLanguageDao.save(candidateLanguage);
         return new SuccessResult("Success");
     }

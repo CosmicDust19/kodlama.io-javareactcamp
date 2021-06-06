@@ -18,7 +18,6 @@ public class CandidateImage {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidates_images_id_generator")
     @SequenceGenerator(name = "candidates_images_id_generator", sequenceName = "candidates_images_id_seq", allocationSize = 1)
-    @JsonIgnore
     @Column(name = "id")
     private int id;
 
@@ -26,10 +25,7 @@ public class CandidateImage {
     @JoinColumn(name = "candidate_id", nullable = false)
     private Candidate candidate;
 
+    @JsonIgnore
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
-
-    public void setCandidateId(int candidateId){
-        this.candidate.setId(candidateId);
-    }
 }

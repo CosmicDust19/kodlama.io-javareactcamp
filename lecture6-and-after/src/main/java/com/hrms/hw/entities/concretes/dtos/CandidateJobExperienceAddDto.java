@@ -11,21 +11,19 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class CandidateJobExperienceAddDto {
 
-    @Positive(message = "Please enter a positive integer (CV id).")
     private int candidateId;
 
-    @NotBlank(message = "This field can't be empty.")
-    @Size(min = 2, max = 100, message = "Please enter your real workplace.")
+    @NotBlank(message = "cannot be empty")
+    @Size(min = 2, max = 100, message = "invalid workplace")
     private String workPlace;
 
-    @Positive(message = "Please enter a positive integer (Position id).")
     private short positionId;
 
-    @Min(value = 1900, message = "Please enter your birth year properly")
-    @Max(value = 2030, message = "Please enter your birth year properly")
+    @Min(value = 1900, message = "invalid start year")
+    @Max(value = 2030, message = "invalid start year")
     private short startYear;
 
-    @Min(value = 1900, message = "Please enter your birth year properly")
-    @Max(value = 2030, message = "Please enter your birth year properly")
+    @Min(value = 1900, message = "invalid quit year")
+    @Max(value = 2030, message = "invalid quit year")
     private Short quitYear;
 }

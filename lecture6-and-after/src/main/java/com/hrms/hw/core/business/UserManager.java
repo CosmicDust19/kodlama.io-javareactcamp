@@ -1,12 +1,9 @@
-package com.hrms.hw.business.concretes;
+package com.hrms.hw.core.business;
 
-import com.hrms.hw.business.abstracts.UserService;
 import com.hrms.hw.core.utilities.results.DataResult;
-import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.core.utilities.results.SuccessDataResult;
-import com.hrms.hw.dataAccess.abstracts.UserDao;
+import com.hrms.hw.core.dataAccess.UserDao;
 import com.hrms.hw.core.entities.User;
-import com.hrms.hw.entities.concretes.dtos.UserAddDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -10,32 +10,29 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class JobAdvertisementAddDto {
 
-    @Positive(message = "Please enter a positive integer (Employer id).")
-    private int employer;
+    private int employerId;
 
-    @Positive(message = "Please enter a positive integer (Position id).")
-    private short position;
+    private short positionId;
 
-    @NotBlank(message = "This field can't be empty.")
+    @NotBlank(message = "cannot be empty")
     private String jobDescription;
 
-    @Positive(message = "Please enter a positive integer (City id).")
-    private short city;
+    private short cityId;
 
     //If i do not declare this variable in a nullable type,
     //when i execute getAll method, it can throw an error
     //because this field may be null in the database.
-    @PositiveOrZero(message = "This field should be positive and is not required (zero will be ignored)")
+    @PositiveOrZero(message = "not a positive integer")
     private Integer minSalary;
 
     //The same can be said for this field.
-    @PositiveOrZero(message = "This field should be positive and is not required (zero will be ignored)")
+    @PositiveOrZero(message = "not a positive integer")
     private Integer maxSalary;
 
-    @Positive(message = "The number of people to be recruited must be positive.")
+    @Positive(message = "not a positive integer")
     private short numberOfPeopleToBeHired;
 
-    @Future(message = "This field must be a date in the future.")
+    @Future(message = "not a date in the future")
     private LocalDate applicationDeadline;
 
 }

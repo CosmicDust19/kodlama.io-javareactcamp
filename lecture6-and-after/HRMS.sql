@@ -26,12 +26,12 @@ CREATE TABLE public.languages
     CONSTRAINT uk_languages_name UNIQUE (name)
 );
 
-CREATE TABLE public.software_knowledge
+CREATE TABLE public.skills
 (
     id   smallint               NOT NULL,
     name character varying(100) NOT NULL,
-    CONSTRAINT pk_software_knowledge PRIMARY KEY (id),
-    CONSTRAINT uk_software_knowledge_name UNIQUE (name)
+    CONSTRAINT pk_skills PRIMARY KEY (id),
+    CONSTRAINT uk_skills_name UNIQUE (name)
 );
 
 CREATE TABLE public.schools
@@ -68,7 +68,7 @@ CREATE TABLE public.system_employees
     first_name character varying(50) NOT NULL,
     last_name  character varying(50) NOT NULL,
     CONSTRAINT pk_system_employees PRIMARY KEY (user_id),
-    CONSTRAINT fk_system_employees_id_users_id FOREIGN KEY (user_id)
+    CONSTRAINT fk_system_employees_user_id_users_id FOREIGN KEY (user_id)
         REFERENCES public.users (id)
         ON DELETE CASCADE
 );
@@ -84,9 +84,26 @@ CREATE TABLE public.candidates
     linkedin_account_link char varying(100),
     CONSTRAINT pk_candidates PRIMARY KEY (user_id),
     CONSTRAINT uk_candidates_nationality_id UNIQUE (nationality_id),
-    CONSTRAINT fk_candidates_candidate_id_users_id FOREIGN KEY (user_id)
+    CONSTRAINT fk_candidates_user_id_users_id FOREIGN KEY (user_id)
         REFERENCES public.users (id)
         ON DELETE CASCADE
+);
+
+CREATE TABLE public.candidates_job_experiences
+(
+    id           integer                NOT NULL,
+    candidate_id integer                NOT NULL,
+    workplace    character varying(100) NOT NULL,
+    position_id  smallint               NOT NULL,
+    start_year   smallint               NOT NULL,
+    quit_year    smallint,
+    CONSTRAINT pk_candidates_job_experiences PRIMARY KEY (id),
+    CONSTRAINT uk_candidates_job_experiences_candidate_workplace_position UNIQUE (candidate_id, workplace, position_id),
+    CONSTRAINT fk_candidates_job_experiences_candidate_id FOREIGN KEY (candidate_id)
+        REFERENCES public.candidates (user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_candidates_job_experiences_position_id FOREIGN KEY (position_id)
+        REFERENCES public.positions (id)
 );
 
 CREATE TABLE public.candidates_schools
@@ -120,35 +137,18 @@ CREATE TABLE public.candidates_languages
         REFERENCES public.languages (id)
 );
 
-CREATE TABLE public.candidates_software_knowledge
+CREATE TABLE public.candidates_skills
 (
-    id                    integer  NOT NULL,
-    candidates_id         integer  NOT NULL,
-    software_knowledge_id smallint NOT NULL,
-    CONSTRAINT pk_candidates_software_knowledge PRIMARY KEY (id),
-    CONSTRAINT uk_candidates_software_knowledge_candidates_sk UNIQUE (candidates_id, software_knowledge_id),
-    CONSTRAINT fk_candidates_software_knowledge_candidates_id FOREIGN KEY (candidates_id)
+    id           integer  NOT NULL,
+    candidate_id integer  NOT NULL,
+    skill_id     smallint NOT NULL,
+    CONSTRAINT pk_candidates_skills PRIMARY KEY (id),
+    CONSTRAINT uk_candidates_skills_candidate_skill UNIQUE (candidate_id, skill_id),
+    CONSTRAINT fk_candidates_skills_candidates_id FOREIGN KEY (candidate_id)
         REFERENCES public.candidates (user_id)
         ON DELETE CASCADE,
-    CONSTRAINT fk_candidates_sk_sk_id FOREIGN KEY (software_knowledge_id)
-        REFERENCES public.software_knowledge (id)
-);
-
-CREATE TABLE public.candidates_job_experiences
-(
-    id           integer                NOT NULL,
-    candidate_id integer                NOT NULL,
-    workplace    character varying(100) NOT NULL,
-    position_id  smallint               NOT NULL,
-    start_year   smallint               NOT NULL,
-    quit_year    smallint,
-    CONSTRAINT pk_candidates_job_experiences PRIMARY KEY (id),
-    CONSTRAINT uk_candidates_job_experiences_candidate_workplace_position UNIQUE (candidate_id, workplace, position_id),
-    CONSTRAINT fk_candidates_job_experiences_candidate_id FOREIGN KEY (candidate_id)
-        REFERENCES public.candidates (user_id)
-        ON DELETE CASCADE,
-    CONSTRAINT fk_candidates_job_experiences_position_id FOREIGN KEY (position_id)
-        REFERENCES public.positions (id)
+    CONSTRAINT fk_candidates_skills_id FOREIGN KEY (skill_id)
+        REFERENCES public.skills (id)
 );
 
 CREATE TABLE public.candidates_images
@@ -165,11 +165,13 @@ CREATE TABLE public.candidates_images
 CREATE TABLE public.candidates_cvs
 (
     id               integer                        NOT NULL,
+    title            char varying(50)               NOT NULL,
     candidate_id     integer                        NOT NULL,
-    cover_letter     char varying(200)              NOT NULL,
+    cover_letter     char varying(200),
     created_at       timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
     last_modified_at timestamp(0) without time zone,
     CONSTRAINT pk_candidates_cvs PRIMARY KEY (id),
+    CONSTRAINT uk_candidates_cvs_title UNIQUE (title),
     CONSTRAINT fk_candidates_cvs_candidate_id FOREIGN KEY (candidate_id)
         REFERENCES public.candidates (user_id)
         ON DELETE CASCADE
@@ -211,16 +213,16 @@ CREATE TABLE public.candidates_cvs_job_experiences
         REFERENCES public.candidates_job_experiences (id)
 );
 
-CREATE TABLE public.candidates_cvs_software_knowledge
+CREATE TABLE public.candidates_cvs_skills
 (
-    cv_id            integer NOT NULL,
-    candidates_sk_id integer NOT NULL,
-    CONSTRAINT pk_candidates_cvs_software_knowledge PRIMARY KEY (cv_id, candidates_sk_id),
-    CONSTRAINT fk_candidates_cvs_software_knowledge_cv_id FOREIGN KEY (cv_id)
+    cv_id              integer NOT NULL,
+    candidate_skill_id integer NOT NULL,
+    CONSTRAINT pk_candidates_cvs_skills PRIMARY KEY (cv_id, candidate_skill_id),
+    CONSTRAINT fk_candidates_cvs_skills_cv_id FOREIGN KEY (cv_id)
         REFERENCES public.candidates_cvs (id)
         ON DELETE CASCADE,
-    CONSTRAINT fk_candidates_cvs_software_knowledge_candidates_sk_id FOREIGN KEY (candidates_sk_id)
-        REFERENCES public.candidates_software_knowledge (id)
+    CONSTRAINT fk_candidates_cvs_skills_candidates_sk_id FOREIGN KEY (candidate_skill_id)
+        REFERENCES public.candidates_skills (id)
 );
 
 CREATE TABLE public.employers
@@ -263,110 +265,161 @@ CREATE TABLE public.job_advertisements
         REFERENCES public.positions (id)
 );
 
+INSERT INTO languages
+VALUES (1, 'Arabic'),
+       (2, 'Azerbaijani'),
+       (3, 'Bengali'),
+       (4, 'Chinese'),
+       (5, 'Czech'),
+       (6, 'Dutch'),
+       (7, 'English'),
+       (8, 'Filipino'),
+       (9, 'French'),
+       (10, 'German'),
+       (11, 'Greek'),
+       (12, 'Hindi'),
+       (13, 'Hungarian'),
+       (14, 'Indonesian'),
+       (15, 'Italian'),
+       (16, 'Japanese'),
+       (17, 'Kazakh'),
+       (18, 'Korean'),
+       (19, 'Polish'),
+       (20, 'Portuguese'),
+       (21, 'Romanian'),
+       (22, 'Russian'),
+       (23, 'Spanish'),
+       (24, 'Swedish'),
+       (25, 'Turkish'),
+       (26, 'Ukrainian'),
+       (27, 'Urdu'),
+       (28, 'Uzbek'),
+       (29, 'Vietnamese');
+
+INSERT INTO skills
+VALUES (1, 'Office suites'),
+       (2, 'Python'),
+       (3, 'Django '),
+       (4, 'Kotlin'),
+       (5, 'Java'),
+       (6, 'React'),
+       (7, 'JavaScript'),
+       (8, 'TypeScript'),
+       (9, 'Go'),
+       (10, 'Swift'),
+       (11, 'C#'),
+       (12, 'Angular'),
+       (13, 'SQL'),
+       (14, 'HTML'),
+       (15, 'CSS'),
+       (16, 'R'),
+       (17, 'Ruby'),
+       (18, 'Vue');
+
 INSERT INTO positions
-VALUES (1, N'Web Developer'),
-       (2, N'Network Engineer'),
-       (3, N'Software Engineer'),
-       (5, N'Front End Developer'),
-       (6, N'Java Developer'),
-       (7, N'Salesforce Developer'),
-       (8, N'IOS Developer'),
-       (9, N'SQL Developer'),
-       (10, N'Android Developer'),
-       (11, N'.NET Developer'),
-       (12, N'Game Developer'),
-       (13, N'Machine Learning Engineer'),
-       (14, N'Embedded Software Engineer'),
-       (15, N'Programmer Analyst'),
-       (16, N'Application Security Engineer'),
-       (17, N'AWS Solutions Architect'),
-       (18, N'CNC Programmer'),
-       (19, N'Mulesoft Developer'),
-       (20, N'Data Engineer'),
-       (21, N'QA Engineer'),
-       (23, N'Python Developer'),
-       (24, N'JavaScript Developer'),
-       (25, N'Sharepoint Developer');
+VALUES (1, 'Web Developer'),
+       (2, 'Network Engineer'),
+       (3, 'Software Engineer'),
+       (4, 'Sharepoint Developer'),
+       (5, 'Front End Developer'),
+       (6, 'Java Developer'),
+       (7, 'Salesforce Developer'),
+       (8, 'IOS Developer'),
+       (9, 'SQL Developer'),
+       (10, 'Android Developer'),
+       (11, '.NET Developer'),
+       (12, 'Game Developer'),
+       (13, 'Machine Learning Engineer'),
+       (14, 'Embedded Software Engineer'),
+       (15, 'Programmer Analyst'),
+       (16, 'Application Security Engineer'),
+       (17, 'AWS Solutions Architect'),
+       (18, 'CNC Programmer'),
+       (19, 'Mulesoft Developer'),
+       (20, 'Data Engineer'),
+       (21, 'QA Engineer'),
+       (23, 'Python Developer'),
+       (24, 'JavaScript Developer');
 
 INSERT INTO cities
-VALUES (1, N'Adana'),
-       (2, N'Adıyaman'),
-       (3, N'Afyon'),
-       (4, N'Ağrı'),
-       (5, N'Amasya'),
-       (6, N'Ankara'),
-       (7, N'Antalya'),
-       (8, N'Artvin'),
-       (9, N'Aydın'),
-       (10, N'Balıkesir'),
-       (11, N'Bilecik'),
-       (12, N'Bingöl'),
-       (13, N'Bitlis'),
-       (14, N'Bolu'),
-       (15, N'Burdur'),
-       (16, N'Bursa'),
-       (17, N'Çanakkale'),
-       (18, N'Çankırı'),
-       (19, N'Çorum'),
-       (20, N'Denizli'),
-       (21, N'Diyarbakır'),
-       (22, N'Edirne'),
-       (23, N'Elazığ'),
-       (24, N'Erzincan'),
-       (25, N'Erzurum'),
-       (26, N'Eskişehir'),
-       (27, N'Gaziantep'),
-       (28, N'Giresun'),
-       (29, N'Gümüşhane'),
-       (30, N'Hakkari'),
-       (31, N'Hatay'),
-       (32, N'Isparta'),
-       (33, N'Mersin'),
-       (34, N'İstanbul'),
-       (35, N'İzmir'),
-       (36, N'Kars'),
-       (37, N'Kastamonu'),
-       (38, N'Kayseri'),
-       (39, N'Kırklareli'),
-       (40, N'Kırşehir'),
-       (41, N'Kocaeli'),
-       (42, N'Konya'),
-       (43, N'Kütahya'),
-       (44, N'Malatya'),
-       (45, N'Manisa'),
-       (46, N'Kahramanmaraş'),
-       (47, N'Mardin'),
-       (48, N'Muğla'),
-       (49, N'Muş'),
-       (50, N'Nevşehir'),
-       (51, N'Niğde'),
-       (52, N'Ordu'),
-       (53, N'Rize'),
-       (54, N'Sakarya'),
-       (55, N'Samsun'),
-       (56, N'Siirt'),
-       (57, N'Sinop'),
-       (58, N'Sivas'),
-       (59, N'Tekirdağ'),
-       (60, N'Tokat'),
-       (61, N'Trabzon'),
-       (62, N'Tunceli'),
-       (63, N'Şanlıurfa'),
-       (64, N'Uşak'),
-       (65, N'Van'),
-       (66, N'Yozgat'),
-       (67, N'Zonguldak'),
-       (68, N'Aksaray'),
-       (69, N'Bayburt'),
-       (70, N'Karaman'),
-       (71, N'Kırıkkale'),
-       (72, N'Batman'),
-       (73, N'Şırnak'),
-       (74, N'Bartın'),
-       (75, N'Ardahan'),
-       (76, N'Iğdır'),
-       (77, N'Yalova'),
-       (78, N'Karabük'),
-       (79, N'Kilis'),
-       (80, N'Osmaniye'),
-       (81, N'Düzce');
+VALUES (1, 'Adana'),
+       (2, 'Adıyaman'),
+       (3, 'Afyon'),
+       (4, 'Ağrı'),
+       (5, 'Amasya'),
+       (6, 'Ankara'),
+       (7, 'Antalya'),
+       (8, 'Artvin'),
+       (9, 'Aydın'),
+       (10, 'Balıkesir'),
+       (11, 'Bilecik'),
+       (12, 'Bingöl'),
+       (13, 'Bitlis'),
+       (14, 'Bolu'),
+       (15, 'Burdur'),
+       (16, 'Bursa'),
+       (17, 'Çanakkale'),
+       (18, 'Çankırı'),
+       (19, 'Çorum'),
+       (20, 'Denizli'),
+       (21, 'Diyarbakır'),
+       (22, 'Edirne'),
+       (23, 'Elazığ'),
+       (24, 'Erzincan'),
+       (25, 'Erzurum'),
+       (26, 'Eskişehir'),
+       (27, 'Gaziantep'),
+       (28, 'Giresun'),
+       (29, 'Gümüşhane'),
+       (30, 'Hakkari'),
+       (31, 'Hatay'),
+       (32, 'Isparta'),
+       (33, 'Mersin'),
+       (34, 'İstanbul'),
+       (35, 'İzmir'),
+       (36, 'Kars'),
+       (37, 'Kastamonu'),
+       (38, 'Kayseri'),
+       (39, 'Kırklareli'),
+       (40, 'Kırşehir'),
+       (41, 'Kocaeli'),
+       (42, 'Konya'),
+       (43, 'Kütahya'),
+       (44, 'Malatya'),
+       (45, 'Manisa'),
+       (46, 'Kahramanmaraş'),
+       (47, 'Mardin'),
+       (48, 'Muğla'),
+       (49, 'Muş'),
+       (50, 'Nevşehir'),
+       (51, 'Niğde'),
+       (52, 'Ordu'),
+       (53, 'Rize'),
+       (54, 'Sakarya'),
+       (55, 'Samsun'),
+       (56, 'Siirt'),
+       (57, 'Sinop'),
+       (58, 'Sivas'),
+       (59, 'Tekirdağ'),
+       (60, 'Tokat'),
+       (61, 'Trabzon'),
+       (62, 'Tunceli'),
+       (63, 'Şanlıurfa'),
+       (64, 'Uşak'),
+       (65, 'Van'),
+       (66, 'Yozgat'),
+       (67, 'Zonguldak'),
+       (68, 'Aksaray'),
+       (69, 'Bayburt'),
+       (70, 'Karaman'),
+       (71, 'Kırıkkale'),
+       (72, 'Batman'),
+       (73, 'Şırnak'),
+       (74, 'Bartın'),
+       (75, 'Ardahan'),
+       (76, 'Iğdır'),
+       (77, 'Yalova'),
+       (78, 'Karabük'),
+       (79, 'Kilis'),
+       (80, 'Osmaniye'),
+       (81, 'Düzce');

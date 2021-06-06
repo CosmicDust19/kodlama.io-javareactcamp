@@ -29,10 +29,10 @@ public class User {
     @Column(name = "id")
     private int id;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password", nullable = false, length = 100)
     private String password;
 
     @JsonIgnore
@@ -48,8 +48,4 @@ public class User {
     @LastModifiedDate
     @Column(name = "last_modified_at")
     private LocalDate lastModifiedDate;
-
-    public User(int id) {
-        this.id = id;
-    }
 }

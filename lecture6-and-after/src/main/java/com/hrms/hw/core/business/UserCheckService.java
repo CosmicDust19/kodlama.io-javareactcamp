@@ -1,4 +1,4 @@
-package com.hrms.hw.business.abstracts;
+package com.hrms.hw.core.business;
 
 public interface UserCheckService<User> {
 

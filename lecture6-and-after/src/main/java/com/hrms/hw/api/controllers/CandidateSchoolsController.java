@@ -29,6 +29,11 @@ public class CandidateSchoolsController {
         return candidateSchoolService.getAll();
     }
 
+    @GetMapping("/getAllSortedDesc")
+    public DataResult<List<CandidateSchool>> getAllSortedDesc() {
+        return candidateSchoolService.getAllSortedDesc();
+    }
+
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateSchoolAddDto candidateSchoolAddDto) {
         return ResponseEntity.ok(candidateSchoolService.add(candidateSchoolAddDto));

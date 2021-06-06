@@ -27,13 +27,15 @@ public class CandidateCv {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidates_cvs_id_generator")
     @SequenceGenerator(name = "candidates_cvs_id_generator", sequenceName = "candidates_cvs_id_seq", allocationSize = 1)
-    @JsonIgnore
     @Column(name = "id")
     private int id;
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
     private Candidate candidate;
+
+    @Column(name = "title", nullable = false, unique = true)
+    private String title;
 
     @Column(name = "cover_letter")
     private String coverLetter;
@@ -46,31 +48,27 @@ public class CandidateCv {
     @Column(name = "last_modified_at")
     private LocalDate lastModifiedAt;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "candidates_cvs_job_experiences",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_job_exp_id", referencedColumnName = "id")})
     private List<CandidateJobExperience> candidateJobExperiences;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "candidates_cvs_languages",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_language_id", referencedColumnName = "id")})
     private List<CandidateLanguage> candidateLanguages;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "candidates_cvs_schools",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_school_id", referencedColumnName = "id")})
     private List<CandidateSchool> candidateSchools;
 
-    @ManyToMany
-    @JoinTable(name = "candidates_cvs_software_knowledge",
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "candidates_cvs_skills",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "candidates_sk_id", referencedColumnName = "id")})
-    private List<CandidateSoftwareKnowledge> candidateSoftwareKnowledgeList;
-
-    public void setCandidateId(int candidateId){
-        this.candidate.setId(candidateId);
-    }
+            inverseJoinColumns = {@JoinColumn(name = "candidate_skill_id", referencedColumnName = "id")})
+    private List<CandidateSkill> candidateSkills;
 }

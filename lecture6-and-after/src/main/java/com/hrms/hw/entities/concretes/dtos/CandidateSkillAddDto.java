@@ -9,11 +9,9 @@ import javax.validation.constraints.Positive;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CandidateSoftwareKnowledgeAddDto {
+public class CandidateSkillAddDto {
 
-    @Positive
     private int candidateId;
 
-    @Positive
-    private short softwareKnowledgeId;
+    private short skillId;
 }
