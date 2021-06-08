@@ -1,10 +1,11 @@
 package com.hrms.hw.entities.concretes.dtos;
 
+import com.hrms.hw.entities.concretes.Skill;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Positive;
+import javax.validation.Valid;
 
 @Data
 @AllArgsConstructor
@@ -13,5 +14,6 @@ public class CandidateSkillAddDto {
 
     private int candidateId;
 
-    private short skillId;
+    @Valid
+    private Skill skill;
 }

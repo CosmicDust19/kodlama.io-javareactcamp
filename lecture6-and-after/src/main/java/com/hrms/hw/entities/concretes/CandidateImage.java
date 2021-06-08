@@ -1,6 +1,6 @@
 package com.hrms.hw.entities.concretes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,9 +23,11 @@ public class CandidateImage {
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
+    @JsonIgnoreProperties(value = {"candidateCvs","candidateImages", "candidateJobExperiences",
+            "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 
-    @JsonIgnore
     @Column(name = "image_url", nullable = false)
     private String imageUrl;
+
 }

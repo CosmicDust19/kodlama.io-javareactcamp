@@ -1,12 +1,11 @@
 package com.hrms.hw.entities.concretes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -25,16 +24,15 @@ public class CandidateLanguage {
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
+    @JsonIgnoreProperties(value = {"candidateCvs","candidateImages", "candidateJobExperiences",
+            "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "language_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "language_id", nullable = false, unique = true)
     private Language language;
 
     @Column(name = "language_level", nullable = false)
     private String languageLevel;
 
-    @JsonIgnore
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "candidateLanguages")
-    private List<CandidateCv> candidateCvs;
 }

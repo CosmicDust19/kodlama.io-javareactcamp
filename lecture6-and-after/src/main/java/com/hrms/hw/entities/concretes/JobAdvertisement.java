@@ -1,6 +1,5 @@
 package com.hrms.hw.entities.concretes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,7 +19,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "job_advertisements",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"employer_id", "position_id", "job_description", "city_id"})})
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
 public class JobAdvertisement {
 
     @Id
@@ -31,17 +29,20 @@ public class JobAdvertisement {
 
     @ManyToOne
     @JoinColumn(name = "employer_id", nullable = false)
+    @JsonIgnoreProperties(value = {"jobAdvertisements", "password"})
     private Employer employer;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "position_id", nullable = false)
+    @JsonIgnoreProperties(value = {"jobAdvertisements"})
     private Position position;
 
     @Column(name = "job_description", nullable = false)
     private String jobDescription;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "city_id", nullable = false)
+    @JsonIgnoreProperties(value = {"jobAdvertisements"})
     private City city;
 
     @Column(name = "min_salary")

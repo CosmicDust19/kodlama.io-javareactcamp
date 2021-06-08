@@ -1,12 +1,14 @@
 package com.hrms.hw.entities.concretes.dtos;
 
+import com.hrms.hw.entities.concretes.Department;
+import com.hrms.hw.entities.concretes.School;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Positive;
 
 @Data
 @AllArgsConstructor
@@ -15,9 +17,11 @@ public class CandidateSchoolAddDto {
 
     private int candidateId;
 
-    private int schoolId;
+    @Valid
+    private School school;
 
-    private short departmentId;
+    @Valid
+    private Department department;
 
     @Min(value = 1900, message = "invalid school start year")
     @Max(value = 2030, message = "invalid school start year")

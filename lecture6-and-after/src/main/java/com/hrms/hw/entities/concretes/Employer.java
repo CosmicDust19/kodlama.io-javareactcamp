@@ -36,8 +36,8 @@ public class Employer extends User {
     @Column(name = "is_system_verified", nullable = false)
     private boolean isSystemVerified = false;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "employer")
+    @JsonIgnoreProperties(value = {"employer"})
     private List<JobAdvertisement> jobAdvertisements;
 
 }

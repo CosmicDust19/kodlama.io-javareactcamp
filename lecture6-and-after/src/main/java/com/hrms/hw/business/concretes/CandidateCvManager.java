@@ -29,13 +29,6 @@ public class CandidateCvManager implements CandidateCvService {
     @Override
     public Result add(CandidateCvAddDto candidateCvAddDto) {
         CandidateCv candidateCv = modelMapper.map(candidateCvAddDto, CandidateCv.class);
-
-        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getCandidate().getId());
-        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getPosition().getId());
-        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getQuitYear());
-        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getStartYear());
-        System.out.println(candidateCv.getCandidateJobExperiences().get(0).getWorkPlace());
-
         candidateCvDao.save(candidateCv);
         return new SuccessResult("Success");
     }

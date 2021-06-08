@@ -23,6 +23,6 @@ public class PositionManager implements PositionService {
     @Override
     public Result add(Position position) {
         positionDao.save(position);
-        return new SuccessResult("Position Saved");
+        return new SuccessResult("Success");
     }
 }

@@ -1,12 +1,17 @@
 package com.hrms.hw.business.concretes;
 
 import com.hrms.hw.business.abstracts.CandidateSchoolService;
+import com.hrms.hw.core.utilities.Utils;
 import com.hrms.hw.core.utilities.results.DataResult;
 import com.hrms.hw.core.utilities.results.Result;
 import com.hrms.hw.core.utilities.results.SuccessDataResult;
 import com.hrms.hw.core.utilities.results.SuccessResult;
 import com.hrms.hw.dataAccess.abstracts.CandidateSchoolDao;
+import com.hrms.hw.dataAccess.abstracts.DepartmentDao;
+import com.hrms.hw.dataAccess.abstracts.SchoolDao;
 import com.hrms.hw.entities.concretes.CandidateSchool;
+import com.hrms.hw.entities.concretes.Department;
+import com.hrms.hw.entities.concretes.School;
 import com.hrms.hw.entities.concretes.dtos.CandidateSchoolAddDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -20,6 +25,8 @@ import java.util.List;
 public class CandidateSchoolManager implements CandidateSchoolService {
 
     private final CandidateSchoolDao candidateSchoolDao;
+    private final SchoolDao schoolDao;
+    private final DepartmentDao departmentDao;
     private final ModelMapper modelMapper;
 
     @Override
@@ -36,6 +43,19 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     @Override
     public Result add(CandidateSchoolAddDto candidateSchoolAddDto) {
         CandidateSchool candidateSchool = modelMapper.map(candidateSchoolAddDto, CandidateSchool.class);
+
+        School school = candidateSchool.getSchool();
+        school.setName(Utils.formName(school.getName()));
+        if (!Utils.tryToSaveIfNotExists(school, schoolDao)){
+            school.setId(schoolDao.getByName(school.getName()).getId());
+        }
+
+        Department department = candidateSchool.getDepartment();
+        department.setName(Utils.formName(department.getName()));
+        if (!Utils.tryToSaveIfNotExists(department, departmentDao)){
+            department.setId(departmentDao.getByName(department.getName()).getId());
+        }
+
         candidateSchoolDao.save(candidateSchool);
         return new SuccessResult("Success");
     }

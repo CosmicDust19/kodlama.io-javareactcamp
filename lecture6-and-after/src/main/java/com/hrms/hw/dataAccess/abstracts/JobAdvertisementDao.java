@@ -22,7 +22,7 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
     List<JobAdvertisement> getByActivationStatusTrueAndEmployer_Id(int employerId);
 
     @Modifying
-    @Query("update JobAdvertisement j set j.activationStatus = :activationStatus where j.id = :jobAdvertisementId")
-    void updateActivationStatus(@Param(value = "activationStatus") boolean activationStatus, @Param(value = "jobAdvertisementId") int jobAdvertisementId);
+    @Query("update JobAdvertisement j set j.activationStatus = :activationStatus where j.id = :id")
+    void updateActivationStatus(@Param(value = "activationStatus") boolean activationStatus, @Param(value = "id") int id);
 
 }

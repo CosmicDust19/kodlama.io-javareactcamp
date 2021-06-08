@@ -1,9 +1,14 @@
 package com.hrms.hw.business.concretes;
 
 import com.hrms.hw.business.abstracts.JobAdvertisementService;
+import com.hrms.hw.core.utilities.Utils;
 import com.hrms.hw.core.utilities.results.*;
+import com.hrms.hw.dataAccess.abstracts.CityDao;
 import com.hrms.hw.dataAccess.abstracts.JobAdvertisementDao;
+import com.hrms.hw.dataAccess.abstracts.PositionDao;
+import com.hrms.hw.entities.concretes.City;
 import com.hrms.hw.entities.concretes.JobAdvertisement;
+import com.hrms.hw.entities.concretes.Position;
 import com.hrms.hw.entities.concretes.dtos.JobAdvertisementAddDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,6 +22,8 @@ import java.util.List;
 public class JobAdvertisementManager implements JobAdvertisementService {
 
     private final JobAdvertisementDao jobAdvertisementDao;
+    private final PositionDao positionDao;
+    private final CityDao cityDao;
     private final ModelMapper modelMapper;
 
     @Override
@@ -48,6 +55,19 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public Result add(JobAdvertisementAddDto jobAdvertisementAddDto) {
         JobAdvertisement jobAdvertisement = modelMapper.map(jobAdvertisementAddDto, JobAdvertisement.class);
+
+        Position position = jobAdvertisement.getPosition();
+        position.setTitle(Utils.formName(position.getTitle()));
+        if (!Utils.tryToSaveIfNotExists(position, positionDao)){
+            position.setId(positionDao.getByTitle(position.getTitle()).getId());
+        }
+
+        City city = jobAdvertisement.getCity();
+        city.setName(Utils.formName(city.getName()));
+        if (!Utils.tryToSaveIfNotExists(city, cityDao)){
+            city.setId(cityDao.getByName(city.getName()).getId());
+        }
+
         jobAdvertisementDao.save(jobAdvertisement);
         return new SuccessResult("Advertisement has been added successfully.");
     }

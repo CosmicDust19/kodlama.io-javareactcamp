@@ -2,7 +2,8 @@
 
 ### If we activate these classes, we can write a container(List, Map etc.) as a @RequestBody
 
-###### 
+######
+    //To activate, add this in Application.java class
     @Bean
     public FilterRegistrationBean httpServletRequestReplacedRegistration() {
         FilterRegistrationBean registration = new FilterRegistrationBean();

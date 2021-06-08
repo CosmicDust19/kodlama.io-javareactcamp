@@ -1,7 +1,7 @@
 package com.hrms.hw.entities.concretes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hrms.hw.entities.abstracts.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,12 +18,11 @@ import java.util.List;
 @Entity
 @Table(name = "cities")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
-public class City {
+public class City implements BaseEntity<Short> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cities_id_generator")
     @SequenceGenerator(name = "cities_id_generator", sequenceName = "cities_id_seq", allocationSize = 1, initialValue = 82)
-    @JsonIgnore
     @Column(name = "id")
     private short id;
 
@@ -32,8 +31,15 @@ public class City {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "city")
+    @JsonIgnoreProperties(value = {"city"})
     private List<JobAdvertisement> jobAdvertisements;
 
+    public Short getId() {
+        return id;
+    }
+
+    public void setId(Short id) {
+        this.id = id;
+    }
 }

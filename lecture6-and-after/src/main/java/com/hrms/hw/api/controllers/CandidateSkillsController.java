@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/cvsSoftwareKnowledge")
+@RequestMapping("/api/candidateSkills")
 @RequiredArgsConstructor
 public class CandidateSkillsController {
 

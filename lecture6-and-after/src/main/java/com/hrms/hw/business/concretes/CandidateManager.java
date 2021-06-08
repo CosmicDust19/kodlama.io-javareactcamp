@@ -30,11 +30,11 @@ public class CandidateManager implements CandidateService {
     @Override
     public Result add(CandidateAddDto candidateAddDto) {
         if (!mernisServiceAdapter.isRealPerson(candidateAddDto.getNationalityId(),
-                candidateAddDto.getFirstName(), candidateAddDto.getLastName(), candidateAddDto.getBirthYear())) {
-            return new ErrorResult("Mernis verification failed.");
-        } else if (!candidateAddDto.getPassword().equals(candidateAddDto.getPasswordRepeat())) {
-            return new ErrorResult("Password repetition mismatch.");
-        }
+                candidateAddDto.getFirstName(), candidateAddDto.getLastName(), candidateAddDto.getBirthYear()))
+            return new ErrorResult("mernis verification failed");
+        else if (!candidateAddDto.getPassword().equals(candidateAddDto.getPasswordRepeat()))
+            return new ErrorResult("password repetition mismatch");
+
         Candidate candidate = modelMapper.map(candidateAddDto, Candidate.class);
         emailService.sendVerificationMail(candidateAddDto.getEmail());
         candidateDao.save(candidate);

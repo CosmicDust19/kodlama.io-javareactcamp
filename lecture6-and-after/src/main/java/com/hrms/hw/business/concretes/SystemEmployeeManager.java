@@ -25,13 +25,11 @@ public class SystemEmployeeManager implements SystemEmployeeService {
 
     @Override
     public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
+        if (!systemEmployeesAddDto.getPassword().equals(systemEmployeesAddDto.getPasswordRepeat()))
+            return new ErrorResult("Password repetition mismatch.");
+
         SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
-        try {
-            systemEmployeeDao.save(systemEmployee);
-            return new SuccessResult("System Employee Saved");
-        } catch (Exception exception){
-            exception.printStackTrace();
-            return new ErrorResult("Registration Failed");
-        }
+        systemEmployeeDao.save(systemEmployee);
+        return new SuccessResult("System Employee Saved");
     }
 }

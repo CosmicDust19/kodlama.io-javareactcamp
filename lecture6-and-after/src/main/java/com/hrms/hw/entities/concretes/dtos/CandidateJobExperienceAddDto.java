@@ -1,9 +1,12 @@
 package com.hrms.hw.entities.concretes.dtos;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hrms.hw.entities.concretes.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 @Data
@@ -17,7 +20,9 @@ public class CandidateJobExperienceAddDto {
     @Size(min = 2, max = 100, message = "invalid workplace")
     private String workPlace;
 
-    private short positionId;
+    @Valid
+    @JsonIgnoreProperties(value = {"jobAdvertisements"})
+    private Position position;
 
     @Min(value = 1900, message = "invalid start year")
     @Max(value = 2030, message = "invalid start year")

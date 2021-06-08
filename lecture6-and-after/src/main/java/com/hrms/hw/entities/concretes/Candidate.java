@@ -1,5 +1,6 @@
 package com.hrms.hw.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hrms.hw.core.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,21 +40,27 @@ public class Candidate extends User {
 
     //I made this one to many because i looked at some sites and they takes more than one cv
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateCv> candidateCvs;
 
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateImage> candidateImages;
 
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateJobExperience> candidateJobExperiences;
 
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateLanguage> candidateLanguages;
 
     @OneToMany(mappedBy = "candidate")
+    @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateSchool> candidateSchools;
 
     @OneToMany(mappedBy = "candidate")
-    private List<CandidateSkill> candidateSkillList;
+    @JsonIgnoreProperties(value = {"candidate"})
+    private List<CandidateSkill> candidateSkills;
 
 }

@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface SchoolService {
     DataResult<List<School>> getAll();
+
     Result add(School school);
 }

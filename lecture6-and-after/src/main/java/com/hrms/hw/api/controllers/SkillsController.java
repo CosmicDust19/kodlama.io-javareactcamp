@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/softwareKnowledge")
+@RequestMapping("/api/skills")
 @RequiredArgsConstructor
 public class SkillsController {
 

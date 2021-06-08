@@ -1,7 +1,10 @@
 package com.hrms.hw.entities.concretes.dtos;
 
+import com.hrms.hw.entities.concretes.City;
+import com.hrms.hw.entities.concretes.Position;
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
@@ -12,12 +15,14 @@ public class JobAdvertisementAddDto {
 
     private int employerId;
 
-    private short positionId;
+    @Valid
+    private Position position;
 
     @NotBlank(message = "cannot be empty")
     private String jobDescription;
 
-    private short cityId;
+    @Valid
+    private City city;
 
     //If i do not declare this variable in a nullable type,
     //when i execute getAll method, it can throw an error

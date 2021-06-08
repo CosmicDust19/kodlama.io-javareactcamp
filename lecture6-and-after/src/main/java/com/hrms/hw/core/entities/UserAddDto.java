@@ -13,14 +13,14 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UserAddDto {
 
-    @NotBlank(message = "This field can't be empty.")
-    @Pattern(regexp = "^\\w+(\\.\\w+)*@[a-zA-Z]+(\\.\\w{2,6})+$", message = "Please enter your e-mail properly. ")
+    @NotBlank(message = "cannot be empty")
+    @Pattern(regexp = "^\\w+(\\.\\w+)*@[a-zA-Z]+(\\.\\w{2,6})+$", message = "invalid e-mail")
     private String email;
 
-    @NotBlank(message = "This field can't be empty.")
-    @Size(min = 6, max = 20, message = "Please enter a password between 6 and 20 long")
+    @NotBlank(message = "cannot be empty")
+    @Size(min = 6, max = 20, message = "should be a text between 6 and 20 long")
     private String password;
 
-    @NotBlank(message = "This field can't be empty.")
+    @NotBlank(message = "cannot be empty")
     private String passwordRepeat;
 }

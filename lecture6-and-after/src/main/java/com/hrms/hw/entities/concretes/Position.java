@@ -2,6 +2,7 @@ package com.hrms.hw.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hrms.hw.entities.abstracts.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,14 +17,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "positions")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
-public class Position {
+public class Position implements BaseEntity<Short> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "positions_id_generator")
-    // i am starting the sequence from 26 because i inserted some positions to the table for the testing purposes
     @SequenceGenerator(name = "positions_id_generator", sequenceName = "positions_id_seq", allocationSize = 1, initialValue = 25)
-    @JsonIgnore
     @Column(name = "id")
     private short id;
 
@@ -31,7 +29,15 @@ public class Position {
     @Column(name = "title", unique = true)
     private String title;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "position")
+    @JsonIgnore
     private List<JobAdvertisement> jobAdvertisements;
+
+    public Short getId() {
+        return id;
+    }
+
+    public void setId(Short id) {
+        this.id = id;
+    }
 }

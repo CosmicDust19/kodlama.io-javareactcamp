@@ -27,8 +27,6 @@ public class ModelMapperConfig {
     PropertyMap<JobAdvertisementAddDto, JobAdvertisement> jobAdvertisementAddDtoJobAdvertisementPropertyMap = new PropertyMap<JobAdvertisementAddDto, JobAdvertisement>() {
         protected void configure() {
             map(source.getEmployerId(), destination.getEmployer().getId());
-            map(source.getCityId(), destination.getCity().getId());
-            map(source.getPositionId(), destination.getPosition().getId());
         }
     };
 
@@ -41,7 +39,6 @@ public class ModelMapperConfig {
     PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience> candidateJobExperienceAddDtoCandidateJobExperiencePropertyMap = new PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
-            map(source.getPositionId(), destination.getPosition().getId());
         }
     };
 
@@ -49,7 +46,6 @@ public class ModelMapperConfig {
     PropertyMap<CandidateLanguageAddDto, CandidateLanguage> candidateLanguageAddDtoCandidateLanguagePropertyMap = new PropertyMap<CandidateLanguageAddDto, CandidateLanguage>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
-            map(source.getLanguageId(), destination.getLanguage().getId());
         }
     };
 
@@ -57,15 +53,12 @@ public class ModelMapperConfig {
     PropertyMap<CandidateSchoolAddDto, CandidateSchool> candidateSchoolAddDtoCandidateSchoolPropertyMap = new PropertyMap<CandidateSchoolAddDto, CandidateSchool>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
-            map(source.getDepartmentId(), destination.getDepartment().getId());
-            map(source.getSchoolId(), destination.getSchool().getId());
         }
     };
 
     PropertyMap<CandidateSkillAddDto, CandidateSkill> candidateSkillAddDtoCandidateSkillPropertyMap = new PropertyMap<CandidateSkillAddDto, CandidateSkill>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
-            map(source.getSkillId(), destination.getSkill().getId());
         }
     };
 
