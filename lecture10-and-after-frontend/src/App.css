@@ -1,0 +1,33 @@
+.App {
+    text-align: center;
+}
+
+.ui.main.container {
+    margin-top: 10em;
+}
+
+.logo {
+    margin-top: 5px;
+    position: fixed;
+    left: 100px;
+
+}
+
+.MainMenu {
+    margin-top: 4px;
+    position: fixed;
+    left: 300px;
+}
+
+.searchBar {
+    margin-top: 10px;
+    position: fixed;
+    right: 100px;
+
+}
+
+
+.footer {
+    position: relative;
+    bottom: auto;
+}
