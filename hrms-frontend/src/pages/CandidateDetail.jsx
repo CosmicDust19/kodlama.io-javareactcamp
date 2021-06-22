@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import CandidateService from "../services/candidateService";
-import {Card, Grid, Icon, Table, Header} from "semantic-ui-react";
 
 export default function CandidateDetail() {
 
@@ -9,9 +8,6 @@ export default function CandidateDetail() {
 
     const colors = ['red', 'orange', 'yellow', 'olive', 'green',
         'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-    const months = ["January", "February", "March", "April", "May",
-        "June", "July", "August", "September", "October", "November", "December"]
 
     const [candidate, setCandidate] = useState({});
 
