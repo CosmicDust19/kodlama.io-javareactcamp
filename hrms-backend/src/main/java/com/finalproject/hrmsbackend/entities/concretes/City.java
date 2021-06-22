@@ -17,7 +17,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "cities")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class City implements BaseEntity<Short> {
 
     @Id

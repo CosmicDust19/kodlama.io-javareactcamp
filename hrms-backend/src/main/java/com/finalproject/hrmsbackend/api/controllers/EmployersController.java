@@ -32,7 +32,6 @@ public class EmployersController {
 
     @GetMapping("/getById")
     public DataResult<Employer> getById(@RequestParam int id) {
-        System.out.println(id);
         return employerService.getById(id);
     }
 

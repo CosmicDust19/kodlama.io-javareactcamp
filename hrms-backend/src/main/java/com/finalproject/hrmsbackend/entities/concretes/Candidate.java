@@ -18,6 +18,7 @@ import java.util.List;
 @Entity
 @Table(name = "candidates")
 @PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Candidate extends User {
 
     @Column(name = "first_name", nullable = false)

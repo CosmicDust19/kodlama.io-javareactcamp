@@ -20,7 +20,7 @@ import java.util.List;
 @Entity
 @Table(name = "employers")
 @PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "jobAdvertisements"})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Employer extends User {
 
     @Column(name = "company_name", nullable = false, unique = true)

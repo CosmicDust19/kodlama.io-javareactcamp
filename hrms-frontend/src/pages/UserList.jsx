@@ -8,23 +8,17 @@ const panes = [
     {
         menuItem: 'Employers',
         render: () =>
-            <Tab.Pane attached={false}>
-                <EmployerList/>
-            </Tab.Pane>,
+            <EmployerList/>
     },
     {
         menuItem: 'Candidates',
         render: () =>
-            <Tab.Pane attached={false}>
-                <CandidateList/>
-            </Tab.Pane>,
+            <CandidateList/>
     },
     {
         menuItem: 'System Employees',
         render: () =>
-            <Tab.Pane attached={false}>
-                <SystemEmployeeList/>
-            </Tab.Pane>,
+            <SystemEmployeeList/>
     },
 ]
 

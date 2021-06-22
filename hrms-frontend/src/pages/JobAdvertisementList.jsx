@@ -1,15 +1,6 @@
 import React, {useState, useEffect, Component} from "react";
 import JobAdvertisementService from "../services/jobAdvertisementService";
-import {
-    Card,
-    CardGroup,
-    Icon,
-    CardDescription,
-    Grid,
-    GridColumn,
-    Dropdown,
-    Checkbox, Segment, Button
-} from "semantic-ui-react";
+import {Card, Icon, Grid, Dropdown, Checkbox, Segment, Button, Header} from "semantic-ui-react";
 import {useHistory} from "react-router-dom";
 import CityService from "../services/cityService";
 import PositionService from "../services/positionService";
@@ -23,23 +14,14 @@ export default function JobAdvertisementList() {
     const months = ["January", "February", "March", "April", "May",
         "June", "July", "August", "September", "October", "November", "December"]
 
-    const [jobAdvertisements, setJobAdvertisement] = useState([]);
-    useEffect(() => {
-        let jobAdvertisementService = new JobAdvertisementService();
-        jobAdvertisementService.getJobAdvertisements().then((result) => setJobAdvertisement(result.data.data));
-    }, []);
-
-    let history = useHistory();
-
-    const handleAdvertisementClick = id => {
-        history.push(`/jobAdvertisements/${id}`);
-    };
-
+    //const [sortingOpts] = useState(["Creation Date + ", "Creation Date - "]);
     const [cities, setCities] = useState([]);
     const [positions, setPositions] = useState([]);
     const [employers, setEmployers] = useState([]);
+    const [jobAdvertisements, setJobAdvertisement] = useState([]);
 
     useEffect(() => {
+        let jobAdvertisementService = new JobAdvertisementService();
         let cityService = new CityService();
         let positionService = new PositionService();
         let employerService = new EmployerService();
@@ -47,6 +29,7 @@ export default function JobAdvertisementList() {
         cityService.getCities().then((result) => setCities(result.data.data));
         positionService.getPositions().then((result) => setPositions(result.data.data));
         employerService.getEmployers().then((result) => setEmployers(result.data.data));
+        jobAdvertisementService.getJobAdvertisements().then((result) => setJobAdvertisement(result.data.data));
     }, []);
 
     const cityOption = cities.map((city, index) => ({
@@ -67,29 +50,48 @@ export default function JobAdvertisementList() {
         value: employer.id,
     }));
 
+    let history = useHistory();
+
+    const handleAdvertisementClick = id => {
+        history.push(`/jobAdvertisements/${id}`);
+    };
+
     class Filters extends Component {
         render() {
             return (
                 <Segment>
-                    <Card>
-                        <Dropdown clearable item placeholder="Select cities" search multiple selection fluid={true}
-                                  options={cityOption}/>
-                    </Card>
-                    <Card>
-                        <Dropdown clearable item placeholder="Select positions" search multiple selection fluid={true}
-                                  options={positionOption}/>
-                    </Card>
-                    <Card>
-                        <Dropdown clearable item placeholder="Select employers" search multiple selection fluid={true}
-                                  options={employerOption}/>
-                    </Card>
+                    <Header dividing>
+                        <Header.Content>
+                            <Icon name="filter"/>
+                            Filter
+                        </Header.Content>
+                    </Header>
+                    <Card.Group>
+                        <Card>
+                            <Dropdown clearable item placeholder="Select cities" search multiple selection fluid
+                                      options={cityOption}/>
+                        </Card>
+                        <Card>
+                            <Dropdown clearable item placeholder="Select positions" search multiple selection fluid
+                                      options={positionOption}/>
+                        </Card>
+                        <Card>
+                            <Dropdown clearable item placeholder="Select employers" search multiple selection fluid
+                                      options={employerOption}/>
+                        </Card>
+                    </Card.Group>
 
-                    <Checkbox label='Remote' className={"remoteCheckBox"}/>
-                    <Checkbox label='Office' className={"officeCheckBox"}/>
-                    <Checkbox label='Part Time' className={"partTimeCheckBox"}/>
-                    <Checkbox label='Full Time' className={"fullTimeCheckBox"}/>
-                    <Button className={"jobAdvertisementFilterButton"} compact={true}
-                             attached={"bottom"} basic color={"green"}>Apply</Button>
+                    <Grid columns={2} padded>
+                        <Grid.Column>
+                            <Checkbox label='Remote' className={"remoteCheckBox"}/>
+                            <Checkbox label='Office' className={"officeCheckBox"}/>
+                        </Grid.Column>
+                        <Grid.Column>
+                            <Checkbox label='Part Time' className={"partTimeCheckBox"}/>
+                            <Checkbox label='Full Time' className={"fullTimeCheckBox"}/>
+                        </Grid.Column>
+                    </Grid>
+                    <Button compact={true} attached={"bottom"} basic color={"green"}>Apply</Button>
                 </Segment>
             )
         }
@@ -97,43 +99,43 @@ export default function JobAdvertisementList() {
 
     return (
         <div>
-            <Grid>
-                <GridColumn width={4}>
+            <Grid stackable>
+                <Grid.Column width={4}>
                     <Filters/>
-                </GridColumn>
-                <GridColumn width={12}>
-                    <CardGroup>
+                </Grid.Column>
+                <Grid.Column width={12}>
+                    <Card.Group>
                         {jobAdvertisements.map((jobAdvertisement) => (
                             <Card color={colors[Math.floor(Math.random() * 12)]} onClick={() => {
                                 handleAdvertisementClick(jobAdvertisement.id);
-                            }} fluid={true}>
+                            }} fluid={true} key={jobAdvertisement.id}>
                                 <Card.Content>
                                     <Card.Header>{jobAdvertisement.position.title}</Card.Header>
                                     <Card.Meta>{jobAdvertisement.employer.companyName}</Card.Meta>
-                                    <CardDescription>
+                                    <Card.Description>
                                         <div>
                                             <Icon name={"map marker"}/> {jobAdvertisement.city.name}
                                         </div>
-                                    </CardDescription>
+                                    </Card.Description>
                                 </Card.Content>
                                 <Card.Content>
                                     <Card.Description>
                                         <Grid>
-                                            <GridColumn width={8}>
+                                            <Grid.Column width={8}>
                                                 {jobAdvertisement.workTime + " & " + jobAdvertisement.workModel}
-                                            </GridColumn>
-                                            <GridColumn width={8} textAlign={"right"}>Created at
+                                            </Grid.Column>
+                                            <Grid.Column width={8} textAlign={"right"}>Created at
                                                 {" " + new Date(jobAdvertisement.createdAt).getDate() + " " +
                                                 months[new Date(jobAdvertisement.createdAt).getMonth()] + " " +
                                                 new Date(jobAdvertisement.createdAt).getFullYear()}
-                                            </GridColumn>
+                                            </Grid.Column>
                                         </Grid>
                                     </Card.Description>
                                 </Card.Content>
                             </Card>
                         ))}
-                    </CardGroup>
-                </GridColumn>
+                    </Card.Group>
+                </Grid.Column>
             </Grid>
         </div>
     );

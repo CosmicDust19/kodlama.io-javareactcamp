@@ -48,12 +48,24 @@ public class CandidateCvManager implements CandidateCvService {
         List<CandidateLanguage> candidateLanguages = candidateCv.getCandidateLanguages() != null ? candidateCv.getCandidateLanguages() : new ArrayList<>();
         List<CandidateSchool> candidateSchools = candidateCv.getCandidateSchools() != null ? candidateCv.getCandidateSchools() : new ArrayList<>();
         List<CandidateSkill> candidateSkills = candidateCv.getCandidateSkills() != null ? candidateCv.getCandidateSkills() : new ArrayList<>();
+        candidateJobExperiences.forEach((candidateJobExperience) -> {
+            if (candidateJobExperience.getCandidate() == null) candidateJobExperience.setCandidate(new Candidate());
+        });
+        candidateLanguages.forEach((candidateLanguage) -> {
+            if (candidateLanguage.getCandidate() == null) candidateLanguage.setCandidate(new Candidate());
+        });
+        candidateSchools.forEach((candidateSchool) -> {
+            if (candidateSchool.getCandidate() == null) candidateSchool.setCandidate(new Candidate());
+        });
+        candidateSkills.forEach((candidateSkill) -> {
+            if (candidateSkill.getCandidate() == null) candidateSkill.setCandidate(new Candidate());
+        });
 
         //set candidateIds
-        candidateJobExperiences.forEach((candidateJobExperience) -> candidateJobExperience.setId(candidateCv.getCandidate().getId()));
-        candidateLanguages.forEach((candidateLanguage) -> candidateLanguage.setId(candidateCv.getCandidate().getId()));
-        candidateSchools.forEach((candidateSchool) -> candidateSchool.setId(candidateCv.getCandidate().getId()));
-        candidateSkills.forEach((candidateSkill) -> candidateSkill.setId(candidateCv.getCandidate().getId()));
+        candidateJobExperiences.forEach((candidateJobExperience) -> candidateJobExperience.getCandidate().setId(candidateCv.getCandidate().getId()));
+        candidateLanguages.forEach((candidateLanguage) -> candidateLanguage.getCandidate().setId(candidateCv.getCandidate().getId()));
+        candidateSchools.forEach((candidateSchool) -> candidateSchool.getCandidate().setId(candidateCv.getCandidate().getId()));
+        candidateSkills.forEach((candidateSkill) -> candidateSkill.getCandidate().setId(candidateCv.getCandidate().getId()));
 
         //save if not exists
         candidateJobExperiences.forEach(candidateJobExperience -> {
@@ -63,7 +75,6 @@ public class CandidateCvManager implements CandidateCvService {
         candidateLanguages.forEach(candidateLanguage -> {
             if (!Utils.tryToSaveIfNotExists(candidateLanguage, candidateLanguageDao))
                 candidateLanguage.setId(candidateLanguageDao.getByCandidateAndLanguage(candidateLanguage.getCandidate(), candidateLanguage.getLanguage()).getId());
-
         });
         candidateSchools.forEach(candidateSchool -> {
             if (!Utils.tryToSaveIfNotExists(candidateSchool, candidateSchoolDao))

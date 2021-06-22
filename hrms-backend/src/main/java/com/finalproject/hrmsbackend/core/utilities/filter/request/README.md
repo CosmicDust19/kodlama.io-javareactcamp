@@ -1,6 +1,6 @@
 ### This package is not used in this project, i write them because they may be needed later.
 
-### If we activate these classes, we can write a container(List, Map etc.) as a @RequestBody
+### It may help us for some errors 
 
 ######
     //To activate, add this in Application.java class

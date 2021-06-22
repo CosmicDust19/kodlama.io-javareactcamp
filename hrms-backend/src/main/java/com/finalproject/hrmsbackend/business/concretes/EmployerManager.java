@@ -10,7 +10,6 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.EmployerAddDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 

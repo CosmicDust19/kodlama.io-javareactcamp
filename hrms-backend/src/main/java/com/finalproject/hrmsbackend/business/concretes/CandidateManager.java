@@ -28,6 +28,11 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
+    public DataResult<Candidate> getById(int id) {
+        return new SuccessDataResult<>("Success", candidateDao.getById(id));
+    }
+
+    @Override
     public Result add(CandidateAddDto candidateAddDto) {
         if (!mernisServiceAdapter.isRealPerson(candidateAddDto.getNationalityId(),
                 candidateAddDto.getFirstName(), candidateAddDto.getLastName(), candidateAddDto.getBirthYear()))

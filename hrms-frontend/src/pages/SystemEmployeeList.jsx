@@ -3,14 +3,15 @@ import SystemEmployeeService from "../services/systemEmployeeService";
 import {Table, Header, Image} from "semantic-ui-react";
 import {useState, useEffect} from "react";
 
-let placeholderImageUrls = ['https://semantic-ui.com/images/avatar/small/ade.jpg',
-    'https://semantic-ui.com/images/avatar/small/chris.jpg', 'https://semantic-ui.com/images/avatar/small/christian.jpg',
-    'https://semantic-ui.com/images/avatar/small/daniel.jpg', 'https://semantic-ui.com/images/avatar/small/elliot.jpg',
-    'https://semantic-ui.com/images/avatar/small/helen.jpg', 'https://semantic-ui.com/images/avatar/small/jenny.jpg']
 
 
 export default function SystemEmployeeList() {
+
+    let placeholderImageNames = ["ade", "chris", "christian", "daniel", "elliot", "helen", "jenny",
+        "joe", "justen", "laura", "matt", "nan", "steve", "stevie", "veronika"]
+
     const [systemEmployees, setSystemEmployee] = useState([]);
+
     useEffect(() => {
         let systemEmployeeService = new SystemEmployeeService();
         systemEmployeeService.getSystemEmployees().then((result) => setSystemEmployee(result.data.data));
@@ -29,7 +30,8 @@ export default function SystemEmployeeList() {
                     <Table.Row key={systemEmployee.id}>
                         <Table.Cell>
                             <Header as='h4' image>
-                                <Image src={placeholderImageUrls[Math.floor(Math.random() * 7)]} rounded size='mini'/>
+                                <Image src={`https://semantic-ui.com/images/avatar/small/${placeholderImageNames[Math.floor(Math.random() * 15)]}.jpg`}
+                                    rounded size='mini'/>
                                 <Header.Content>{systemEmployee.firstName}
                                     <Header.Subheader>{systemEmployee.lastName}</Header.Subheader>
                                 </Header.Content>

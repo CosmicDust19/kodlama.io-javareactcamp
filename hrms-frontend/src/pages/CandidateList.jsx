@@ -1,46 +1,50 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import CandidateService from "../services/candidateService";
-import {Table} from "semantic-ui-react";
-import {useState, useEffect} from "react";
+import {Card, Image} from "semantic-ui-react";
+import {useHistory} from "react-router-dom";
 
 export default function CandidateList() {
+
+    let placeholderImageNames = ["elyse", "kristy", "lena", "lindsay", "mark", "matthew", "molly", "patrick", "rachel"]
+
     const [candidates, setCandidate] = useState([]);
+
     useEffect(() => {
         let candidateService = new CandidateService();
         candidateService.getCandidates().then((result) => setCandidate(result.data.data));
-    },[]);
+    }, []);
+
+    let history = useHistory();
+
+    const handleCandidateClick = id => {
+        history.push(`/candidates/${id}`);
+    };
 
     return (
         <div>
-            <Table celled>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>ID</Table.HeaderCell>
-                        <Table.HeaderCell>E-mail</Table.HeaderCell>
-                        <Table.HeaderCell>First Name</Table.HeaderCell>
-                        <Table.HeaderCell>Last Name</Table.HeaderCell>
-                        <Table.HeaderCell>Nationality Id</Table.HeaderCell>
-                        <Table.HeaderCell>Birth Year</Table.HeaderCell>
-                        <Table.HeaderCell>Github Account</Table.HeaderCell>
-                        <Table.HeaderCell>Linkedin Account</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-
-                <Table.Body>
-                    {candidates.map((candidate) => (
-                        <Table.Row key={candidate.id}>
-                            <Table.Cell>{candidate.id}</Table.Cell>
-                            <Table.Cell>{candidate.email}</Table.Cell>
-                            <Table.Cell>{candidate.firstName}</Table.Cell>
-                            <Table.Cell>{candidate.lastName}</Table.Cell>
-                            <Table.Cell>{candidate.nationalityId}</Table.Cell>
-                            <Table.Cell>{candidate.birthYear}</Table.Cell>
-                            <Table.Cell>{candidate.githubAccountLink}</Table.Cell>
-                            <Table.Cell>{candidate.linkedinAccountLink}</Table.Cell>
-                        </Table.Row>
-                    ))}
-                </Table.Body>
-            </Table>
+            <Card.Group itemsPerRow={3} centered stackable>
+                {candidates.map((candidate) => (
+                    <Card onClick={() => {
+                        handleCandidateClick(candidate.id);
+                    }} key={candidate.id}>
+                        <Image
+                            src={`https://semantic-ui.com/images/avatar2/large/${placeholderImageNames[Math.floor(Math.random() * 9)]}.png`}
+                            wrapped ui={false}/>
+                        <Card.Content>
+                            <Card.Header>{candidate.firstName}</Card.Header>
+                            <Card.Meta>
+                                <span>{candidate.lastName}</span>
+                            </Card.Meta>
+                            <Card.Description>
+                                {candidate.email}
+                            </Card.Description>
+                        </Card.Content>
+                        <Card.Content extra>
+                            Birth Year | {candidate.birthYear}
+                        </Card.Content>
+                    </Card>
+                ))}
+            </Card.Group>
         </div>
     );
 }

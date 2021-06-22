@@ -1,17 +1,25 @@
 import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import JobAdvertisementService from "../services/jobAdvertisementService";
-import {Button, Card, CardContent, CardDescription, Grid, GridColumn, Icon, Table, TableBody} from "semantic-ui-react";
+import {Button, Card, Grid, Icon, Table, Header} from "semantic-ui-react";
+
+const colors = ['red', 'orange', 'yellow', 'olive', 'green',
+    'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+
+let color = colors[Math.floor(Math.random() * 12)]
 
 export default function JobAdvertisementDetail() {
 
-    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+    let {id} = useParams()
 
     const months = ["January", "February", "March", "April", "May",
         "June", "July", "August", "September", "October", "November", "December"]
 
-    let {id} = useParams()
+    let history = useHistory();
+
+    const handleEmployerDetailClick = id => {
+        history.push(`/employers/${id}`);
+    };
 
     const [jobAdvertisement, setJobAdvertisement] = useState({});
 
@@ -31,21 +39,7 @@ export default function JobAdvertisementDetail() {
         return `between ${jobAdvertisement.minSalary} ~ ${jobAdvertisement.maxSalary}`;
     }
 
-
-    function findRemainedDays(){
-        let now = new Date()
-        let deadline = new Date(jobAdvertisement.applicationDeadline)
-        let remainedDays = now.getDate() - deadline.getDate()
-        return remainedDays.toString()
-    }
-
-    let history = useHistory();
-
-    const handleEmployerDetailClick = id => {
-        history.push(`/employers/${id}`);
-    };
-
-    let color = colors[Math.floor(Math.random() * 12)]
+    let remainedDays = Math.round((new Date(jobAdvertisement.applicationDeadline).getTime() - new Date().getTime()) / 86400000)
 
     return (
         <div>
@@ -53,17 +47,19 @@ export default function JobAdvertisementDetail() {
 
                 <Card.Content>
                     <Grid>
-                        <GridColumn width={8}>
-                            <Card.Header>{jobAdvertisement.position?.title}</Card.Header>
+                        <Grid.Column width={8}>
+                            <Card.Header>
+                                <Header>{jobAdvertisement.position?.title}</Header>
+                            </Card.Header>
                             <Card.Meta>{jobAdvertisement.employer?.companyName}</Card.Meta>
-                        </GridColumn>
-                        <GridColumn width={8} textAlign={"right"}>
+                        </Grid.Column>
+                        <Grid.Column width={8} textAlign={"right"}>
                             <Button color={color}>Apply</Button>
-                        </GridColumn>
+                        </Grid.Column>
                     </Grid>
-                    <CardDescription>
+                    <Card.Description>
                         <Icon name={"map marker"}/> {jobAdvertisement.city?.name}
-                    </CardDescription>
+                    </Card.Description>
                 </Card.Content>
 
                 <Card.Content>
@@ -73,53 +69,53 @@ export default function JobAdvertisementDetail() {
                 </Card.Content>
 
                 {salaryInfo() ?
-                    <CardContent>
+                    <Card.Content>
                         Salary | {salaryInfo()}
-                    </CardContent> : null}
+                    </Card.Content> : null}
 
-                <CardContent>Application deadline
+                <Card.Content>Application deadline
                     | {" " + new Date(jobAdvertisement.applicationDeadline).getDate() + " " +
                     months[new Date(jobAdvertisement.applicationDeadline).getMonth()] + " " +
-                    new Date(jobAdvertisement.applicationDeadline).getFullYear()} | Remained {findRemainedDays} days
-                </CardContent>
+                    new Date(jobAdvertisement.applicationDeadline).getFullYear()} | Remained {remainedDays} {(remainedDays>1)? "days" : "day"}
+                </Card.Content>
 
                 <Card.Content>
                     <Grid>
-                        <GridColumn width={8}>
+                        <Grid.Column width={8}>
                             Number of candidates to be hired |{" " + jobAdvertisement.numberOfPeopleToBeHired}
-                        </GridColumn>
-                        <GridColumn width={8} textAlign={"right"}>Created at
+                        </Grid.Column>
+                        <Grid.Column width={8} textAlign={"right"}>Created at
                             {" " + new Date(jobAdvertisement.createdAt).getDate() + " " +
                             months[new Date(jobAdvertisement.createdAt).getMonth()] + " " +
                             new Date(jobAdvertisement.createdAt).getFullYear()}
-                        </GridColumn>
+                        </Grid.Column>
                     </Grid>
                 </Card.Content>
 
             </Card>
 
             <Grid>
-                <GridColumn width={10}>
+                <Grid.Column width={10}>
                     <Card fluid color={color}>
 
-                        <CardContent>
+                        <Card.Content>
                             <Card.Header>
                                 Job Description
                             </Card.Header>
-                        </CardContent>
+                        </Card.Content>
 
-                        <CardContent>
+                        <Card.Content>
                             {jobAdvertisement.jobDescription}
-                        </CardContent>
+                        </Card.Content>
 
                     </Card>
-                </GridColumn>
+                </Grid.Column>
 
-                <GridColumn width={6}>
+                <Grid.Column width={6}>
                     <Table compact celled>
 
                         <Table.Header>
-                            <Table.HeaderCell textAlign={"right"} width={1}>
+                            <Table.HeaderCell>
                                 {jobAdvertisement.employer?.companyName}
                             </Table.HeaderCell>
                             <Table.HeaderCell textAlign={"right"}>
@@ -129,7 +125,7 @@ export default function JobAdvertisementDetail() {
                             </Table.HeaderCell>
                         </Table.Header>
 
-                        <TableBody>
+                        <Table.Body>
 
                             <Table.Row>
                                 <Table.Cell> <Icon name={"envelope"}/> E-mail</Table.Cell>
@@ -148,9 +144,9 @@ export default function JobAdvertisementDetail() {
                                 </Table.Cell>
                             </Table.Row>
 
-                        </TableBody>
+                        </Table.Body>
                     </Table>
-                </GridColumn>
+                </Grid.Column>
             </Grid>
         </div>
     );
