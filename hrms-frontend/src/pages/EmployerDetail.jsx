@@ -31,12 +31,14 @@ export default function EmployerDetail() {
             <Table celled size={"large"}>
 
                 <Table.Header>
-                    <Table.HeaderCell textAlign={"right"} width={1}>
-                        <Header>
-                            {employer.companyName}
-                        </Header>
-                    </Table.HeaderCell>
-                    <Table.HeaderCell/>
+                    <Table.Row>
+                        <Table.HeaderCell textAlign={"right"} width={1}>
+                            <Header>
+                                {employer.companyName}
+                            </Header>
+                        </Table.HeaderCell>
+                        <Table.HeaderCell/>
+                    </Table.Row>
                 </Table.Header>
 
                 <Table.Body>
@@ -61,13 +63,15 @@ export default function EmployerDetail() {
                 </Table.Body>
             </Table>
 
-            <Card.Group itemsPerRow={2} >
+            <Card.Group itemsPerRow={2} stackable>
                 {employer.jobAdvertisements?.map((jobAdvertisement) => (
                     <Card color={colors[Math.floor(Math.random() * 12)]}
-                          onClick={() => {handleAdvertisementClick(jobAdvertisement.id);}}
+                          onClick={() => {
+                              handleAdvertisementClick(jobAdvertisement.id);
+                          }}
                           key={jobAdvertisement.id}>
 
-                        <Card.Content >
+                        <Card.Content>
                             <Card.Header>{jobAdvertisement.position.title}</Card.Header>
                             <Card.Meta>{employer.companyName}</Card.Meta>
                             <Card.Description>

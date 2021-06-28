@@ -21,6 +21,4 @@ public class UserAddDto {
     @Size(min = 6, max = 20, message = "should be a text between 6 and 20 long")
     private String password;
 
-    @NotBlank(message = "cannot be empty")
-    private String passwordRepeat;
 }

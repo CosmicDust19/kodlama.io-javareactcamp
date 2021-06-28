@@ -25,9 +25,24 @@ public class SystemEmployeesController {
 
     private final SystemEmployeeService systemEmployeeService;
 
+    @GetMapping("/existsByEmailAndPassword")
+    public DataResult<Boolean> existsByEmailAndPassword(@RequestParam String email, @RequestParam String password){
+        return systemEmployeeService.existsByEmailAndPassword(email, password);
+    }
+
     @GetMapping("/getAll")
     public DataResult<List<SystemEmployee>> getAll() {
         return systemEmployeeService.getAll();
+    }
+
+    @GetMapping("/getById")
+    public DataResult<SystemEmployee> getById(@RequestParam int id) {
+        return systemEmployeeService.getById(id);
+    }
+
+    @GetMapping("/getByEmailAndPassword")
+    public DataResult<SystemEmployee> getByEmailAndPassword(@RequestParam String email, @RequestParam String password){
+        return systemEmployeeService.getByEmailAndPassword(email, password);
     }
 
     @PostMapping("/add")

@@ -6,4 +6,13 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmployerDao extends JpaRepository<Employer,Integer> {
+    boolean existsByEmailAndPassword(String email, String password);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByWebsite(String website);
+
+    boolean existsByCompanyName(String companyName);
+
+    Employer getByEmailAndPassword(String email, String password);
 }

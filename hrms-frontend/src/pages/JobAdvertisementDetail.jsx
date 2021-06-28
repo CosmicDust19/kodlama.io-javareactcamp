@@ -8,12 +8,12 @@ const colors = ['red', 'orange', 'yellow', 'olive', 'green',
 
 let color = colors[Math.floor(Math.random() * 12)]
 
+const months = ["January", "February", "March", "April", "May",
+    "June", "July", "August", "September", "October", "November", "December"]
+
 export default function JobAdvertisementDetail() {
 
     let {id} = useParams()
-
-    const months = ["January", "February", "March", "April", "May",
-        "June", "July", "August", "September", "October", "November", "December"]
 
     let history = useHistory();
 
@@ -94,7 +94,7 @@ export default function JobAdvertisementDetail() {
 
             </Card>
 
-            <Grid>
+            <Grid stackable>
                 <Grid.Column width={10}>
                     <Card fluid color={color}>
 
@@ -115,14 +115,16 @@ export default function JobAdvertisementDetail() {
                     <Table compact celled>
 
                         <Table.Header>
-                            <Table.HeaderCell>
-                                {jobAdvertisement.employer?.companyName}
-                            </Table.HeaderCell>
-                            <Table.HeaderCell textAlign={"right"}>
-                                <Button basic color={color} onClick={() => {
-                                    handleEmployerDetailClick(jobAdvertisement.employer?.id)
-                                }}>Company Detail</Button>
-                            </Table.HeaderCell>
+                            <Table.Row>
+                                <Table.HeaderCell>
+                                    {jobAdvertisement.employer?.companyName}
+                                </Table.HeaderCell>
+                                <Table.HeaderCell textAlign={"right"}>
+                                    <Button basic color={color} onClick={() => {
+                                        handleEmployerDetailClick(jobAdvertisement.employer?.id)
+                                    }}>Company Detail</Button>
+                                </Table.HeaderCell>
+                            </Table.Row>
                         </Table.Header>
 
                         <Table.Body>
@@ -145,6 +147,7 @@ export default function JobAdvertisementDetail() {
                             </Table.Row>
 
                         </Table.Body>
+
                     </Table>
                 </Grid.Column>
             </Grid>

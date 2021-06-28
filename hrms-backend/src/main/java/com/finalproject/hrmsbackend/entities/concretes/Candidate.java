@@ -39,7 +39,6 @@ public class Candidate extends User {
     @Column(name = "linkedin_account_link")
     private String linkedinAccountLink;
 
-    //I made this one to many because i looked at some sites and they takes more than one cv
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateCv> candidateCvs;

@@ -19,6 +19,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 @Table(name = "candidates_cvs")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CandidateCv {
 
     @Id

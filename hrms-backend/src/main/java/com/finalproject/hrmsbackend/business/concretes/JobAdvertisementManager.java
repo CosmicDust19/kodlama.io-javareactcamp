@@ -80,6 +80,10 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         return new SuccessResult("Advertisement has been added successfully.");
     }
 
+    public void deleteById(int id){
+        jobAdvertisementDao.deleteById(id);
+    }
+
     @Override
     public Result updateActivationStatus(boolean activationStatus, int jobAdvertisementId) {
         jobAdvertisementDao.updateActivationStatus(activationStatus, jobAdvertisementId);

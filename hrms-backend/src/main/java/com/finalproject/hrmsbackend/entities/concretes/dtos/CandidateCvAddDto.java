@@ -15,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 public class CandidateCvAddDto {
 
+    private Integer id;
+
     @NotNull(message = "cannot be empty")
     private Integer candidateId;
 

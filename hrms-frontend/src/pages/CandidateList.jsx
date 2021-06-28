@@ -22,7 +22,7 @@ export default function CandidateList() {
 
     return (
         <div>
-            <Card.Group itemsPerRow={3} centered stackable>
+            <Card.Group itemsPerRow={3} stackable>
                 {candidates.map((candidate) => (
                     <Card onClick={() => {
                         handleCandidateClick(candidate.id);
@@ -45,6 +45,7 @@ export default function CandidateList() {
                     </Card>
                 ))}
             </Card.Group>
+
         </div>
     );
 }

@@ -10,5 +10,11 @@ import java.util.List;
 public interface CandidateCvService {
     DataResult<List<CandidateCv>> getAll();
 
+    DataResult<CandidateCv> getById(int id);
+
     Result add(CandidateCvAddDto candidateCvAddDto);
+
+    DataResult<Boolean> deleteById(int id);
+
+    DataResult<Boolean> updateCoverLetter(String coverLetter, int id);
 }

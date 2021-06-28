@@ -24,12 +24,33 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     }
 
     @Override
-    public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
-        if (!systemEmployeesAddDto.getPassword().equals(systemEmployeesAddDto.getPasswordRepeat()))
-            return new ErrorResult("Password repetition mismatch.");
+    public DataResult<Boolean> existsByEmailAndPassword(String email, String password) {
+        return new SuccessDataResult<>("Success", systemEmployeeDao.existsByEmailAndPassword(email, password));
+    }
 
+    @Override
+    public DataResult<Boolean> existsByEmail(String email) {
+        return new SuccessDataResult<>("Success", systemEmployeeDao.existsByEmail(email));
+    }
+
+    @Override
+    public DataResult<SystemEmployee> getById(int id) {
+        if (!systemEmployeeDao.existsById(id)){
+            return new ErrorDataResult<>("id does not exist");
+        }
+        return new SuccessDataResult<>("Success", systemEmployeeDao.getById(id));
+    }
+
+    @Override
+    public DataResult<SystemEmployee> getByEmailAndPassword(String email, String password) {
+        return new SuccessDataResult<>("Success", systemEmployeeDao.getByEmailAndPassword(email, password));
+    }
+
+    @Override
+    public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
         SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
         systemEmployeeDao.save(systemEmployee);
         return new SuccessResult("System Employee Saved");
     }
+
 }

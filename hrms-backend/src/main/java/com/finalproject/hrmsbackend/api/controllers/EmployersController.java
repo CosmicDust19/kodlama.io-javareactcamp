@@ -25,6 +25,21 @@ public class EmployersController {
 
     private final EmployerService employerService;
 
+    @GetMapping("/existsByEmailAndPassword")
+    public DataResult<Boolean> existsByEmailAndPassword(@RequestParam String email, @RequestParam String password){
+        return employerService.existsByEmailAndPassword(email, password);
+    }
+
+    @GetMapping("/existsByCompanyName")
+    public DataResult<Boolean> existsByCompanyName(@RequestParam String companyName){
+        return employerService.existsByCompanyName(companyName);
+    }
+
+    @GetMapping("/existsByWebsite")
+    public DataResult<Boolean> existsByWebsite(@RequestParam String website){
+        return employerService.existsByWebsite(website);
+    }
+
     @GetMapping("/getAll")
     public DataResult<List<Employer>> getAll() {
         return employerService.getAll();
@@ -33,6 +48,11 @@ public class EmployersController {
     @GetMapping("/getById")
     public DataResult<Employer> getById(@RequestParam int id) {
         return employerService.getById(id);
+    }
+
+    @GetMapping("/getByEmailAndPassword")
+    public DataResult<Employer> getByEmailAndPassword(@RequestParam String email, @RequestParam String password){
+        return employerService.getByEmailAndPassword(email, password);
     }
 
     @PostMapping("/add")

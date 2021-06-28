@@ -30,9 +30,24 @@ public class CandidateCvsController {
         return candidateCvService.getAll();
     }
 
+    @GetMapping("/getById")
+    public DataResult<CandidateCv> getById(@RequestParam int id) {
+        return candidateCvService.getById(id);
+    }
+
     @PostMapping(value = "/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateCvAddDto candidateCvAddDto) {
         return ResponseEntity.ok(candidateCvService.add(candidateCvAddDto));
+    }
+
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return candidateCvService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updateCoverLetter")
+    public DataResult<Boolean> updateCoverLetter(@RequestParam String coverLetter, @RequestParam int id) {
+        return candidateCvService.updateCoverLetter(coverLetter, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

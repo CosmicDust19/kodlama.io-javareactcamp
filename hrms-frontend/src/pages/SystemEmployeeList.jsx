@@ -18,7 +18,7 @@ export default function SystemEmployeeList() {
     }, []);
 
     return (
-        <Table basic='very' celled collapsing>
+        <Table basic='very' celled collapsing unstackable>
             <Table.Header>
                 <Table.Row>
                     <Table.HeaderCell>Employee</Table.HeaderCell>

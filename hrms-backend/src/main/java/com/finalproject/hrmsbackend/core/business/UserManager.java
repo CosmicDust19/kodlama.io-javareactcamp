@@ -20,4 +20,8 @@ public class UserManager implements UserService<User> {
         return new SuccessDataResult<>("Success", userDao.findAll());
     }
 
+    @Override
+    public DataResult<Boolean> existsByEmail(String email){
+        return new SuccessDataResult<>("Success", userDao.existsByEmail(email));
+    }
 }

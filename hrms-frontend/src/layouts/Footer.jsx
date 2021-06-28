@@ -1,41 +1,57 @@
 import React from "react";
-import { Container, Grid, Header, Icon, List, Segment, } from "semantic-ui-react";
+import {Grid, Header} from "semantic-ui-react";
+
 export default function Footer() {
     return (
-        <div className={"Footer"}>
-            <Segment inverted vertical style={{ padding: "5em 0em" }}>
-                <Container>
-                    <Grid divided inverted stackable>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <List link inverted>
-                                    <List.Item as="a">About us</List.Item>
-                                    <List.Item as="a">Contact</List.Item>
-                                    <List.Item as="a">Cookie</List.Item>
-                                    <List.Item as="a">Privacy policy</List.Item>
-                                </List>
-                            </Grid.Column>
-                            <Grid.Column width={5}>
-                                <div className="descriptionPosition">
-                                    <Header as="h2">
-                                        <Icon name="users" color="blue" size = "big"/>
-                                        <Header.Content>
-                                            <font color="#f5f5f5">
-                                                Human Resources Management System
+        <div className={"Footer"} style={{padding: "5em 5em", marginLeft: 90}}>
+            <Grid celled={"internally"} stackable>
+
+                <Grid.Column width={8} textAlign={"right"} verticalAlign={"middle"}>
+                    <Header as="h2">
+                        <Header.Content>
+                            <Grid stackable>
+                                <Grid stackable>
+                                    <Grid.Row>
+                                        <Grid.Row>
+                                            <font color="black" style={{fontStyle: "italic"}}>
+                                                Human&nbsp;
                                             </font>
-                                        </Header.Content>
-                                    </Header>
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
-                </Container>
-            </Segment>
-            <Segment>
-                <Container>
-                    © 2018 Human Resources Management System - All rights reserved.
-                </Container>
-            </Segment>
+                                        </Grid.Row>
+                                        <Grid.Row>
+                                            <font color="black" style={{fontStyle: "italic"}}>
+                                                Resources&nbsp;
+                                            </font>
+                                        </Grid.Row>
+                                    </Grid.Row>
+                                    <Grid.Row>
+                                        <Grid.Row>
+                                            <font color="black" style={{fontStyle: "italic", stackable: false}}>
+                                                Management&nbsp;
+                                            </font>
+                                        </Grid.Row>
+                                        <Grid.Row>
+                                            <font color="black" style={{fontStyle: "italic"}}>
+                                                System&nbsp;
+                                            </font>
+                                        </Grid.Row>
+                                    </Grid.Row>
+                                </Grid>
+                            </Grid>
+                        </Header.Content>
+                    </Header>
+                </Grid.Column>
+
+                <Grid.Column width={5} textAlign={"left"} verticalAlign={"middle"}>
+                    <Header as="h2">
+                        <Header.Content>
+                            <font color="black" style={{fontStyle: "italic"}}>
+                                Kodlama.io
+                            </font>
+                        </Header.Content>
+                    </Header>
+                </Grid.Column>
+
+            </Grid>
         </div>
     );
 }

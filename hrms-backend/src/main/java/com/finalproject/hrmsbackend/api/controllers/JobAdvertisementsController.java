@@ -56,7 +56,7 @@ public class JobAdvertisementsController {
         return ResponseEntity.ok(jobAdvertisementService.add(jobAdvertisementAddDto));
     }
 
-    @PostMapping("/updateActivationStatus")
+    @PutMapping("/updateActivationStatus")
     public Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int jobAdvertisementId) {
         return jobAdvertisementService.updateActivationStatus(activationStatus, jobAdvertisementId);
     }
