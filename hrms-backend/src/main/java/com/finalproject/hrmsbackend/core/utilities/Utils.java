@@ -10,6 +10,7 @@ public class Utils {
     public String formName(String name){
         if (name != null) {
             StringBuilder sb = new StringBuilder(name.trim().toLowerCase());
+            if (sb.length() == 0) return "";
             sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
             int index = -1;
             while ((index = sb.indexOf(" ", index + 1)) != -1) {

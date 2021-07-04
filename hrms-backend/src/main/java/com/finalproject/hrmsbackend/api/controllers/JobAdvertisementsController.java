@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,17 +34,34 @@ public class JobAdvertisementsController {
 
     @GetMapping("/getAllActives")
     public DataResult<List<JobAdvertisement>> getAllActives() {
-        return jobAdvertisementService.getAllActives();
+        return jobAdvertisementService.getAllActivesAndVerified();
     }
 
     @GetMapping("/getAllActivesSortedByDate")
     public DataResult<List<JobAdvertisement>> getAllActivesSortedByDate(@RequestParam int sortDirection) {
-        return jobAdvertisementService.getAllActivesSortedByDate(sortDirection);
+        return jobAdvertisementService.getAllActivesAndVerifiedSortedByDate(sortDirection);
     }
 
     @GetMapping("/getByActivationStatusTrueAndEmployerId")
     public DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(@RequestParam int employerId) {
-        return jobAdvertisementService.getByActivationStatusTrueAndEmployer_Id(employerId);
+        return jobAdvertisementService.getByActivesAndVerifiedAndEmployer_Id(employerId);
+    }
+
+    @GetMapping("/getAllBySystemVerificationStatusFalse")
+    public DataResult<List<JobAdvertisement>> getAllBySystemVerificationStatusFalse() {
+        return jobAdvertisementService.getAllBySystemVerificationStatusFalse();
+    }
+
+
+    @GetMapping("/findAllByActivesAndVerifiedAndApplicationDeadlineFuture")
+    public DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlineFuture() {
+        return jobAdvertisementService.findAllByActivesAndVerifiedAndApplicationDeadlineFuture();
+    }
+
+
+    @GetMapping("/findAllByActivesAndVerifiedAndApplicationDeadlinePast")
+    public DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlinePast() {
+        return jobAdvertisementService.findAllByActivesAndVerifiedAndApplicationDeadlinePast();
     }
 
     @GetMapping("/getById")
@@ -56,9 +74,59 @@ public class JobAdvertisementsController {
         return ResponseEntity.ok(jobAdvertisementService.add(jobAdvertisementAddDto));
     }
 
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return jobAdvertisementService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updatePosition")
+    public Result updatePosition(@RequestParam short positionId, @RequestParam int id) {
+        return jobAdvertisementService.updatePosition(positionId, id);
+    }
+
+    @PutMapping("/updateJobDescription")
+    public Result updateJobDescription(@RequestParam String jobDescription, @RequestParam int id) {
+        return jobAdvertisementService.updateJobDescription(jobDescription, id);
+    }
+
+    @PutMapping("/updateCity")
+    public Result updateCity(@RequestParam short cityId, @RequestParam int id) {
+        return jobAdvertisementService.updateCity(cityId, id);
+    }
+
+    @PutMapping("/updateMinSalary")
+    public Result updateMinSalary(@RequestParam Double minSalary, @RequestParam int id) {
+        return jobAdvertisementService.updateMinSalary(minSalary, id);
+    }
+
+    @PutMapping("/updateMaxSalary")
+    public Result updateMaxSalary(@RequestParam Double maxSalary, @RequestParam int id) {
+        return jobAdvertisementService.updateMaxSalary(maxSalary, id);
+    }
+
+    @PutMapping("/updateWorkModel")
+    public Result updateWorkModel(@RequestParam String workModel, @RequestParam int id) {
+        return jobAdvertisementService.updateWorkModel(workModel, id);
+    }
+
+    @PutMapping("/updateWorkTime")
+    public Result updateWorkTime(@RequestParam String workTime, @RequestParam int id) {
+        return jobAdvertisementService.updateWorkTime(workTime, id);
+    }
+
+    @PutMapping(value = "/updateApplicationDeadLine")
+    public Result updateApplicationDeadLine(@RequestParam String applicationDeadLine, @RequestParam int id) {
+        return jobAdvertisementService.updateApplicationDeadLine(applicationDeadLine, id);
+    }
+
     @PutMapping("/updateActivationStatus")
-    public Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int jobAdvertisementId) {
-        return jobAdvertisementService.updateActivationStatus(activationStatus, jobAdvertisementId);
+    public Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int id) {
+        return jobAdvertisementService.updateActivationStatus(activationStatus, id);
+    }
+
+    @PutMapping("/updateSystemVerificationStatus")
+    public Result updateSystemVerificationStatus(@RequestParam boolean systemVerificationStatus, @RequestParam int id) {
+        return jobAdvertisementService.updateSystemVerificationStatus(systemVerificationStatus, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

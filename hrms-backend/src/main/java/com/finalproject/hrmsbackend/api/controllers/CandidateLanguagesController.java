@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.api.controllers;
 import com.finalproject.hrmsbackend.business.abstracts.CandidateLanguageService;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateLanguage;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateLanguageAddDto;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,21 @@ public class CandidateLanguagesController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateLanguageAddDto candidateLanguageAddDto) {
         return ResponseEntity.ok(candidateLanguageService.add(candidateLanguageAddDto));
+    }
+
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return candidateLanguageService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updateLanguage")
+    public Result updateLanguage(@RequestParam short languageId, @RequestParam int id) {
+        return candidateLanguageService.updateLanguage(languageId, id);
+    }
+
+    @PutMapping(value = "/updateLanguageLevel")
+    public Result updateLanguageLevel(@RequestParam String languageLevel, @RequestParam int id) {
+        return candidateLanguageService.updateLanguageLevel(languageLevel, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

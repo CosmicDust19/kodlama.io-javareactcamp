@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.api.controllers;
 import com.finalproject.hrmsbackend.business.abstracts.CandidateJobExperienceService;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateJobExperience;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateJobExperienceAddDto;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,31 @@ public class CandidateJobExperiencesController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateJobExperienceAddDto candidateJobExperienceAddDto) {
         return ResponseEntity.ok(candidateJobExperienceService.add(candidateJobExperienceAddDto));
+    }
+
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return candidateJobExperienceService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updateWorkPlace")
+    public Result updateWorkPlace(@RequestParam String workPlace, @RequestParam int id) {
+        return candidateJobExperienceService.updateWorkPlace(workPlace, id);
+    }
+
+    @PutMapping(value = "/updatePosition")
+    public Result updatePosition(@RequestParam short positionId, @RequestParam int id) {
+        return candidateJobExperienceService.updatePosition(positionId, id);
+    }
+
+    @PutMapping(value = "/updateStartYear")
+    public Result updateStartYear(@RequestParam short startYear, @RequestParam int id) {
+        return candidateJobExperienceService.updateStartYear(startYear, id);
+    }
+
+    @PutMapping(value = "/updateQuitYear")
+    public Result updateQuitYear(Short quitYear, @RequestParam int id) {
+        return candidateJobExperienceService.updateQuitYear(quitYear, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

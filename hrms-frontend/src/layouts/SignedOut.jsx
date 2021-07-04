@@ -16,7 +16,7 @@ export default function SignedOut() {
                 <Menu.Menu position='right'>
                     <Menu.Item>
                         <ButtonGroup>
-                            <Button as={Link} to={"/candidateSignUp"} animated="fade" size={"big"} color={"purple"}>
+                            <Button as={Link} to={"/signUpCandidate"} animated="fade" size={"big"} color={"purple"}>
                                 <Button.Content visible>Sign Up</Button.Content>
                                 <Button.Content hidden><Icon name='signup'/></Button.Content>
                             </Button>
@@ -31,11 +31,11 @@ export default function SignedOut() {
                             <Dropdown.Menu position='right'>
                                 <Dropdown.Header>Employers</Dropdown.Header>
                                 <Dropdown.Item as={Link} to={"/login"}>Login</Dropdown.Item>
-                                <Dropdown.Item as={Link} to={"/employerSignUp"}>Sign Up</Dropdown.Item>
+                                <Dropdown.Item as={Link} to={"/signUpEmployer"}>Sign Up</Dropdown.Item>
                                 <Dropdown.Divider/>
                                 <Dropdown.Header>System Employees</Dropdown.Header>
                                 <Dropdown.Item as={Link} to={"/login"}>Login</Dropdown.Item>
-                                <Dropdown.Item as={Link} to={"/systemEmployeeSignUp"}>Sign Up</Dropdown.Item>
+                                <Dropdown.Item as={Link} to={"/signUpSystemEmployee"}>Sign Up</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                     </Menu.Item>

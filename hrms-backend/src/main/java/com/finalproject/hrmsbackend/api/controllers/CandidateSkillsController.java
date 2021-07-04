@@ -35,6 +35,11 @@ public class CandidateSkillsController {
         return ResponseEntity.ok(candidateSkillService.add(candidateSkillAddDto));
     }
 
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return candidateSkillService.deleteById(id);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {

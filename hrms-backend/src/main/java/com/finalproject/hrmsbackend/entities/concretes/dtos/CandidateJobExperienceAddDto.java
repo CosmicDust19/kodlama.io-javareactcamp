@@ -17,7 +17,7 @@ public class CandidateJobExperienceAddDto {
 
     private int candidateId;
 
-    @Size(min = 2, max = 100, message = "invalid workplace")
+    @Size(min = 1, max = 100, message = "invalid workplace")
     private String workPlace;
 
     @JsonIgnoreProperties(value = {"jobAdvertisements"})

@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
 import CandidateService from "../services/candidateService";
-import {Grid, Header, Table, Icon, Item, Tab, Card, Segment, Label} from "semantic-ui-react";
+import {Grid, Header, Table, Icon, Item, Tab, Card, Segment, Button} from "semantic-ui-react";
 import CandidateCvService from "../services/candidateCvService";
 
 let placeholderImageNames = ["elyse", "kristy", "lena", "lindsay", "mark", "matthew", "molly", "patrick", "rachel"]
@@ -29,12 +29,12 @@ export default function CandidateDetail() {
 
     useEffect(() => {
         let candidateCvService = new CandidateCvService();
-        if(selectedCv.id !== undefined)
+        if (selectedCv.id !== undefined)
             candidateCvService.getById(selectedCv?.id).then((result) => setSelectedCv(result.data.data));
     }, [selectedCv.id]);
 
     const handleCvClick = id => {
-        setSelectedCv({id: id})
+        if (selectedCv.id !== id) setSelectedCv({id: id})
     };
 
     function getAge() {
@@ -113,101 +113,109 @@ export default function CandidateDetail() {
 
     function details(candidateJobExperiences, candidateSkills, candidateSchools, candidateLanguages) {
         return (
-            <div>
-                <Grid>
-                    <Header style={{marginTop: 20}}>
-                        {(candidateJobExperiences?.length === 0 && candidateSkills?.length === 0 &&
-                            candidateSchools?.length === 0 && candidateLanguages?.length === 0) ?
-                            "No details found :(" : null}
-                        {(!candidateJobExperiences && !candidateSkills &&
-                            !candidateSchools && !candidateLanguages) ?
-                            "No additional information found for this CV :(" : null}
-                    </Header>
-                    <Grid stackable style={{marginTop: 10}}>
-                        {candidateJobExperiences?.length !== 0 && candidateJobExperiences ?
-                            <Grid.Column width={8}>
-                                <strong>Job Experiences</strong>
-                                <Table basic={"very"} compact collapsing celled unstackable>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell>Workplace</Table.HeaderCell>
-                                            <Table.HeaderCell>Position</Table.HeaderCell>
-                                            <Table.HeaderCell>Start Year</Table.HeaderCell>
-                                            <Table.HeaderCell>Quit Year</Table.HeaderCell>
+            <Grid>
+                <Header style={{marginTop: 20}}>
+                    {(candidateJobExperiences?.length === 0 && candidateSkills?.length === 0 &&
+                        candidateSchools?.length === 0 && candidateLanguages?.length === 0) ?
+                        "No additional info found." : null}
+                    {(!candidateJobExperiences && !candidateSkills &&
+                        !candidateSchools && !candidateLanguages) ?
+                        "No additional info found." : null}
+                </Header>
+                <Grid stackable style={{marginTop: 10}}>
+                    {candidateJobExperiences?.length !== 0 && candidateJobExperiences ?
+                        <Grid.Column width={8}>
+                            <Header textAlign={"center"} dividing color="green">
+                                Job Experiences
+                            </Header>
+                            <Table basic={"very"} size="large" celled unstackable textAlign="center">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Workplace</Table.HeaderCell>
+                                        <Table.HeaderCell>Position</Table.HeaderCell>
+                                        <Table.HeaderCell>Start Year</Table.HeaderCell>
+                                        <Table.HeaderCell>Quit Year</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {candidateJobExperiences?.map((candidateJobExperience) => (
+                                        <Table.Row key={candidateJobExperience.id}>
+                                            <Table.Cell>{candidateJobExperience.workPlace}</Table.Cell>
+                                            <Table.Cell>{candidateJobExperience.position?.title}</Table.Cell>
+                                            <Table.Cell>{candidateJobExperience.startYear}</Table.Cell>
+                                            <Table.Cell>{candidateJobExperience.quitYear === null ? "Continues" : candidateJobExperience.quitYear}</Table.Cell>
                                         </Table.Row>
-                                    </Table.Header>
-                                    <Table.Body>
-                                        {candidateJobExperiences?.map((candidateJobExperience) => (
-                                            <Table.Row key={candidateJobExperience.id}>
-                                                <Table.Cell>{candidateJobExperience.workPlace}</Table.Cell>
-                                                <Table.Cell>{candidateJobExperience.position?.title}</Table.Cell>
-                                                <Table.Cell>{candidateJobExperience.startYear}</Table.Cell>
-                                                <Table.Cell>{candidateJobExperience.quitYear === null ? "Continues" : candidateJobExperience.quitYear}</Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table>
-                            </Grid.Column> : null}
-
-                        {candidateSkills?.length !== 0 && candidateSkills ?
-                            <Grid.Column width={8}>
-                                <strong>Skills</strong>
-                                <Grid padded relaxed>
-                                    {candidateSkills?.map((candidateSkill) => (
-                                        <Label key={candidateSkill.id} color={colors[Math.floor(Math.random() * 12)]} size={"large"} circular>
-                                    {candidateSkill.skill?.name}
-                                        </Label>
                                     ))}
-                                </Grid>
-                            </Grid.Column> : null}
+                                </Table.Body>
+                            </Table>
+                        </Grid.Column> : null}
 
-                        {candidateSchools?.length !== 0 && candidateSchools ?
-                            <Grid.Column width={8}>
-                                <Table basic={"very"} compact collapsing celled unstackable>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell>Schools</Table.HeaderCell>
-                                            <Table.HeaderCell>Department</Table.HeaderCell>
-                                            <Table.HeaderCell>Start Year</Table.HeaderCell>
-                                            <Table.HeaderCell>Graduation Year</Table.HeaderCell>
+                    {candidateSchools?.length !== 0 && candidateSchools ?
+                        <Grid.Column width={8}>
+                            <Header textAlign={"center"} dividing color="yellow">
+                                Schools
+                            </Header>
+                            <Table basic={"very"} size="large" celled unstackable textAlign="center">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Schools</Table.HeaderCell>
+                                        <Table.HeaderCell>Department</Table.HeaderCell>
+                                        <Table.HeaderCell>Start Year</Table.HeaderCell>
+                                        <Table.HeaderCell>Graduation Year</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {candidateSchools?.map((candidateSchool) => (
+                                        <Table.Row key={candidateSchool.id}>
+                                            <Table.Cell>{candidateSchool.school?.name}</Table.Cell>
+                                            <Table.Cell>{candidateSchool.department?.name}</Table.Cell>
+                                            <Table.Cell>{candidateSchool.schoolStartYear}</Table.Cell>
+                                            <Table.Cell>{candidateSchool.graduationYear === null ? "Continues" : candidateSchool.graduationYear}</Table.Cell>
                                         </Table.Row>
-                                    </Table.Header>
-                                    <Table.Body>
-                                        {candidateSchools?.map((candidateSchool) => (
-                                            <Table.Row key={candidateSchool.id}>
-                                                <Table.Cell>{candidateSchool.school?.name}</Table.Cell>
-                                                <Table.Cell>{candidateSchool.department?.name}</Table.Cell>
-                                                <Table.Cell>{candidateSchool.schoolStartYear}</Table.Cell>
-                                                <Table.Cell>{candidateSchool.graduationYear === null ? "Continues" : candidateSchool.graduationYear}</Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table>
-                            </Grid.Column> : null}
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                        </Grid.Column> : null}
 
-                        {candidateLanguages?.length !== 0 && candidateLanguages ?
-                            <Grid.Column width={8}>
-                                <Table basic={"very"} compact collapsing celled unstackable>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.HeaderCell>Languages</Table.HeaderCell>
-                                            <Table.HeaderCell>Level(CEFR)</Table.HeaderCell>
+                    {candidateLanguages?.length !== 0 && candidateLanguages ?
+                        <Grid.Column width={8}>
+                            <Header textAlign={"center"} dividing color="violet">
+                                Languages
+                            </Header>
+                            <Table basic={"very"} size="large" celled unstackable textAlign="center">
+                                <Table.Header>
+                                    <Table.Row>
+                                        <Table.HeaderCell>Languages</Table.HeaderCell>
+                                        <Table.HeaderCell>Level(CEFR)</Table.HeaderCell>
+                                    </Table.Row>
+                                </Table.Header>
+                                <Table.Body>
+                                    {candidateLanguages?.map((candidateLanguage) => (
+                                        <Table.Row key={candidateLanguage.id}>
+                                            <Table.Cell>{candidateLanguage.language?.name}</Table.Cell>
+                                            <Table.Cell>{candidateLanguage.languageLevel}</Table.Cell>
                                         </Table.Row>
-                                    </Table.Header>
-                                    <Table.Body>
-                                        {candidateLanguages?.map((candidateLanguage) => (
-                                            <Table.Row key={candidateLanguage.id}>
-                                                <Table.Cell>{candidateLanguage.language?.name}</Table.Cell>
-                                                <Table.Cell>{candidateLanguage.languageLevel}</Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table>
-                            </Grid.Column> : null}
-                    </Grid>
+                                    ))}
+                                </Table.Body>
+                            </Table>
+                        </Grid.Column> : null}
+
+                    {candidateSkills?.length !== 0 && candidateSkills ?
+                        <Grid.Column width={8}>
+                            <Header textAlign={"center"} dividing color="pink">
+                                Skills
+                            </Header>
+                            <Grid padded relaxed>
+                                {candidateSkills?.map((candidateSkill) => (
+                                    <Button key={candidateSkill.id} color={colors[Math.floor(Math.random() * 12)]}
+                                            circular style={{marginTop: 6, marginLeft: 5}}>
+                                        {candidateSkill.skill?.name}
+                                    </Button>
+                                ))}
+                            </Grid>
+                        </Grid.Column> : null}
                 </Grid>
-            </div>
-
+            </Grid>
         )
     }
 
@@ -229,19 +237,21 @@ export default function CandidateDetail() {
 
         return (
             <div>
-                <Card fluid color={color}>
+                {selectedCv?.coverLetter ?
+                    <Card fluid color={color}>
 
-                    <Card.Content>
-                        <Card.Header>
-                            Cover Letter
-                        </Card.Header>
-                    </Card.Content>
+                        <Card.Content>
+                            <Card.Header>
+                                Cover Letter
+                            </Card.Header>
+                        </Card.Content>
 
-                    <Card.Content>
-                        {selectedCv?.coverLetter}
-                    </Card.Content>
+                        <Card.Content>
+                            {selectedCv?.coverLetter}
+                        </Card.Content>
 
-                </Card>
+                    </Card> : null}
+
 
                 {details(
                     selectedCv?.candidateJobExperiences, selectedCv?.candidateSkills,
@@ -256,14 +266,6 @@ export default function CandidateDetail() {
                                     {` ${new Date(selectedCv?.createdAt).getDate()} 
                                     ${months[new Date(selectedCv?.createdAt).getMonth()]} 
                                     ${new Date(selectedCv?.createdAt).getFullYear()} `}
-                                </Table.Cell>
-                            </Table.Row>
-                            <Table.Row>
-                                <Table.Cell>
-                                    Last modified at
-                                    {` ${new Date(selectedCv?.lastModifiedAt).getDate()} 
-                                    ${months[new Date(selectedCv?.lastModifiedAt).getMonth()]} 
-                                    ${new Date(selectedCv?.lastModifiedAt).getFullYear()}`}
                                 </Table.Cell>
                             </Table.Row>
                         </Table.Body>

@@ -13,4 +13,14 @@ public interface CandidateJobExperienceService {
     DataResult<List<CandidateJobExperience>> getAllSortedDesc();
 
     Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto);
+
+    DataResult<Boolean> deleteById(int id);
+
+    Result updateWorkPlace(String workPlace, int id);
+
+    Result updatePosition(short positionId, int id);
+
+    Result updateStartYear(short startYear, int id);
+
+    Result updateQuitYear(Short quitYear, int id);
 }

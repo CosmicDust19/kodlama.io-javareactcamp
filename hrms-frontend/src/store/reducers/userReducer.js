@@ -1,5 +1,22 @@
 import {userProps} from "../initialStates/userProps";
-import {LOGIN, SIGN_OUT} from "../actions/userActions";
+import {
+    LOGIN,
+    SIGN_OUT,
+    CHANGE_EMAIl,
+    CHANGE_GITHUB,
+    CHANGE_LINKEDIN,
+    CHANGE_CV_TITLE,
+    CHANGE_CV_COVERLETTER,
+    CHANGE_CV_JOBEXP,
+    CHANGE_CV_LANG,
+    CHANGE_CV_SCHOOL,
+    CHANGE_CV_SKILL,
+    ADD_CV,
+    DELETE_CV,
+    CHANGE_JOBEXP,
+    CHANGE_LANG,
+    CHANGE_SCHOOL, CHANGE_SKILL
+} from "../actions/userActions";
 
 const initialState = {
     userProps: userProps
@@ -7,7 +24,7 @@ const initialState = {
 
 export default function userReducer(state = initialState, {type, payload}) {
 
-    switch (type){
+    switch (type) {
         case LOGIN:
             state.userProps.user = payload.user
             state.userProps.userType = payload.userType
@@ -18,8 +35,81 @@ export default function userReducer(state = initialState, {type, payload}) {
             state.userProps.userType = null
             state.userProps.loggedIn = false
             return {...state}
+        case CHANGE_EMAIl:
+            state.userProps.user.email = payload.email
+            return {...state}
+        case CHANGE_GITHUB:
+            state.userProps.user.githubAccountLink = payload.link
+            return {...state}
+        case CHANGE_LINKEDIN:
+            state.userProps.user.linkedinAccountLink = payload.link
+            return {...state}
+        case CHANGE_JOBEXP:
+            state.userProps.user.candidateJobExperiences = payload.jobExps
+            return {...state}
+        case CHANGE_LANG:
+            state.userProps.user.candidateLanguages = payload.langs
+            return {...state}
+        case CHANGE_SCHOOL:
+            state.userProps.user.candidateSchools = payload.schools
+            return {...state}
+        case CHANGE_SKILL:
+            state.userProps.user.candidateSkills = payload.skills
+            return {...state}
+        case CHANGE_CV_TITLE: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs[index].title = payload.title
+            return {...state}
+        }
+        case CHANGE_CV_COVERLETTER: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs[index].coverLetter = payload.coverLetter
+            return {...state}
+        }
+        case CHANGE_CV_JOBEXP: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs[index].candidateJobExperiences = payload.jobExps
+            return {...state}
+        }
+        case CHANGE_CV_LANG: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs[index].candidateLanguages = payload.cvLangs
+            return {...state}
+        }
+        case CHANGE_CV_SCHOOL: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs[index].candidateSchools = payload.cvSchools
+            return {...state}
+        }
+        case CHANGE_CV_SKILL: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs[index].candidateSkills = payload.cvSkills
+            return {...state}
+        }
+        case ADD_CV: {
+            state.userProps.user.candidateCvs.push(payload.CV)
+            return {...state}
+        }
+        case DELETE_CV: {
+            let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {
+                return candidateCv.id === payload.cvId
+            })
+            state.userProps.user.candidateCvs.splice(index, 1)
+            return {...state}
+        }
         default:
             return state
-
     }
 }

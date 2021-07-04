@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import JobAdvertisementService from "../services/jobAdvertisementService";
 import {
     Card, Icon, Grid, Dropdown, Checkbox, Segment, Button, Header,
-    Pagination, Loader, Image, Menu, Popup
+    Pagination, Image, Menu, Popup, Placeholder
 } from "semantic-ui-react";
 import {useHistory} from "react-router-dom";
 import CityService from "../services/cityService";
@@ -18,13 +18,12 @@ export default function JobAdvertisementList() {
         "June", "July", "August", "September", "October", "November", "December"]
 
     //const [sortingOpts] = useState(["Creation Date + ", "Creation Date - "]);
-    const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [jobAdvertisementsPerPage, setJobAdvertisementsPerPage] = useState(5);
     const [cities, setCities] = useState([]);
     const [positions, setPositions] = useState([]);
     const [employers, setEmployers] = useState([]);
-    const [jobAdvertisements, setJobAdvertisement] = useState([]);
+    const [jobAdvertisements, setJobAdvertisements] = useState([]);
 
     useEffect(() => {
         let cityService = new CityService();
@@ -36,10 +35,8 @@ export default function JobAdvertisementList() {
     }, []);
 
     useEffect(() => {
-        setLoading(true);
         let jobAdvertisementService = new JobAdvertisementService();
-        jobAdvertisementService.getJobAdvertisements().then((result) => setJobAdvertisement(result.data.data));
-        setLoading(false);
+        jobAdvertisementService.getJobAdvertisements().then((result) => setJobAdvertisements(result.data.data));
     }, [])
 
     const cityOption = cities.map((city, index) => ({
@@ -79,7 +76,7 @@ export default function JobAdvertisementList() {
 
     function filters() {
         return (
-            <Segment style={{marginTop:11}}>
+            <Segment style={{marginTop: 11}}>
                 <Header dividing>
                     <Header.Content>
                         <Icon name="filter"/>
@@ -125,11 +122,27 @@ export default function JobAdvertisementList() {
     }
 
     function listJobAdvertisements(currentJobAdvertisements) {
-        if (loading) {
+        if (jobAdvertisements.length === 0 && (!currentJobAdvertisements || currentJobAdvertisements.length === 0)) {
+            let placeHolders = []
+            for (let i = 0; i < 10; i++) {
+                placeHolders.push(
+                    <Placeholder size="large">
+                        <Placeholder.Header>
+                            <Placeholder.Line/>
+                            <Placeholder.Line/>
+                        </Placeholder.Header>
+                        <Placeholder.Paragraph>
+                            <Placeholder.Line/>
+                            <Placeholder.Line/>
+                            <Placeholder.Line/>
+                        </Placeholder.Paragraph>
+                    </Placeholder>)
+            }
             return (
-                <Segment>
-                    <Loader active/>
-                    <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png'/>
+                <Segment basic size={"large"}>
+                    {placeHolders}
+                    <Image src='https://react.semantic-ui.com/images/wireframe/short-paragraph.png'
+                           style={{opacity: 0}}/>
                 </Segment>
             )
         }
@@ -139,7 +152,7 @@ export default function JobAdvertisementList() {
                 {currentJobAdvertisements.map((jobAdvertisement) => (
                     <Card color={colors[Math.floor(Math.random() * 12)]} onClick={() => {
                         handleAdvertisementClick(jobAdvertisement.id);
-                    }} fluid={true} key={jobAdvertisement.id}>
+                    }} fluid key={jobAdvertisement.id}>
                         <Card.Content>
                             <Card.Header>{jobAdvertisement.position.title}</Card.Header>
                             <Card.Meta>{jobAdvertisement.employer?.companyName}</Card.Meta>
@@ -169,7 +182,7 @@ export default function JobAdvertisementList() {
         )
     }
 
-    function itemsPerPageBar(){
+    function itemsPerPageBar() {
         return (
             <Popup
                 trigger={
@@ -204,7 +217,7 @@ export default function JobAdvertisementList() {
                     opacity: 0.9,
                     color: "rgb(18,18,18)"
                 }}
-                position = {"top right"}
+                position={"top right"}
                 on={"hover"}
                 mouseEnterDelay={1000}
                 mouseLeaveDelay={150}
@@ -212,7 +225,7 @@ export default function JobAdvertisementList() {
         )
     }
 
-    function paginationBar(){
+    function paginationBar() {
         return (
             <Popup
                 trigger={
@@ -232,7 +245,7 @@ export default function JobAdvertisementList() {
                     opacity: 0.9,
                     color: "rgb(18,18,18)"
                 }}
-                position = {"top center"}
+                position={"top center"}
                 on={"hover"}
                 mouseEnterDelay={1000}
                 mouseLeaveDelay={150}
@@ -243,7 +256,7 @@ export default function JobAdvertisementList() {
     return (
         <div>
             <Grid stackable padded>
-                <Grid.Column width={5} >
+                <Grid.Column width={5}>
                     <Grid padded>
                         <Grid.Row/>
                         <Grid.Row/>
@@ -263,7 +276,7 @@ export default function JobAdvertisementList() {
                                     {listJobAdvertisements(currentJobAdvertisements)}
                                 </Grid.Column>
                                 <Grid.Column width={1}>
-                                    {itemsPerPageBar()}
+                                    {currentJobAdvertisements.length !== 0 ? itemsPerPageBar() : null}
                                 </Grid.Column>
                             </Grid>
                         </Grid.Row>

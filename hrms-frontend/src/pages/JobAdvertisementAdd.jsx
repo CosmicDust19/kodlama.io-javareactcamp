@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import {useFormik} from "formik";
 import * as Yup from "yup";
 import {
-    Button, Dropdown, Input, TextArea, Card, Form, Grid, GridColumn, Segment,
-    Progress, Icon
+    Button, Dropdown, Input, TextArea, Card, Form, Grid, GridColumn,
+    Progress, Icon, Header
 } from "semantic-ui-react";
 import CityService from "../services/cityService";
 import PositionService from "../services/positionService";
@@ -21,15 +21,23 @@ export default function JobAdvertisementAdd() {
     const userProps = useSelector(state => state?.user?.userProps)
 
     const [progressBarState, setProgressBarState] = useState({percent: 0});
+    const [workTimes] = useState(["Part Time", "Full Time", "Seasonal", "Internship", "Freelance"]);
+    const [workModals] = useState(["Remote", "Office", "Hybrid"]);
+    const [cities, setCities] = useState([]);
+    const [positions, setPositions] = useState([]);
+    const [is1stTimePosition, setIs1stTimePosition] = useState(true);
+    const [is1stTimeCity, setIs1stTimeCity] = useState(true);
+    const [is1stTimeWorkModel, setIs1stTimeWorkModel] = useState(true);
+    const [is1stTimeWorkTime, setIs1stTimeWorkTime] = useState(true);
+    const [is1stTimeHired, setIs1stTimeHired] = useState(true);
+    const [is1stTimeMinSal, setIs1stTimeMinSal] = useState(true);
+    const [is1stTimeMaxSal, setIs1stTimeMaxSal] = useState(true);
+    const [is1stTimeJobDesc, setIs1stJobDesc] = useState(true);
+    const [is1stTimeDeadline, setIs1stDeadline] = useState(true);
 
     const increment = () =>
         setProgressBarState((prevState) => ({
-            percent: prevState.percent + 10 >= 100 ? 100 : prevState.percent + 10,
-        }))
-
-    const decrement = () =>
-        setProgressBarState((prevState) => ({
-            percent: prevState.percent - 10 <= 0 ? 0 : prevState.percent - 10,
+            percent: prevState.percent + 11 >= 100 ? 100 : prevState.percent + 11,
         }))
 
     let jobAdvertisementService = new JobAdvertisementService();
@@ -53,24 +61,39 @@ export default function JobAdvertisementAdd() {
         },
         validationSchema: JobAdvertisementAddSchema,
         onSubmit: (values) => {
+            let counter = 0
             values.employerId = userProps.user?.id;
             formik.values.position = {id: formik.values.positionId}
             formik.values.city = {id: formik.values.cityId}
+            if (values.minSalary && values.maxSalary && values.minSalary > values.maxSalary) {
+                toast.warning("Minimum salary cannot be bigger than maximum salary")
+                counter++
+            }
             if (new Date(values.applicationDeadline).getTime() < new Date().getTime()) {
                 toast.warning("Application deadline should be a date in the future")
-                return
+                counter++
             }
-            jobAdvertisementService.add(values).then((result) => console.log(result.data.data));
-            toast("Published 🎉", {
-                autoClose: 2500
-            })
+            if (counter === 0) {
+                jobAdvertisementService.add(values).then((result) => {
+                    console.log(result)
+                    toast("Published 🎉", {
+                        autoClose: 2500
+                    })
+                    increment()
+                    increment()
+                    increment()
+                }).catch(reason => {
+                    console.log(reason)
+                    toast.warning("A problem has occurred", {
+                        autoClose: 4000
+                    })
+                    toast.warning("Probably you already have an advert in this city, this position and this description", {
+                        autoClose: 8000
+                    })
+                })
+            }
         },
     });
-
-    const [workTimes] = useState(["Part Time", "Full Time"]);
-    const [workModals] = useState(["Remote", "Office"]);
-    const [cities, setCities] = useState([]);
-    const [positions, setPositions] = useState([]);
 
     useEffect(() => {
         let cityService = new CityService();
@@ -104,14 +127,74 @@ export default function JobAdvertisementAdd() {
         value: position.id,
     }));
 
-    const handleChangeSemantic = (fieldName, value) => {
+    const handleChange = (fieldName, value) => {
+        switch (fieldName) {
+            case "positionId":
+                if (is1stTimePosition) {
+                    increment()
+                    setIs1stTimePosition(false)
+                }
+                break;
+            case "cityId":
+                if (is1stTimeCity) {
+                    increment()
+                    setIs1stTimeCity(false)
+                }
+                break;
+            case "workModel":
+                if (is1stTimeWorkModel) {
+                    increment()
+                    setIs1stTimeWorkModel(false)
+                }
+                break;
+            case "workTime":
+                if (is1stTimeWorkTime) {
+                    increment()
+                    setIs1stTimeWorkTime(false)
+                }
+                break;
+            case "numberOfPeopleToBeHired":
+                if (is1stTimeHired) {
+                    increment()
+                    setIs1stTimeHired(false)
+                }
+                break;
+            case "minSalary":
+                if (is1stTimeMinSal) {
+                    increment()
+                    setIs1stTimeMinSal(false)
+                }
+                break;
+            case "maxSalary":
+                if (is1stTimeMaxSal) {
+                    increment()
+                    setIs1stTimeMaxSal(false)
+                }
+                break;
+            case "jobDescription":
+                if (is1stTimeJobDesc) {
+                    increment()
+                    setIs1stJobDesc(false)
+                }
+                break;
+            case "applicationDeadline":
+                if (is1stTimeDeadline) {
+                    increment()
+                    setIs1stDeadline(false)
+                }
+                break;
+            default:
+                return null
+        }
         formik.setFieldValue(fieldName, value);
     }
 
     return (
         <div>
-            <Progress percent={progressBarState.percent} indicating />
-            <Segment disabled inverted color={color} basic size={"big"} textAlign={"center"}>Post Job</Segment>
+            <Header textAlign = "center">
+                Post Job
+            </Header>
+            <Progress percent={progressBarState.percent} indicating style = {{marginBottom: -13}} attached={"bottom"}/>
             <Card fluid color={color}>
                 <Card.Content>
                     <Form onSubmit={formik.handleSubmit}>
@@ -120,8 +203,7 @@ export default function JobAdvertisementAdd() {
                                 <GridColumn width={4}>
                                     <Dropdown clearable item placeholder="Select a position" search selection
                                               onChange={(event, data) => {
-                                                  handleChangeSemantic("positionId", data.value)
-                                                  increment()
+                                                  handleChange("positionId", data.value)
                                               }}
                                               onBlur={formik.handleBlur} id="id"
                                               value={formik.values.positionId} options={positionOption}
@@ -135,8 +217,7 @@ export default function JobAdvertisementAdd() {
                                 <GridColumn width={4}>
                                     <Dropdown clearable item placeholder="Select a city" search selection
                                               onChange={(event, data) => {
-                                                  handleChangeSemantic("cityId", data.value)
-                                                  increment()
+                                                  handleChange("cityId", data.value)
                                               }}
                                               onBlur={formik.handleBlur} id="id" value={formik.values.cityId}
                                               options={cityOption}
@@ -150,8 +231,7 @@ export default function JobAdvertisementAdd() {
                                 <GridColumn width={4}>
                                     <Dropdown clearable item placeholder="Enter Work Model" search selection
                                               onChange={(event, data) => {
-                                                  handleChangeSemantic("workModel", data.value)
-                                                  increment()
+                                                  handleChange("workModel", data.value)
                                               }}
                                               onBlur={formik.handleBlur} id="workModel"
                                               value={formik.values.workModel} options={workModalOption}
@@ -167,8 +247,7 @@ export default function JobAdvertisementAdd() {
                                               onBlur={formik.handleBlur} id="workTime" openOnFocus
                                               value={formik.values.workTime} options={workTimeOption}
                                               onChange={(event, data) => {
-                                                  handleChangeSemantic("workTime", data.value)
-                                                  increment()
+                                                  handleChange("workTime", data.value)
                                               }}
                                     />
                                     {formik.errors.workTime && formik.touched.workTime && (
@@ -184,7 +263,7 @@ export default function JobAdvertisementAdd() {
                                            id="numberOfPeopleToBeHired" name="numberOfPeopleToBeHired"
                                            error={Boolean(formik.errors.numberOfPeopleToBeHired)}
                                            onChange={(event, data) => {
-                                               handleChangeSemantic("numberOfPeopleToBeHired", data.value)
+                                               handleChange("numberOfPeopleToBeHired", data.value)
                                            }} value={formik.values.numberOfPeopleToBeHired}
                                            onBlur={formik.handleBlur} type="number"
                                            placeholder="Enter the number of people to be hired"
@@ -204,7 +283,7 @@ export default function JobAdvertisementAdd() {
                                         error={Boolean(formik.errors.minSalary)}
                                         name="minSalary"
                                         onChange={(event, data) => {
-                                            handleChangeSemantic("minSalary", data.value)
+                                            handleChange("minSalary", data.value)
                                         }}
                                         onBlur={formik.handleBlur}
                                     />
@@ -222,7 +301,9 @@ export default function JobAdvertisementAdd() {
                                         value={formik.values.maxSalary}
                                         error={Boolean(formik.errors.maxSalary)}
                                         name="maxSalary"
-                                        onChange={formik.handleChange}
+                                        onChange={(event, data) => {
+                                            handleChange("maxSalary", data.value)
+                                        }}
                                         onBlur={formik.handleBlur}
                                     />
                                     {formik.errors.maxSalary && formik.touched.maxSalary && (
@@ -242,7 +323,9 @@ export default function JobAdvertisementAdd() {
                                         style={{minHeight: 300, maxWidth: 762}}
                                         value={formik.values.jobDescription}
                                         name="jobDescription"
-                                        onChange={formik.handleChange}
+                                        onChange={(event, data) => {
+                                            handleChange("jobDescription", data.value)
+                                        }}
                                         onBlur={formik.handleBlur}
                                     />
                                     {formik.errors.jobDescription && formik.touched.jobDescription && (
@@ -257,7 +340,7 @@ export default function JobAdvertisementAdd() {
                                         style={{width: "78%"}} type="date"
                                         error={Boolean(formik.errors.applicationDeadline)}
                                         onChange={(event, data) =>
-                                            handleChangeSemantic("applicationDeadline", data.value)
+                                            handleChange("applicationDeadline", data.value)
                                         }
                                         value={formik.values.applicationDeadline} onBlur={formik.handleBlur}
                                         name="applicationDeadline"
@@ -270,7 +353,7 @@ export default function JobAdvertisementAdd() {
                                 </Grid.Column>
                             </Grid>
                         </Form.Field>
-                        <Button animated="fade" positive type="submit">
+                        <Button animated="fade" positive type="submit" size="large">
                             <Button.Content hidden><Icon name='checkmark'/></Button.Content>
                             <Button.Content visible>Post</Button.Content>
                         </Button>

@@ -5,4 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserDao extends JpaRepository<User,Integer> {
     boolean existsByEmail(String email);
+
+    boolean existsByIdAndPassword(Integer id, String password);
 }

@@ -11,4 +11,6 @@ public interface CandidateSkillService {
     DataResult<List<CandidateSkill>> getAll();
 
     Result add(CandidateSkillAddDto candidateSkillAddDto);
+
+    DataResult<Boolean> deleteById(int id);
 }

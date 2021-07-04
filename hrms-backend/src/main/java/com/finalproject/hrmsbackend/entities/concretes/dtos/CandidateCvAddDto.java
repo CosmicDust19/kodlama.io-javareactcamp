@@ -25,16 +25,12 @@ public class CandidateCvAddDto {
 
     private String coverLetter;
 
-    @Valid
     private List<CandidateJobExperienceAddDto> candidateJobExperiences;
 
-    @Valid
     private List<CandidateLanguageAddDto> candidateLanguages;
 
-    @Valid
     private List<CandidateSchoolAddDto> candidateSchools;
 
-    @Valid
     private List<CandidateSkillAddDto> candidateSkills;
 
 }

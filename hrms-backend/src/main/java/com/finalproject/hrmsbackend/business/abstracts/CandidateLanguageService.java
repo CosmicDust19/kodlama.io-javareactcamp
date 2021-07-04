@@ -11,4 +11,10 @@ public interface CandidateLanguageService {
     DataResult<List<CandidateLanguage>> getAll();
 
     Result add(CandidateLanguageAddDto candidateLanguageAddDto);
+
+    DataResult<Boolean> deleteById(int id);
+
+    Result updateLanguage(short languageId, int id);
+
+    Result updateLanguageLevel(String languageLevel, int id);
 }

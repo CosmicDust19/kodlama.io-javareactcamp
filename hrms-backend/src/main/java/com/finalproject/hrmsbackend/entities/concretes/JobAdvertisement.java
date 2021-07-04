@@ -1,5 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -66,6 +67,9 @@ public class JobAdvertisement {
 
     @Column(name = "is_active", nullable = false)
     private boolean activationStatus = true;
+
+    @Column(name = "is_system_verified", nullable = false)
+    private boolean systemVerificationStatus = true;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

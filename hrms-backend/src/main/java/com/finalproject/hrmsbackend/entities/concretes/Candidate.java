@@ -63,4 +63,7 @@ public class Candidate extends User {
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateSkill> candidateSkills;
 
+    public Candidate(int id) {
+        super(id);
+    }
 }

@@ -9,14 +9,18 @@ import Navi from "./Navi";
 import Footer from "./Footer";
 import UserList from "../pages/UserList";
 import Login from "../pages/Login";
-import {CandidateSignUp, EmployerSignUp, SystemEmployeeSignUp} from "../pages/SignUp";
 import CandidateDetail from "../pages/CandidateDetail";
 import {ToastContainer} from "react-toastify";
 import CandidateList from "../pages/CandidateList";
 import {useSelector} from "react-redux";
 import EmployerList from "../pages/EmployerList";
-import {CandidateAccount, CandidateCvs} from "../pages/CandidateOperations";
+import {CandidateManageAccount} from "../pages/CandidateManageAccount"
+import {CandidateManageCvs} from "../pages/CandidateManageCVs"
 import {EmployerAccount, EmployerAdverts} from "../pages/EmployerOperations";
+import {SignUpCandidate} from "../pages/SignUpCandidate";
+import {SignUpEmployer} from "../pages/SignUpEmployer";
+import {SignUpSystemEmployee} from "../pages/SignUpSystemEmployee";
+import {CandidateManageMe} from "../pages/CandidateManageMe";
 
 export default function Dashboard() {
 
@@ -34,25 +38,26 @@ export default function Dashboard() {
     return (
         <div className="dashboard">
             <Navi/>
-            <ToastContainer position = {"top-right"}/>
+            <ToastContainer position = {"bottom-right"}/>
             <Container className="main container">
                 <Route exact path="/" component={mainPage()}/>
                 <Route path="/users" component={UserList}/>
                 <Route path="/login" component={Login}/>
                 <Route exact path="/candidates" component={CandidateList}/>
-                <Route path="/candidates/:id" component={CandidateDetail}/>
-                <Route exact path="/candidateSignUp" component={CandidateSignUp}/>
-                <Route exact path="/candidateAccount" component={CandidateAccount}/>
-                <Route exact path="/candidateCVs" component={CandidateCvs}/>
+                <Route exact path="/candidates/:id" component={CandidateDetail}/>
+                <Route exact path="/signUpCandidate" component={SignUpCandidate}/>
+                <Route exact path="/candidateManageAccount" component={CandidateManageAccount}/>
+                <Route exact path="/candidateManageCVs" component={CandidateManageCvs}/>
+                <Route exact path="/candidateManageMe" component={CandidateManageMe}/>
                 <Route exact path="/employers" component={EmployerList}/>
                 <Route path="/employers/:id" component={EmployerDetail}/>
-                <Route exact path="/employerSignUp" component={EmployerSignUp}/>
+                <Route exact path="/signUpEmployer" component={SignUpEmployer}/>
                 <Route exact path="/employerAccount" component={EmployerAccount}/>
                 <Route exact path="/employerJobAdverts" component={EmployerAdverts}/>
                 <Route exact path="/jobAdvertisements" component={JobAdvertisementList}/>
                 <Route path="/jobAdvertisements/:id" component={JobAdvertisementDetail}/>
                 <Route path="/postJobAdvertisement" component={JobAdvertisementAdd}/>
-                <Route exact path="/systemEmployeeSignUp" component={SystemEmployeeSignUp}/>
+                <Route exact path="/signUpSystemEmployee" component={SignUpSystemEmployee}/>
             </Container>
             <Footer/>
         </div>

@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.api.controllers;
 import com.finalproject.hrmsbackend.business.abstracts.CandidateService;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.Candidate;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateAddDto;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,31 @@ public class CandidatesController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateAddDto candidateAddDto) {
         return ResponseEntity.ok(candidateService.add(candidateAddDto));
+    }
+
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return candidateService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updateEmail")
+    public Result updateEmail(@RequestParam String email, @RequestParam int id) {
+        return candidateService.updateEmail(email, id);
+    }
+
+    @PutMapping(value = "/updatePassword")
+    public Result updatePassword(@RequestParam String password, @RequestParam String oldPassword, @RequestParam int id) {
+        return candidateService.updatePassword(password, oldPassword, id);
+    }
+
+    @PutMapping(value = "/updateGithubAccountLink")
+    public Result updateGithubAccountLink(String githubAccountLink, @RequestParam int id) {
+        return candidateService.updateGithubAccountLink(githubAccountLink, id);
+    }
+
+    @PutMapping(value = "/updateLinkedinAccountLink")
+    public Result updateLinkedinAccountLink(String linkedinAccountLink, @RequestParam int id) {
+        return candidateService.updateLinkedinAccountLink(linkedinAccountLink, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

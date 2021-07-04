@@ -13,4 +13,14 @@ public interface CandidateSchoolService {
     DataResult<List<CandidateSchool>> getAllSortedDesc();
 
     Result add(CandidateSchoolAddDto candidateSchoolAddDto);
+
+    DataResult<Boolean> deleteById(int id);
+
+    Result updateSchool(int schoolId, int id);
+
+    Result updateDepartment(short departmentId, int id);
+
+    Result updateStartYear(short schoolStartYear, int id);
+
+    Result updateGraduationYear(Short graduationYear, int id);
 }

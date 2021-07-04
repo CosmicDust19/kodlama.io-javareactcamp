@@ -52,7 +52,7 @@ export default function Login() {
     }
 
     const loginValidationSchema = Yup.object().shape({
-        email: Yup.string().required("Please enter your e-mail").matches(/\w+(\.\w+)*@[a-zA-Z]+(\.\w{2,6})+/, "not a valid e-mail format"),
+        email: Yup.string().required("Please enter your e-mail").matches(/^\w+(\.\w+)*@[a-zA-Z]+(\.\w{2,6})+$/, "not a valid e-mail format"),
         password: Yup.string().required("Please enter your password")
     });
 
@@ -70,13 +70,13 @@ export default function Login() {
                 return
             }
 
-            if (candidate !== undefined && candidate !== {} && candidate !== null) {
+            if (candidate && candidate !== {}  ) {
                 handleLogin(candidate, "candidate")
                 history.push("/")
-            } else if (employer && employer !== {} && employer !== null) {
+            } else if (employer &&  employer !== {}) {
                 handleLogin(employer, "employer")
                 history.push("/")
-            } else if (systemEmployee && systemEmployee !== {} && systemEmployee !== null) {
+            } else if (systemEmployee && systemEmployee !== {}) {
                 handleLogin(systemEmployee, "systemEmployee")
                 history.push("/")
             } else {
@@ -84,7 +84,8 @@ export default function Login() {
                 return
             }
             toast("Welcome", {
-                autoClose: 1500
+                autoClose: 1500,
+                pauseOnHover: false,
             })
         }
     });

@@ -2,16 +2,15 @@ import {Container, Dropdown, Icon, Image, Menu, Modal, Header, Button, Grid} fro
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {signOut} from "../store/actions/userActions";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 
 
 export default function SignedIn() {
 
     const [isOpen, setIsOpen] = useState(false)
-
     const userProps = useSelector(state => state?.user?.userProps)
-
     const dispatch = useDispatch();
+    const history = useHistory();
 
     const handleSignOut = () => {
         setIsOpen(true)
@@ -24,7 +23,7 @@ export default function SignedIn() {
                 <Grid centered padded>
                     <Grid.Row>
                         <Header size={"large"} color={"yellow"}>
-                            Are you sure you want to sign out?
+                            Are you sure you want to sign out ?
                         </Header>
                     </Grid.Row>
                 </Grid>
@@ -33,6 +32,7 @@ export default function SignedIn() {
                         <Modal.Actions>
                             <Button color='yellow' inverted  size='large' onClick={() => {
                                 dispatch(signOut())
+                                history.push("/")
                                 setIsOpen(false)
                             }}>
                                 <Icon name='checkmark' /> Yes
@@ -63,14 +63,17 @@ export default function SignedIn() {
                     <Menu.Menu position='right'>
                         <Menu.Item>
                             <Image size="mini" circular
-                                   src='https://user-images.githubusercontent.com/74824916/122045900-edc1b800-cde6-11eb-8d51-e44fe3c3daba.png'/>
+                                   src='https://freesvg.org/img/abstract-user-flat-1.png'/>
                             <Dropdown item text={userProps.user?.firstName}>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item as={Link} to={"/candidateAccount"}>
-                                        <Icon name="edit"/>Account
-                                    </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to={"/candidateCVs"}>
+                                    <Dropdown.Item as={Link} to={"/candidateManageCVs"}>
                                         <Icon name="file alternate outline"/>My CVs
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to={"/candidateManageMe"}>
+                                        <Icon name="address book"/>About Me
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to={"/candidateManageAccount"}>
+                                        <Icon name="setting"/>Account
                                     </Dropdown.Item>
                                     <Dropdown.Item onClick={() => {
                                         handleSignOut()
@@ -100,10 +103,12 @@ export default function SignedIn() {
 
                     <Menu.Item name="Users" as={Link} to={"/users"}>Users</Menu.Item>
 
+                    <Menu.Item name="Job Advertisements" as={Link} to={"/jobAdvertisements"}>Job Advertisements</Menu.Item>
+
                     <Menu.Menu position='right'>
                         <Menu.Item>
-                            <Image size="mini" circular
-                                   src='https://user-images.githubusercontent.com/74824916/122045900-edc1b800-cde6-11eb-8d51-e44fe3c3daba.png'/>
+                            <Image size="mini"
+                                   src='https://www.vhv.rs/dpng/d/52-524451_building-company-icon-png-transparent-png.png'/>
                             <Dropdown item text={userProps.user?.companyName}>
                                 <Dropdown.Menu>
                                     <Dropdown.Item as={Link} to={"/employerAccount"}>
@@ -144,8 +149,8 @@ export default function SignedIn() {
                     <Menu.Menu position='right'>
                         <Menu.Item>
                             <Image size="mini" circular
-                                   src='https://user-images.githubusercontent.com/74824916/122045900-edc1b800-cde6-11eb-8d51-e44fe3c3daba.png'/>
-                            <Dropdown item text={userProps.user?.firstName}>
+                                   src="https://freesvg.org/img/abstract-user-flat-1.png"/>
+                            <Dropdown item text={userProps.user?.firstName} selection>
                                 <Dropdown.Menu>
                                     <Dropdown.Item><Icon name="info"/>Account</Dropdown.Item>
                                     <Dropdown.Item><Icon name="settings"/>Settings</Dropdown.Item>

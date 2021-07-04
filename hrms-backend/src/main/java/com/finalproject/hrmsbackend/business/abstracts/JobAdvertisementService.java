@@ -11,15 +11,41 @@ public interface JobAdvertisementService {
 
     DataResult<List<JobAdvertisement>> getAll();
 
-    DataResult<List<JobAdvertisement>> getAllActives();
+    DataResult<List<JobAdvertisement>> getAllActivesAndVerified();
 
-    DataResult<List<JobAdvertisement>> getAllActivesSortedByDate(int sortDirection);
+    DataResult<List<JobAdvertisement>> getAllActivesAndVerifiedSortedByDate(int sortDirection);
 
-    DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(int employerId);
+    DataResult<List<JobAdvertisement>> getByActivesAndVerifiedAndEmployer_Id(int employerId);
+
+    DataResult<List<JobAdvertisement>> getAllBySystemVerificationStatusFalse();
+
+    DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlineFuture();
+
+    DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlinePast();
 
     DataResult<JobAdvertisement> getById(int jobAdvertisementId);
 
     Result add(JobAdvertisementAddDto jobAdvertisementAddDto);
 
+    DataResult<Boolean> deleteById(int id);
+
+    Result updatePosition(short positionId, int id);
+
+    Result updateJobDescription(String jobDescription, int id);
+
+    Result updateCity(short cityId, int id);
+
+    Result updateMinSalary(Double minSalary, int id);
+
+    Result updateMaxSalary(Double maxSalary, int id);
+
+    Result updateWorkModel(String workModel, int id);
+
+    Result updateWorkTime(String workTime, int id);
+
+    Result updateApplicationDeadLine(String applicationDeadLine, int id);
+
     Result updateActivationStatus(boolean isActive, int id);
+
+    Result updateSystemVerificationStatus(boolean systemVerificationStatus, int id);
 }

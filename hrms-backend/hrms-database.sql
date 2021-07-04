@@ -171,7 +171,6 @@ CREATE TABLE public.candidates_cvs
     created_at       timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
     last_modified_at timestamp(0) without time zone,
     CONSTRAINT pk_candidates_cvs PRIMARY KEY (id),
-    CONSTRAINT uk_candidates_cvs_title UNIQUE (title),
     CONSTRAINT fk_candidates_cvs_candidate_id FOREIGN KEY (candidate_id)
         REFERENCES public.candidates (user_id)
         ON DELETE CASCADE
@@ -254,6 +253,7 @@ CREATE TABLE public.job_advertisements
     work_time                    char varying(20)               NOT NULL,
     application_deadline         date,
     is_active                    boolean                        NOT NULL DEFAULT TRUE,
+    is_system_verified           boolean                        NOT NULL DEFAULT FALSE,
     created_at                   timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
     last_modified_at             timestamp(0) without time zone,
     CONSTRAINT pk_job_advertisements PRIMARY KEY (id),
@@ -543,8 +543,9 @@ VALUES (4, 'examplefn4', 'exampleln4', '12345678910', 1994),
        (6, 'examplefn6', 'exampleln6', '34567891012', 1996);
 
 UPDATE candidates
-SET github_account_link = 'https://github.com/CosmicDust19',
-    linkedin_account_link = 'https://www.linkedin.com/in/semih-kayan/' WHERE user_id = 4;
+SET github_account_link   = 'https://github.com/CosmicDust19',
+    linkedin_account_link = 'https://www.linkedin.com/in/semih-kayan/'
+WHERE user_id = 4;
 
 INSERT INTO employers
 VALUES (7, 'example_company7', 'www.example_web_site7.com', '05005005057', true),

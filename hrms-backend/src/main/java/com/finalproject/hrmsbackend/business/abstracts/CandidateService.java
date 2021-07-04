@@ -18,4 +18,13 @@ public interface CandidateService extends UserService<Candidate> {
 
     Result add(CandidateAddDto candidateAddDto);
 
+    DataResult<Boolean> deleteById(int id);
+
+    Result updateEmail(String email, int id);
+
+    Result updatePassword(String password, String oldPassword, int id);
+
+    Result updateGithubAccountLink(String githubAccountLink, int id);
+
+    Result updateLinkedinAccountLink(String linkedinAccountLink, int id);
 }

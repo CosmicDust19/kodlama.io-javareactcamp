@@ -16,5 +16,31 @@ public interface CandidateCvService {
 
     DataResult<Boolean> deleteById(int id);
 
-    DataResult<Boolean> updateCoverLetter(String coverLetter, int id);
+    Result updateTitle(String title, int id);
+
+    Result updateCoverLetter(String coverLetter, int id);
+
+    Result syncCandidateCvJobExperiences(List<Integer> candidateJobExperienceIds, int candidateCvId);
+
+    Result syncCandidateCvLanguages(List<Integer> candidateLanguageIds, int candidateCvId);
+
+    Result syncCandidateCvSchools(List<Integer> candidateSchoolIds, int candidateCvId);
+
+    Result syncCandidateCvSkills(List<Integer> candidateSkillIds, int candidateCvId);
+
+    Result addJobExperiencesToCandidateCv(List<Integer> candidateJobExperienceIds, int candidateCvId, byte checkType);
+
+    Result addLanguagesToCandidateCv(List<Integer> candidateLanguageIds, int candidateCvId, byte checkType);
+
+    Result addSchoolsToCandidateCv(List<Integer> candidateSchoolIds, int candidateCvId, byte checkType);
+
+    Result addSkillsToCandidateCv(List<Integer> candidateSchoolIds, int candidateCvId, byte checkType);
+
+    Result deleteJobExperiencesFromCandidateCv(List<Integer> candidateJobExperienceIds, int candidateCvId, byte checkType);
+
+    Result deleteLanguagesFromCandidateCv(List<Integer> candidateLanguageIds, int candidateCvId, byte checkType);
+
+    Result deleteSchoolsFromCandidateCv(List<Integer> candidateSchoolIds, int candidateCvId, byte checkType);
+
+    Result deleteSkillsFromCandidateCv(List<Integer> candidateSkillIds, int candidateCvId, byte checkType);
 }

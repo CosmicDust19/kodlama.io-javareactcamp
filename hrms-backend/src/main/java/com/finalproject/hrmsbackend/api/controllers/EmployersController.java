@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.api.controllers;
 import com.finalproject.hrmsbackend.business.abstracts.EmployerService;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.Employer;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.EmployerAddDto;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,16 @@ public class EmployersController {
         return employerService.getAll();
     }
 
+    @GetMapping("/getAllBySystemVerificationStatusTrue")
+    public DataResult<List<Employer>> getAllBySystemVerificationStatusTrue(){
+        return employerService.getAllBySystemVerificationStatusTrue();
+    }
+
+    @GetMapping("/getAllBySystemVerificationStatusFalse")
+    public DataResult<List<Employer>> getAllBySystemVerificationStatusFalse(){
+        return employerService.getAllBySystemVerificationStatusFalse();
+    }
+
     @GetMapping("/getById")
     public DataResult<Employer> getById(@RequestParam int id) {
         return employerService.getById(id);
@@ -58,6 +69,36 @@ public class EmployersController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody EmployerAddDto employerAddDto) {
         return ResponseEntity.ok(employerService.add(employerAddDto));
+    }
+
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return employerService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updatePassword")
+    public Result updatePassword(@RequestParam String password, @RequestParam String oldPassword, @RequestParam int id) {
+        return employerService.updatePassword(password, oldPassword, id);
+    }
+
+    @PutMapping(value = "/updateCompanyName")
+    public Result updateCompanyName(@RequestParam String companyName, @RequestParam int id) {
+        return employerService.updateCompanyName(companyName, id);
+    }
+
+    @PutMapping(value = "/updateEmailAndWebsite")
+    public Result updateEmailAndWebsite(@RequestParam String email, @RequestParam String website, @RequestParam int id) {
+        return employerService.updateEmailAndWebsite(email, website, id);
+    }
+
+    @PutMapping(value = "/updatePhoneNumber")
+    public Result updatePhoneNumber(@RequestParam String phoneNumber, @RequestParam int id) {
+        return employerService.updatePhoneNumber(phoneNumber, id);
+    }
+
+    @PutMapping(value = "/updateSystemVerificationStatus")
+    public Result updateSystemVerificationStatus(@RequestParam boolean systemVerificationStatus, @RequestParam int id) {
+        return employerService.updateSystemVerificationStatus(systemVerificationStatus, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

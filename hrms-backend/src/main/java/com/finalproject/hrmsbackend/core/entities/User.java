@@ -48,4 +48,8 @@ public class User {
     @LastModifiedDate
     @Column(name = "last_modified_at")
     private LocalDate lastModifiedDate;
+
+    public User(int id) {
+        this.id = id;
+    }
 }

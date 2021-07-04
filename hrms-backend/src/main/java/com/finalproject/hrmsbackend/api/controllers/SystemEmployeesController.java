@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.api.controllers;
 import com.finalproject.hrmsbackend.business.abstracts.SystemEmployeeService;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.SystemEmployee;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.SystemEmployeesAddDto;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,31 @@ public class SystemEmployeesController {
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody SystemEmployeesAddDto systemEmployeesAddDto) {
         return ResponseEntity.ok(systemEmployeeService.add(systemEmployeesAddDto));
+    }
+
+    @DeleteMapping(value = "/deleteById")
+    public DataResult<Boolean> deleteById(@RequestParam int id) {
+        return systemEmployeeService.deleteById(id);
+    }
+
+    @PutMapping(value = "/updateEmail")
+    public Result updateEmail(@RequestParam String email, @RequestParam int id) {
+        return systemEmployeeService.updateEmail(email, id);
+    }
+
+    @PutMapping(value = "/updatePassword")
+    public Result updatePassword(@RequestParam String password, @RequestParam String oldPassword, @RequestParam int id) {
+        return systemEmployeeService.updatePassword(password, oldPassword, id);
+    }
+
+    @PutMapping(value = "/updateFirstName")
+    public Result updateFirstName(@RequestParam String firstName, @RequestParam int id) {
+        return systemEmployeeService.updateFirstName(firstName, id);
+    }
+
+    @PutMapping(value = "/updateLastName")
+    public Result updateLastName(@RequestParam String lastName, @RequestParam int id) {
+        return systemEmployeeService.updateLastName(lastName, id);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

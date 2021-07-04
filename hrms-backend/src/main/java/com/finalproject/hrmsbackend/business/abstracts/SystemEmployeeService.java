@@ -15,4 +15,14 @@ public interface SystemEmployeeService extends UserService<SystemEmployee> {
     DataResult<SystemEmployee> getByEmailAndPassword(String email, String password);
 
     Result add(SystemEmployeesAddDto systemEmployeesAddDto);
+
+    DataResult<Boolean> deleteById(int id);
+
+    Result updateEmail(String email, int id);
+
+    Result updatePassword(String password, String oldPassword, int id);
+
+    Result updateFirstName(String firstName, int id);
+
+    Result updateLastName(String lastName, int id);
 }

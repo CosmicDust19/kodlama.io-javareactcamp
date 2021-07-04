@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -36,28 +37,63 @@ public class CandidateLanguageManager implements CandidateLanguageService {
         CandidateLanguage candidateLanguage = modelMapper.map(candidateLanguageAddDto, CandidateLanguage.class);
 
         Map<String, String> errors = new HashMap<>();
-
         if (!candidateDao.existsById(candidateLanguage.getCandidate().getId()))
             errors.put("candidateId", "does not exist");
-        if (candidateLanguage.getLanguage() == null || (candidateLanguage.getLanguage().getId() == 0 && candidateLanguage.getLanguage().getName() == null))
-            errors.put("languageId", "language id or language name should be given");
+        if (candidateLanguage.getLanguage() == null) errors.put("language", "null");
         if (!errors.isEmpty()) return new ErrorDataResult<>("error", errors);
 
         Language language = candidateLanguage.getLanguage();
         language.setName(Utils.formName(language.getName()));
+        if (language.getId() <= 0  || !languageDao.existsById(language.getId()))
+            if(language.getName() == null || language.getName().length() == 0)
+                return new ErrorResult("language id or language name should be given");
         if (!Utils.tryToSaveIfNotExists(language, languageDao))
             language.setId(languageDao.getByName(language.getName()).getId());
 
         if (candidateLanguageDao.existsByCandidateAndLanguage(candidateLanguage.getCandidate(), candidateLanguage.getLanguage()))
-            return new ErrorDataResult<>("unique key", "candidate and language is used together before");
+            return new ErrorResult("this candidate already have this language");
 
-        try {
-            candidateLanguageDao.save(candidateLanguage);
-        } catch (Exception exception) {
-            System.out.println(exception.getMessage());
-            return new ErrorResult("an unknown error has occurred");
-        }
+        CandidateLanguage savedCandidateLanguage = candidateLanguageDao.save(candidateLanguage);
+        return new SuccessResult(Integer.toString(savedCandidateLanguage.getId()));
+    }
+
+    @Override
+    public DataResult<Boolean> deleteById(int id) {
+        if (id <= 0 || !candidateLanguageDao.existsById(id))
+            return new ErrorDataResult<>("id does not exist", false);
+        candidateLanguageDao.deleteById(id);
+        return new SuccessDataResult<>("Success", true);
+    }
+
+    @Override
+    public Result updateLanguage(short languageId, int id){
+        Language language = new Language();
+        language.setId(languageId);
+        Map<String, String> errors = new HashMap<>();
+        if (id <= 0 || !candidateLanguageDao.existsById(id))
+            errors.put("candidateId", "does not exist");
+        if (language.getId() <= 0 || !languageDao.existsById(language.getId()))
+            errors.put("language", "does not exist");
+        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
+        CandidateLanguage candidateLanguage = candidateLanguageDao.getById(id);
+        if (candidateLanguage.getLanguage().getId() == languageId)
+            return new ErrorResult("language is the same");
+        if (candidateLanguageDao.existsByCandidateAndLanguage(candidateLanguage.getCandidate(), language))
+            return new ErrorResult("the candidateLanguage that you want to create is already exists");
+        candidateLanguageDao.updateLanguage(language, id);
         return new SuccessResult("Success");
     }
 
+    @Override
+    public Result updateLanguageLevel(String languageLevel, int id){
+        if (languageLevel != null) languageLevel = languageLevel.trim().toUpperCase();
+        Map<String, String> errors = new HashMap<>();
+        if (id <= 0 || !candidateLanguageDao.existsById(id))
+            errors.put("candidateId", "does not exist");
+        if (languageLevel == null || !Pattern.matches("[ABC][12]", languageLevel))
+            errors.put("languageLevel", "not a english level according to the common european framework (A1, A2 etc.)");
+        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
+        candidateLanguageDao.updateLanguageLevel(languageLevel, id);
+        return new SuccessResult("Success");
+    }
 }
