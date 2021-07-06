@@ -224,6 +224,19 @@ CREATE TABLE public.candidates_cvs_skills
         REFERENCES public.candidates_skills (id)
 );
 
+CREATE TABLE public.candidates_favorite_job_advertisements
+(
+    candidate_id        integer NOT NULL,
+    job_advertisement_id integer NOT NULL,
+    CONSTRAINT pk_candidates_favorite_job_advertisements PRIMARY KEY (candidate_id, job_advertisement_id),
+    CONSTRAINT fk_candidates_favorite_job_adverts_candidate_id FOREIGN KEY (candidate_id)
+        REFERENCES public.candidates (user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_candidates_favorite_job_adverts_job_advertisement_id FOREIGN KEY (job_advertisement_id)
+        REFERENCES public.job_advertisements (id)
+        ON DELETE CASCADE
+);
+
 CREATE TABLE public.employers
 (
     user_id            integer                NOT NULL,

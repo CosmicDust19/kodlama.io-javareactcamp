@@ -16,10 +16,10 @@ export default function SignedIn() {
         setIsOpen(true)
     }
 
-    function areYouSurePopup(){
-        return(
+    function areYouSurePopup() {
+        return (
             <Modal basic onClose={() => setIsOpen(false)} onOpen={() => setIsOpen(true)}
-                open={isOpen} size='fullscreen' dimmer={"blurring"}>
+                   open={isOpen} size='fullscreen' dimmer={"blurring"}>
                 <Grid centered padded>
                     <Grid.Row>
                         <Header size={"large"} color={"yellow"}>
@@ -30,15 +30,15 @@ export default function SignedIn() {
                 <Grid centered padded>
                     <Grid.Row>
                         <Modal.Actions>
-                            <Button color='yellow' inverted  size='large' onClick={() => {
+                            <Button color='yellow' inverted size='large' onClick={() => {
                                 dispatch(signOut())
                                 history.push("/")
                                 setIsOpen(false)
                             }}>
-                                <Icon name='checkmark' /> Yes
+                                <Icon name='checkmark'/> Yes
                             </Button>
                             <Button basic color='red' inverted onClick={() => setIsOpen(false)} size='large'>
-                                <Icon name='remove' /> No
+                                <Icon name='remove'/> No
                             </Button>
                         </Modal.Actions>
                     </Grid.Row>
@@ -46,7 +46,7 @@ export default function SignedIn() {
             </Modal>)
     }
 
-    function candidateSignedIn(){
+    function candidateSignedIn() {
 
         return (
             <Menu size="huge" fixed="top" secondary>
@@ -75,6 +75,7 @@ export default function SignedIn() {
                                     <Dropdown.Item as={Link} to={"/candidateManageAccount"}>
                                         <Icon name="setting"/>Account
                                     </Dropdown.Item>
+                                    <Dropdown.Divider/>
                                     <Dropdown.Item onClick={() => {
                                         handleSignOut()
                                     }}>
@@ -90,7 +91,7 @@ export default function SignedIn() {
         )
     }
 
-    function employerSignedIn(){
+    function employerSignedIn() {
         return (
             <Menu size="huge" fixed="top" secondary>
                 {areYouSurePopup()}
@@ -103,7 +104,8 @@ export default function SignedIn() {
 
                     <Menu.Item name="Users" as={Link} to={"/users"}>Users</Menu.Item>
 
-                    <Menu.Item name="Job Advertisements" as={Link} to={"/jobAdvertisements"}>Job Advertisements</Menu.Item>
+                    <Menu.Item name="Job Advertisements" as={Link} to={"/jobAdvertisements"}>Job
+                        Advertisements</Menu.Item>
 
                     <Menu.Menu position='right'>
                         <Menu.Item>
@@ -117,6 +119,7 @@ export default function SignedIn() {
                                     <Dropdown.Item as={Link} to={"/employerJobAdverts"}>
                                         <Icon name="file outline"/>My Adverts
                                     </Dropdown.Item>
+                                    <Dropdown.Divider/>
                                     <Dropdown.Item onClick={() => {
                                         handleSignOut()
                                     }}><Icon name="sign out"/>Sign Out</Dropdown.Item>
@@ -130,7 +133,7 @@ export default function SignedIn() {
         )
     }
 
-    function systemEmployeeSignedIn(){
+    function systemEmployeeSignedIn() {
         return (
             <Menu size="huge" fixed="top" secondary>
                 {areYouSurePopup()}
@@ -150,10 +153,20 @@ export default function SignedIn() {
                         <Menu.Item>
                             <Image size="mini" circular
                                    src="https://freesvg.org/img/abstract-user-flat-1.png"/>
-                            <Dropdown item text={userProps.user?.firstName} selection>
+                            <Dropdown item text={userProps.user?.firstName}>
                                 <Dropdown.Menu>
-                                    <Dropdown.Item><Icon name="info"/>Account</Dropdown.Item>
-                                    <Dropdown.Item><Icon name="settings"/>Settings</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to={"/systemEmployeeManageAccount"}>
+                                        <Icon name="setting"/>Account
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider/>
+                                    <Dropdown.Header content={"Pending"} icon={"hourglass half"}/>
+                                    <Dropdown.Item as={Link} to={"/systemEmployeeManageAccount"}>
+                                        <Icon name="clipboard outline"/>JobAdverts
+                                    </Dropdown.Item>
+                                    <Dropdown.Item as={Link} to={"/systemEmployeeManageAccount"}>
+                                        <Icon name="building outline"/>Employers
+                                    </Dropdown.Item>
+                                    <Dropdown.Divider/>
                                     <Dropdown.Item onClick={() => {
                                         handleSignOut()
                                     }}><Icon name="sign out"/>Sign Out</Dropdown.Item>
@@ -167,7 +180,7 @@ export default function SignedIn() {
         )
     }
 
-    if(String(userProps.userType) === "candidate") return candidateSignedIn()
+    if (String(userProps.userType) === "candidate") return candidateSignedIn()
     else if (String(userProps.userType) === "employer") return employerSignedIn()
     else if (String(userProps.userType) === "systemEmployee") return systemEmployeeSignedIn()
     else return ""

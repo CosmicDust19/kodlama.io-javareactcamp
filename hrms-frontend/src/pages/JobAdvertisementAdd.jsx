@@ -11,18 +11,17 @@ import JobAdvertisementService from "../services/jobAdvertisementService";
 import {useSelector} from "react-redux";
 import {toast} from "react-toastify";
 
-const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-    'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-let color = colors[Math.floor(Math.random() * 12)]
-
 export default function JobAdvertisementAdd() {
+    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
+        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+
+    let color = colors[Math.floor(Math.random() * 12)]
 
     const userProps = useSelector(state => state?.user?.userProps)
 
     const [progressBarState, setProgressBarState] = useState({percent: 0});
-    const [workTimes] = useState(["Part Time", "Full Time", "Seasonal", "Internship", "Freelance"]);
-    const [workModals] = useState(["Remote", "Office", "Hybrid"]);
+    const [workTimes] = useState(["Part Time", "Full Time"]);
+    const [workModels] = useState(["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]);
     const [cities, setCities] = useState([]);
     const [positions, setPositions] = useState([]);
     const [is1stTimePosition, setIs1stTimePosition] = useState(true);
@@ -109,7 +108,7 @@ export default function JobAdvertisementAdd() {
         value: workTime,
     }));
 
-    const workModalOption = workModals.map((workModal, index) => ({
+    const workModalOption = workModels.map((workModal, index) => ({
         key: index,
         text: workModal,
         value: workModal,

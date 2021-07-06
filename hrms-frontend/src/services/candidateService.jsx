@@ -44,6 +44,14 @@ export default class CandidateService {
         return axios.put(`http://localhost:8080/api/candidates/updateLinkedinAccountLink?id=${id}&linkedinAccountLink=${link}`)
     }
 
+    addJobAdvertisementToFavorites(id, jobAdvertisementId){
+        return axios.put(`http://localhost:8080/api/candidates/addJobAdvertisementToFavorites?id=${id}&jobAdvertisementId=${jobAdvertisementId}`)
+    }
+
+    deleteJobAdvertisementToFavorites(id, jobAdvertisementId){
+        return axios.put(`http://localhost:8080/api/candidates/deleteJobAdvertisementFromFavorites?id=${id}&jobAdvertisementId=${jobAdvertisementId}`)
+    }
+
     deleteAccount(id){
         return axios.delete(`http://localhost:8080/api/candidates/deleteById?id=${id}`)
     }

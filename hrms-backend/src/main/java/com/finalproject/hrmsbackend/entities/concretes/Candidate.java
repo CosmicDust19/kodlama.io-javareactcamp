@@ -63,6 +63,12 @@ public class Candidate extends User {
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateSkill> candidateSkills;
 
+    @ManyToMany
+    @JoinTable(name = "candidates_favorite_job_advertisements",
+            joinColumns = {@JoinColumn(name = "candidate_id", referencedColumnName = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "job_advertisement_id", referencedColumnName = "id")})
+    private List<JobAdvertisement> favoriteJobAdvertisements;
+
     public Candidate(int id) {
         super(id);
     }

@@ -4,12 +4,8 @@ import {useFormik} from "formik";
 import {toast} from "react-toastify";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    changeCvJobExp, changeCvLang, changeCvSchool, changeCvSkill,
-    changeJobExps,
-    changeLangs,
-    changeSchools,
-    changeSkills,
-    login,
+    changeCvJobExp, changeCvLang, changeCvSchool, changeCvSkill, changeJobExps,
+    changeLangs, changeSchools, changeSkills,
 } from "../store/actions/userActions";
 import PositionService from "../services/positionService";
 import SchoolService from "../services/schoolService";
@@ -21,19 +17,17 @@ import CandidateLanguageService from "../services/candidateLanguageService";
 import CandidateSchoolService from "../services/candidateSchoolService";
 import CandidateSkillService from "../services/candidateSkillService";
 import CandidateCvService from "../services/candidateCvService";
-import CandidateService from "../services/candidateService";
-
-const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-    'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-const candidateJobExperienceService = new CandidateJobExperienceService();
-const candidateLanguageService = new CandidateLanguageService();
-const candidateSchoolService = new CandidateSchoolService();
-const candidateSkillService = new CandidateSkillService();
-const candidateCvService = new CandidateCvService()
-const candidateService = new CandidateService()
 
 export function CandidateManageMe() {
+
+    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
+        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+
+    const candidateJobExperienceService = new CandidateJobExperienceService();
+    const candidateLanguageService = new CandidateLanguageService();
+    const candidateSchoolService = new CandidateSchoolService();
+    const candidateSkillService = new CandidateSkillService();
+    const candidateCvService = new CandidateCvService()
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
@@ -144,6 +138,7 @@ export function CandidateManageMe() {
                 newCandidateJobExperience.id = Number(r.data.message)
                 user.candidateJobExperiences.push(newCandidateJobExperience)
                 dispatch(changeJobExps(user.candidateJobExperiences))
+                toast("New Job Experience Added")
                 if (refresh === 0) setRefresh(1);
                 else setRefresh(0)
             } else toast.warning("A problem has occurred")
@@ -181,6 +176,7 @@ export function CandidateManageMe() {
                 newCandidateSchool.id = Number(r.data.message)
                 user.candidateSchools.push(newCandidateSchool)
                 dispatch(changeSchools(user.candidateSchools))
+                toast("New School Added")
                 if (refresh === 0) setRefresh(1);
                 else setRefresh(0)
             } else toast.warning("A problem has occurred")
@@ -212,6 +208,7 @@ export function CandidateManageMe() {
                 newCandidateLanguage.id = Number(r.data.message)
                 user.candidateLanguages.push(newCandidateLanguage)
                 dispatch(changeLangs(user.candidateLanguages))
+                toast("New Language Added")
                 if (refresh === 0) setRefresh(1);
                 else setRefresh(0)
             } else toast.warning("A problem has occurred")
@@ -242,6 +239,7 @@ export function CandidateManageMe() {
                 newCandidateSkill.id = Number(r.data.message)
                 user.candidateSkills.push(newCandidateSkill)
                 dispatch(changeSkills(user.candidateSkills))
+                toast("New Skill Added")
                 if (refresh === 0) setRefresh(1);
                 else setRefresh(0)
             } else toast.warning("A problem has occurred")
@@ -265,13 +263,10 @@ export function CandidateManageMe() {
                 else setRefresh(0)
                 toast("Removed From Your Infos And All CVs")
             } else {
-                handleErr()
                 toast.warning("A problem has occurred when deleting the job experience")
             }
         }).catch(reason => {
             console.log(reason)
-            handleErr()
-            toast.warning("A problem has occurred when deleting the job experience")
         });
     }
 
@@ -289,13 +284,10 @@ export function CandidateManageMe() {
                 else setRefresh(0)
                 toast("Removed From Your Infos And All CVs")
             } else {
-                handleErr()
                 toast.warning("A problem has occurred when deleting the school")
             }
         }).catch(reason => {
             console.log(reason)
-            handleErr()
-            toast.warning("A problem has occurred when deleting the school")
         });
     }
 
@@ -313,13 +305,10 @@ export function CandidateManageMe() {
                 else setRefresh(0)
                 toast("Removed From Your Infos And All CVs")
             } else {
-                handleErr()
                 toast.warning("A problem has occurred when deleting the language")
             }
         }).catch(reason => {
             console.log(reason)
-            handleErr()
-            toast.warning("A problem has occurred when deleting the language")
         });
     }
 
@@ -337,13 +326,10 @@ export function CandidateManageMe() {
                 else setRefresh(0)
                 toast("Removed From Your Infos And All CVs")
             } else {
-                handleErr()
                 toast.warning("A problem has occurred when deleting the skill")
             }
         }).catch(reason => {
             console.log(reason)
-            handleErr()
-            toast.warning("A problem has occurred when deleting the skill")
         });
     }
 
@@ -427,17 +413,6 @@ export function CandidateManageMe() {
         })
     }
 
-    const handleErr = () => {
-        candidateService.getById(user.id).then(r => {
-            dispatch(login(r.data.data, "candidate"))
-            toast("Problem handled, you can try it again")
-            if (refresh === 0) setRefresh(1);
-            else setRefresh(0)
-        }).catch(reason => {
-            console.log(reason)
-            toast.error(":( Something went wrong")
-        })
-    }
 
     return (
         <div>
@@ -516,7 +491,7 @@ export function CandidateManageMe() {
                                 </Table.Row>
                             </Table.Body>
                         </Table>
-                        <Button circular primary onClick={handleJobExperienceAdd} disabled={
+                        <Button primary onClick={handleJobExperienceAdd} style={{borderRadius: 15}} disabled={
                             formik.values.workPlace.trim().length === 0 || formik.values.position.id <= 0 || !formik.values.position.id ||
                             formik.values.jobStartYear > new Date().getFullYear() || formik.values.jobStartYear < 1900 ||
                             (!!formik.values.jobQuitYear && (formik.values.jobQuitYear > new Date().getFullYear() ||
@@ -593,7 +568,7 @@ export function CandidateManageMe() {
                                 </Table.Row>
                             </Table.Body>
                         </Table>
-                        <Button circular primary onClick={handleSchoolAdd} disabled={
+                        <Button primary onClick={handleSchoolAdd} style={{borderRadius: 15}} disabled={
                             formik.values.school.id <= 0 || formik.values.department.id <= 0 || !formik.values.school.id || !formik.values.department.id ||
                             formik.values.schoolStartYear > new Date().getFullYear() || formik.values.schoolStartYear < 1900 ||
                             (!!formik.values.schoolGraduationYear && (formik.values.schoolGraduationYear > new Date().getFullYear() ||
@@ -646,7 +621,7 @@ export function CandidateManageMe() {
                                 </Table.Row>
                             </Table.Body>
                         </Table>
-                        <Button circular primary onClick={handleLanguageAdd} disabled={
+                        <Button primary onClick={handleLanguageAdd} style={{borderRadius: 15}} disabled={
                             formik.values.language.id <= 0 || !formik.values.language.id || !formik.values.languageLevel
                         }><Icon name="plus"/>Add</Button>
                     </Grid.Column>

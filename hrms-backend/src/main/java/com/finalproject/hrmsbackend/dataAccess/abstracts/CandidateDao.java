@@ -36,4 +36,15 @@ public interface CandidateDao extends JpaRepository<Candidate,Integer> {
     @Query("update Candidate candidate set candidate.linkedinAccountLink = :linkedinAccountLink where candidate.id = :id")
     void updateLinkedinAccountLink(@Param(value = "linkedinAccountLink") String linkedinAccountLink, @Param(value = "id") Integer id);
 
+    @Query(value = "select exists(select 1 from candidates_favorite_job_advertisements where job_advertisement_id= :jobAdvertisementId and candidate_id = :candidateId)", nativeQuery = true)
+    boolean existsFavoriteCandidateJobAdvertisement(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
+
+    @Modifying
+    @Query(value = "INSERT INTO candidates_favorite_job_advertisements VALUES (:candidateId, :jobAdvertisementId)", nativeQuery = true)
+    void addJobAdvertisementToCandidateFavorites(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
+
+    @Modifying
+    @Query(value = "DELETE FROM candidates_favorite_job_advertisements WHERE candidate_id = :candidateId AND job_advertisement_id = :jobAdvertisementId", nativeQuery = true)
+    void deleteJobExperienceFromCandidateCv(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
+
 }

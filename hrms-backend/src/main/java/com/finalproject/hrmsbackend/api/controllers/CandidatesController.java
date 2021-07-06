@@ -81,6 +81,16 @@ public class CandidatesController {
         return candidateService.updateLinkedinAccountLink(linkedinAccountLink, id);
     }
 
+    @PutMapping(value = "/addJobAdvertisementToFavorites")
+    public Result addJobAdvertisementToFavorites(@RequestParam int jobAdvertisementId,@RequestParam int id) {
+        return candidateService.addJobAdvertisementToFavorites(jobAdvertisementId, id);
+    }
+
+    @PutMapping(value = "/deleteJobAdvertisementFromFavorites")
+    public Result deleteJobAdvertisementFromFavorites(@RequestParam int jobAdvertisementId,@RequestParam int id) {
+        return candidateService.deleteJobAdvertisementFromFavorites(jobAdvertisementId, id);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {

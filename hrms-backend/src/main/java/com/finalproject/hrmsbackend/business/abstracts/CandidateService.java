@@ -27,4 +27,8 @@ public interface CandidateService extends UserService<Candidate> {
     Result updateGithubAccountLink(String githubAccountLink, int id);
 
     Result updateLinkedinAccountLink(String linkedinAccountLink, int id);
+
+    Result addJobAdvertisementToFavorites(int jobAdvertisementId, int id);
+
+    Result deleteJobAdvertisementFromFavorites(int jobAdvertisementId, int id);
 }

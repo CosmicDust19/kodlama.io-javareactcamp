@@ -24,7 +24,7 @@ export default function CandidateList() {
         <div>
             <Card.Group itemsPerRow={3} stackable>
                 {candidates.map((candidate) => (
-                    <Card onClick={() => {
+                    <Card style={{borderRadius: 10}} onClick={() => {
                         handleCandidateClick(candidate.id);
                     }} key={candidate.id}>
                         <Image

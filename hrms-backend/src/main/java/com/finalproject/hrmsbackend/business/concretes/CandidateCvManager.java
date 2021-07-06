@@ -326,7 +326,7 @@ public class CandidateCvManager implements CandidateCvService {
                 errors.put(String.format("candidateSkillIds[%d] - candidateCvId", i), "the candidate that have this CV does not have this skill");
                 continue;
             }
-            candidateCvDao.addSkillToToCandidateCv(candidateSkillId, candidateCvId);
+            candidateCvDao.addSkillToCandidateCv(candidateSkillId, candidateCvId);
             fail--;
             success++;
         }
@@ -348,7 +348,8 @@ public class CandidateCvManager implements CandidateCvService {
                 }
                 candidateCvDao.deleteJobExperienceFromCandidateCv(candidateJobExperienceId, candidateCvId);
             }
-            if (results.isEmpty()) results.put("result", "Completely Successful");
+            if (!results.isEmpty()) return new ErrorDataResult<>(results);
+            results.put("result", "Completely Successful");
             return new SuccessDataResult<>("Success", results);
         }
         candidateJobExperienceIds.forEach((candidateJobExperienceId) -> candidateCvDao.deleteJobExperienceFromCandidateCv(candidateJobExperienceId, candidateCvId));
@@ -370,7 +371,8 @@ public class CandidateCvManager implements CandidateCvService {
                 }
                 candidateCvDao.deleteLanguageFromCandidateCv(candidateLanguageId, candidateCvId);
             }
-            if (results.isEmpty()) results.put("result", "Completely Successful");
+            if (!results.isEmpty()) return new ErrorDataResult<>(results);
+            results.put("result", "Completely Successful");
             return new SuccessDataResult<>("Success", results);
         }
         candidateLanguageIds.forEach((candidateLanguageId) -> candidateCvDao.deleteLanguageFromCandidateCv(candidateLanguageId, candidateCvId));
@@ -392,7 +394,8 @@ public class CandidateCvManager implements CandidateCvService {
                 }
                 candidateCvDao.deleteSchoolFromCandidateCv(candidateSchoolId, candidateCvId);
             }
-            if (results.isEmpty()) results.put("result", "Completely Successful");
+            if (!results.isEmpty()) return new ErrorDataResult<>(results);
+            results.put("result", "Completely Successful");
             return new SuccessDataResult<>("Success", results);
         }
         candidateSchoolIds.forEach((candidateSchoolId) -> candidateCvDao.deleteSchoolFromCandidateCv(candidateSchoolId, candidateCvId));
@@ -403,7 +406,7 @@ public class CandidateCvManager implements CandidateCvService {
     public Result deleteSkillsFromCandidateCv(List<Integer> candidateSkillIds, int candidateCvId, byte checkType) {
         if (candidateCvId <= 0 || !candidateCvDao.existsById(candidateCvId))
             return new ErrorResult("candidateCvId: does not exist");
-        if (checkType == 0){
+        if (checkType == 0) {
             Map<String, String> results = new HashMap<>();
             for (int i = 0; i < candidateSkillIds.size(); i++) {
                 Integer candidateSkillId = candidateSkillIds.get(i);
@@ -414,7 +417,8 @@ public class CandidateCvManager implements CandidateCvService {
                 }
                 candidateCvDao.deleteSkillFromCandidateCv(candidateSkillId, candidateCvId);
             }
-            if (results.isEmpty()) results.put("result", "Completely Successful");
+            if (!results.isEmpty()) return new ErrorDataResult<>(results);
+            results.put("result", "Completely Successful");
             return new SuccessDataResult<>("Success", results);
         }
         candidateSkillIds.forEach((candidateSkillId) -> candidateCvDao.deleteSkillFromCandidateCv(candidateSkillId, candidateCvId));

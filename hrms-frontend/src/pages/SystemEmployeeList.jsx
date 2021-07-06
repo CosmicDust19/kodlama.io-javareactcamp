@@ -3,8 +3,6 @@ import SystemEmployeeService from "../services/systemEmployeeService";
 import {Table, Header, Image} from "semantic-ui-react";
 import {useState, useEffect} from "react";
 
-
-
 export default function SystemEmployeeList() {
 
     let placeholderImageNames = ["ade", "chris", "christian", "daniel", "elliot", "helen", "jenny",

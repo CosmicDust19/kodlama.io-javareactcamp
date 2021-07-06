@@ -6,6 +6,7 @@ import com.finalproject.hrmsbackend.core.adapters.MernisServiceAdapter;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
+import com.finalproject.hrmsbackend.dataAccess.abstracts.JobAdvertisementDao;
 import com.finalproject.hrmsbackend.entities.concretes.Candidate;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateAddDto;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class CandidateManager implements CandidateService {
     private final EmailService emailService;
     private final ModelMapper modelMapper;
     private final UserDao userDao;
+    private final JobAdvertisementDao jobAdvertisementDao;
 
     @Override
     public DataResult<List<Candidate>> getAll() {
@@ -49,7 +51,7 @@ public class CandidateManager implements CandidateService {
 
     @Override
     public DataResult<Candidate> getById(int id) {
-        if (id <= 0 || !candidateDao.existsById(id)){
+        if (id <= 0 || !candidateDao.existsById(id)) {
             return new ErrorDataResult<>("id does not exist");
         }
         return new SuccessDataResult<>("Success", candidateDao.getById(id));
@@ -72,7 +74,7 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public DataResult<Boolean> deleteById(int id){
+    public DataResult<Boolean> deleteById(int id) {
         if (id <= 0 || !candidateDao.existsById(id))
             return new ErrorDataResult<>("id does not exist", false);
         candidateDao.deleteById(id);
@@ -80,7 +82,7 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public Result updateEmail(String email, int id){
+    public Result updateEmail(String email, int id) {
         if (email != null) email = email.trim();
         Map<String, String> errors = new HashMap<>();
         if (id <= 0 || !candidateDao.existsById(id))
@@ -97,7 +99,7 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public Result updatePassword(String password, String oldPassword, int id){
+    public Result updatePassword(String password, String oldPassword, int id) {
         if (password != null) password = password.trim();
         Map<String, String> errors = new HashMap<>();
         if (!userDao.existsByIdAndPassword(id, oldPassword))
@@ -113,7 +115,7 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public Result updateGithubAccountLink(String githubAccountLink, int id){
+    public Result updateGithubAccountLink(String githubAccountLink, int id) {
         if (githubAccountLink != null) githubAccountLink = githubAccountLink.trim();
         Map<String, String> errors = new HashMap<>();
         if (id <= 0 || !candidateDao.existsById(id))
@@ -127,7 +129,7 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public Result updateLinkedinAccountLink(String linkedinAccountLink, int id){
+    public Result updateLinkedinAccountLink(String linkedinAccountLink, int id) {
         if (linkedinAccountLink != null) linkedinAccountLink = linkedinAccountLink.trim();
         Map<String, String> errors = new HashMap<>();
         if (id <= 0 || !candidateDao.existsById(id))
@@ -139,4 +141,35 @@ public class CandidateManager implements CandidateService {
         candidateDao.updateLinkedinAccountLink(linkedinAccountLink, id);
         return new SuccessResult("Success");
     }
+
+    @Override
+    public Result addJobAdvertisementToFavorites(int jobAdvertisementId, int id) {
+        Map<String, String> errors = new HashMap<>();
+        if (id <= 0 || !candidateDao.existsById(id))
+            errors.put("id", "does not exist");
+        if (id <= 0 || !jobAdvertisementDao.existsById(jobAdvertisementId))
+            errors.put("jobAdvertisementId", "does not exist");
+        if (!errors.isEmpty())
+            return new ErrorDataResult<>("Error", errors);
+        if (candidateDao.existsFavoriteCandidateJobAdvertisement(jobAdvertisementId, id))
+            return new ErrorResult("This favorite jobAd already exists");
+        candidateDao.addJobAdvertisementToCandidateFavorites(jobAdvertisementId, id);
+        return new SuccessResult("Success");
+    }
+
+    @Override
+    public Result deleteJobAdvertisementFromFavorites(int jobAdvertisementId, int id) {
+        Map<String, String> errors = new HashMap<>();
+        if (id <= 0 || !candidateDao.existsById(id))
+            errors.put("id", "does not exist");
+        if (id <= 0 || !jobAdvertisementDao.existsById(jobAdvertisementId))
+            errors.put("jobAdvertisementId", "does not exist");
+        if (!errors.isEmpty())
+            return new ErrorDataResult<>("Error", errors);
+        if (!candidateDao.existsFavoriteCandidateJobAdvertisement(jobAdvertisementId, id))
+            return new ErrorResult("This favorite jobAd does not exists");
+        candidateDao.deleteJobExperienceFromCandidateCv(jobAdvertisementId, id);
+        return new SuccessResult("Success");
+    }
+
 }

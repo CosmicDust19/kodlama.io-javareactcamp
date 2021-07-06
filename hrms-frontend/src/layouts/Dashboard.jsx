@@ -21,6 +21,7 @@ import {SignUpCandidate} from "../pages/SignUpCandidate";
 import {SignUpEmployer} from "../pages/SignUpEmployer";
 import {SignUpSystemEmployee} from "../pages/SignUpSystemEmployee";
 import {CandidateManageMe} from "../pages/CandidateManageMe";
+import {SystemEmployeeManageAccount} from "../pages/systemEmployeeManageAccount";
 
 export default function Dashboard() {
 
@@ -58,6 +59,7 @@ export default function Dashboard() {
                 <Route path="/jobAdvertisements/:id" component={JobAdvertisementDetail}/>
                 <Route path="/postJobAdvertisement" component={JobAdvertisementAdd}/>
                 <Route exact path="/signUpSystemEmployee" component={SignUpSystemEmployee}/>
+                <Route exact path="/systemEmployeeManageAccount" component={SystemEmployeeManageAccount}/>
             </Container>
             <Footer/>
         </div>

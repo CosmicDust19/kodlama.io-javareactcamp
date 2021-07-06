@@ -15,7 +15,7 @@ import {
     DELETE_CV,
     CHANGE_JOBEXP,
     CHANGE_LANG,
-    CHANGE_SCHOOL, CHANGE_SKILL
+    CHANGE_SCHOOL, CHANGE_SKILL, CHANGE_FAVORITE_JOB_ADVS, CHANGE_FIRSTNAME, CHANGE_LASTNAME
 } from "../actions/userActions";
 
 const initialState = {
@@ -34,6 +34,12 @@ export default function userReducer(state = initialState, {type, payload}) {
             state.userProps.user = null
             state.userProps.userType = null
             state.userProps.loggedIn = false
+            return {...state}
+        case CHANGE_FIRSTNAME:
+            state.userProps.user.firstName = payload.firstName
+            return {...state}
+        case CHANGE_LASTNAME:
+            state.userProps.user.lastName = payload.lastName
             return {...state}
         case CHANGE_EMAIl:
             state.userProps.user.email = payload.email
@@ -55,6 +61,9 @@ export default function userReducer(state = initialState, {type, payload}) {
             return {...state}
         case CHANGE_SKILL:
             state.userProps.user.candidateSkills = payload.skills
+            return {...state}
+        case CHANGE_FAVORITE_JOB_ADVS:
+            state.userProps.user.favoriteJobAdvertisements = payload.jobAdvs
             return {...state}
         case CHANGE_CV_TITLE: {
             let index = state.userProps.user.candidateCvs.findIndex(candidateCv => {

@@ -4,17 +4,17 @@ import CandidateService from "../services/candidateService";
 import {Grid, Header, Table, Icon, Item, Tab, Card, Segment, Button} from "semantic-ui-react";
 import CandidateCvService from "../services/candidateCvService";
 
-let placeholderImageNames = ["elyse", "kristy", "lena", "lindsay", "mark", "matthew", "molly", "patrick", "rachel"]
-
-const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-    'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-const months = ["January", "February", "March", "April", "May",
-    "June", "July", "August", "September", "October", "November", "December"]
-
-let color = colors[Math.floor(Math.random() * 12)]
-
 export default function CandidateDetail() {
+
+    let placeholderImageNames = ["elyse", "kristy", "lena", "lindsay", "mark", "matthew", "molly", "patrick", "rachel"]
+
+    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
+        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+
+    const months = ["January", "February", "March", "April", "May",
+        "June", "July", "August", "September", "October", "November", "December"]
+
+    let color = colors[Math.floor(Math.random() * 12)]
 
     let {id} = useParams()
 

@@ -1,5 +1,7 @@
 export const LOGIN = "LOGIN"
 export const SIGN_OUT = "SIGN_OUT"
+export const CHANGE_FIRSTNAME = "CHANGE_FIRSTNAME"
+export const CHANGE_LASTNAME = "CHANGE_LASTNAME"
 export const CHANGE_EMAIl = "CHANGE_EMAIl"
 export const CHANGE_GITHUB = "CHANGE_GITHUB"
 export const CHANGE_LINKEDIN = "CHANGE_LINKEDIN"
@@ -7,6 +9,7 @@ export const CHANGE_JOBEXP = "CHANGE_JOBEXP"
 export const CHANGE_LANG = "CHANGE_LANG"
 export const CHANGE_SCHOOL = "CHANGE_SCHOOL"
 export const CHANGE_SKILL = "CHANGE_SKILL"
+export const CHANGE_FAVORITE_JOB_ADVS = "CHANGE_FAVORITE_JOB_ADVS"
 export const CHANGE_CV_COVERLETTER = "CHANGE_CV_COVERLETTER"
 export const CHANGE_CV_TITLE = "CHANGE_CV_TITLE"
 export const CHANGE_CV_JOBEXP  = "CHANGE_CV_JOBEXP"
@@ -26,6 +29,20 @@ export function login(user, userType) {
 export function signOut() {
     return {
         type: SIGN_OUT
+    }
+}
+
+export function changeFirstName(firstName) {
+    return {
+        type: CHANGE_FIRSTNAME,
+        payload: {firstName}
+    }
+}
+
+export function changeLastName(lastName) {
+    return {
+        type: CHANGE_LASTNAME,
+        payload: {lastName}
     }
 }
 
@@ -75,6 +92,13 @@ export function changeSkills(skills) {
     return {
         type: CHANGE_SKILL,
         payload: {skills}
+    }
+}
+
+export function changeFavoriteJobAdv(jobAdvs) {
+    return {
+        type: CHANGE_FAVORITE_JOB_ADVS,
+        payload: {jobAdvs}
     }
 }
 

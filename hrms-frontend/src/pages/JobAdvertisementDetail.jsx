@@ -3,15 +3,15 @@ import {useHistory, useParams} from "react-router-dom";
 import JobAdvertisementService from "../services/jobAdvertisementService";
 import {Button, Card, Grid, Icon, Table, Header} from "semantic-ui-react";
 
-const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-    'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-let color = colors[Math.floor(Math.random() * 12)]
-
-const months = ["January", "February", "March", "April", "May",
-    "June", "July", "August", "September", "October", "November", "December"]
-
 export default function JobAdvertisementDetail() {
+
+    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
+        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+
+    let color = colors[Math.floor(Math.random() * 12)]
+
+    const months = ["January", "February", "March", "April", "May",
+        "June", "July", "August", "September", "October", "November", "December"]
 
     let {id} = useParams()
 
@@ -32,11 +32,11 @@ export default function JobAdvertisementDetail() {
         if (!jobAdvertisement.minSalary && !jobAdvertisement.maxSalary) {
             return null
         } else if (!jobAdvertisement.maxSalary) {
-            return `more than ${jobAdvertisement.minSalary}`
+            return `more than ${jobAdvertisement.minSalary}$`
         } else if (!jobAdvertisement.minSalary) {
-            return `less than ${jobAdvertisement.maxSalary}`
+            return `less than ${jobAdvertisement.maxSalary}$`
         }
-        return `between ${jobAdvertisement.minSalary} ~ ${jobAdvertisement.maxSalary}`;
+        return `between ${jobAdvertisement.minSalary} ~ ${jobAdvertisement.maxSalary}$`;
     }
 
     let remainedDays = Math.round((new Date(jobAdvertisement.applicationDeadline).getTime() - new Date().getTime()) / 86400000)

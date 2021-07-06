@@ -6,15 +6,15 @@ import React, {useState} from "react";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
 import UserService from "../services/userService";
-import CandidateService from "../services/candidateService";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmail, changeGithub, changeLinkedin, signOut} from "../store/actions/userActions";
+import {changeEmail, changeFirstName, changeLastName, signOut} from "../store/actions/userActions";
 import {useHistory} from "react-router-dom";
+import SystemEmployeeService from "../services/systemEmployeeService";
 
 const userService = new UserService()
-const candidateService = new CandidateService()
+const systemEmployeeService = new SystemEmployeeService()
 
-export function CandidateManageAccount() {
+export function SystemEmployeeManageAccount() {
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
@@ -22,7 +22,7 @@ export function CandidateManageAccount() {
 
     const [deletePopupOpen, setDeletePopupOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const [activeItem, setActiveItem] = useState('email')
+    const [activeItem, setActiveItem] = useState('name')
     const [refresh, setRefresh] = useState(0);
 
     const handleItemClick = (activeItem) => {
@@ -31,14 +31,66 @@ export function CandidateManageAccount() {
 
     const formik = useFormik({
         initialValues: {
+            firstName: "", lastName: "",
             email: "", password: "",
-            passwordRepeat: "", currentPassword: "",
-            githubAccountLink: "", linkedinAccountLink: ""
+            passwordRepeat: "", currentPassword: ""
         }
     });
 
-    function getAge() {
-        return new Date().getFullYear() - user?.birthYear
+    const handleFirstNameSubmit = () => {
+        if (!formik.values.firstName) {
+            toast.warning("Please enter your first name")
+            return;
+        }
+        formik.values.firstName = formik.values.firstName.trim()
+        if (formik.values.firstName.length < 2 || formik.values.firstName.length > 50) {
+            toast.warning("First name should be between 2 - 50 characters long")
+            return;
+        }
+        if (formik.values.firstName === user.firstName) {
+            toast.warning("You are already using this first name")
+            return;
+        }
+        systemEmployeeService.updateFirstName(user.id, formik.values.firstName).then(r => {
+            console.log(r)
+            if (r.data.success) {
+                dispatch(changeFirstName(formik.values.firstName))
+                toast("Saved")
+                if (refresh === 0) setRefresh(1);
+                else setRefresh(0)
+            } else toast.warning("A problem has occurred")
+        }).catch(reason => {
+            console.log(reason)
+            toast.warning("A problem has occurred")
+        })
+    }
+
+    const handleLastNameSubmit = () => {
+        if (!formik.values.lastName) {
+            toast.warning("Please enter your last name")
+            return;
+        }
+        formik.values.lastName = formik.values.lastName.trim()
+        if (formik.values.lastName.length < 2 || formik.values.lastName.length > 50) {
+            toast.warning("Last name should be between 2 - 50 characters long")
+            return;
+        }
+        if (formik.values.lastName === user.lastName) {
+            toast.warning("You are already using this last name")
+            return;
+        }
+        systemEmployeeService.updateLastName(user.id, formik.values.lastName).then(r => {
+            console.log(r)
+            if (r.data.success) {
+                dispatch(changeLastName(formik.values.lastName))
+                toast("Saved")
+                if (refresh === 0) setRefresh(1);
+                else setRefresh(0)
+            } else toast.warning("A problem has occurred")
+        }).catch(reason => {
+            console.log(reason)
+            toast.warning("A problem has occurred")
+        })
     }
 
     const handleEmailSubmit = () => {
@@ -59,7 +111,7 @@ export function CandidateManageAccount() {
             console.log(r)
             if (r.data.success) {
                 if (!r.data.data) {
-                    candidateService.updateEmail(user.id, formik.values.email).then(r => {
+                    systemEmployeeService.updateEmail(user.id, formik.values.email).then(r => {
                         console.log(r)
                         if (r.data.success) {
                             dispatch(changeEmail(formik.values.email))
@@ -88,7 +140,7 @@ export function CandidateManageAccount() {
             toast.warning("Wrong password!")
             return;
         }
-        candidateService.existsByEmailAndPassword(user?.email, formik.values.currentPassword).then((r) => {
+        systemEmployeeService.existsByEmailAndPassword(user.email, formik.values.currentPassword).then((r) => {
             console.log(r)
             if (r.data.success) {
                 if (r.data.data) {
@@ -120,106 +172,11 @@ export function CandidateManageAccount() {
             toast.warning("You are already using this password")
             return;
         }
-        candidateService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(r => {
+        systemEmployeeService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(r => {
             console.log(r)
             if (r.data.success) {
                 toast("Saved")
                 formik.values.currentPassword = formik.values.password
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
-
-    }
-
-    const handleGithubLinkSubmit = () => {
-        if (!formik.values.githubAccountLink) {
-            toast.warning("Please enter your github account link")
-            return;
-        }
-        formik.values.githubAccountLink = formik.values.githubAccountLink.trim()
-        if (formik.values.githubAccountLink.length < 4) {
-            toast.warning("Invalid link")
-            return;
-        }
-        if (formik.values.githubAccountLink === user.githubAccountLink) {
-            toast.warning("You are already using this link")
-            return;
-        }
-        candidateService.updateGithubAccountLink(user.id, formik.values.githubAccountLink).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeGithub(formik.values.githubAccountLink))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Saved")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
-    }
-
-    const handleLinkedinLinkSubmit = () => {
-        if (!formik.values.linkedinAccountLink) {
-            toast.warning("Please enter your linkedin account link")
-            return;
-        }
-        formik.values.linkedinAccountLink = formik.values.linkedinAccountLink.trim()
-        if (formik.values.linkedinAccountLink.length < 4) {
-            toast.warning("Invalid link")
-            return;
-        }
-        if (formik.values.linkedinAccountLink === user.linkedinAccountLink) {
-            toast.warning("You are already using this link")
-            return;
-        }
-        candidateService.updateLinkedinAccount(user.id, formik.values.linkedinAccountLink).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeLinkedin(formik.values.linkedinAccountLink))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Saved")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
-    }
-
-    const handleGithubLinkRemove = () => {
-        if (user.githubAccountLink == null) {
-            toast.warning("Already you do not have a github link")
-            return;
-        }
-        candidateService.updateGithubAccountLink(user.id, null).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeGithub(null))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Removed")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
-    }
-
-    const handleLinkedinLinkRemove = () => {
-        if (user.linkedinAccountLink == null) {
-            toast.warning("Already you do not have a linkedin link")
-            return;
-        }
-        candidateService.updateLinkedinAccount(user.id, null).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeLinkedin(null))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Removed")
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
             console.log(reason)
@@ -240,7 +197,7 @@ export function CandidateManageAccount() {
                 </Header>
                 <Modal.Actions>
                     <Button color='red' inverted size='large' onClick={() => {
-                        candidateService.deleteAccount(user.id).then(r => {
+                        systemEmployeeService.deleteAccount(user.id).then(r => {
                             console.log(r)
                             dispatch(signOut())
                             history.push("/")
@@ -260,6 +217,33 @@ export function CandidateManageAccount() {
 
     function menuSegments() {
         switch (activeItem) {
+            case "name":
+                return (
+                    <Grid>
+                        <Grid.Row>
+                            <Form>
+                                <Input icon="user" iconPosition="left" placeholder="First Name"
+                                       type="text" value={formik.values.firstName}
+                                       onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                       name="firstName"/>
+                                <Button color="blue" style={{marginLeft: 10}}
+                                        onClick={handleFirstNameSubmit} content={"Save"}>
+                                </Button>
+                            </Form>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <Form>
+                                <Input icon="user" iconPosition="left" placeholder="Last Name"
+                                       type="text" value={formik.values.lastName}
+                                       onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                       name="lastName"/>
+                                <Button color="blue" style={{marginLeft: 10}}
+                                        onClick={handleLastNameSubmit} content={"Save"}>
+                                </Button>
+                            </Form>
+                        </Grid.Row>
+                    </Grid>
+                )
             case "email":
                 return (
                     <Form>
@@ -267,7 +251,8 @@ export function CandidateManageAccount() {
                                value={formik.values.email} onBlur={formik.handleBlur} name="email"
                                onChange={formik.handleChange}
                         />
-                        <Button color="blue" onClick={handleEmailSubmit} content={"Save"} style={{marginLeft: 10}}/>
+                        <Button color="blue" onClick={handleEmailSubmit} content={"Save"}
+                                style={{marginLeft: 10}}/>
                     </Form>
                 )
             case "password":
@@ -278,8 +263,7 @@ export function CandidateManageAccount() {
                                 <Grid.Row>
                                     <Input icon="lock" iconPosition="left" placeholder="New Password"
                                            type="password" value={formik.values.password}
-                                           onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                           name="password"/>
+                                           onChange={formik.handleChange} onBlur={formik.handleBlur} name="password"/>
                                 </Grid.Row>
                                 <Grid.Row>
                                     <Input icon="lock" iconPosition="left" placeholder="New Password Repeat"
@@ -287,9 +271,7 @@ export function CandidateManageAccount() {
                                            onChange={formik.handleChange} onBlur={formik.handleBlur}
                                            name="passwordRepeat"/>
                                 </Grid.Row>
-                                <Button color="blue" style={{marginLeft: 10}}
-                                        onClick={handlePasswordSubmit} content={"Save"}>
-                                </Button>
+                                <Button color="blue" onClick={handlePasswordSubmit} content={"Save"}/>
                             </Grid>
                         </Form> :
                         <Form>
@@ -297,40 +279,9 @@ export function CandidateManageAccount() {
                                    type="password" value={formik.values.currentPassword}
                                    onChange={formik.handleChange} onBlur={formik.handleBlur}
                                    name="currentPassword"/>
-                            <Button color="olive" style={{marginLeft: 10}}
-                                    onClick={handleCurrentPasswordSubmit} content={"Authenticate"}>
-                            </Button>
+                            <Button color="olive" onClick={handleCurrentPasswordSubmit} content={"Authenticate"}
+                                    style={{marginLeft: 10}}/>
                         </Form>
-
-                )
-            case "links":
-                return (
-                    <div>
-                        <Form>
-                            <Input icon="world" iconPosition="left" placeholder="Your Github Link"
-                                   type="text" value={formik.values.githubAccountLink}
-                                   onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                   name="githubAccountLink"/>
-                            <Button color="blue" style={{marginLeft: 10}}
-                                    onClick={handleGithubLinkSubmit} content={"Save"}>
-                            </Button>
-                            <Button color="red" style={{marginLeft: 10}}
-                                    onClick={handleGithubLinkRemove} content={"Remove"}>
-                            </Button>
-                        </Form>
-                        <Form style = {{marginTop: 10}}>
-                            <Input icon="world" iconPosition="left" placeholder="Your Linkedin Link"
-                                   type="text" value={formik.values.linkedinAccountLink}
-                                   onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                   name="linkedinAccountLink"/>
-                            <Button color="blue" style={{marginLeft: 10}}
-                                    onClick={handleLinkedinLinkSubmit} content={"Save"}>
-                            </Button>
-                            <Button color="red" style={{marginLeft: 10}}
-                                    onClick={handleLinkedinLinkRemove} content={"Remove"}>
-                            </Button>
-                        </Form>
-                    </div>
                 )
             case "danger":
                 return (
@@ -340,12 +291,11 @@ export function CandidateManageAccount() {
                         </Button> :
                         <Form>
                             <Input icon="lock" iconPosition="left" placeholder="Password"
-                                   type="password" value={formik.values.oldPassword}
+                                   type="password" value={formik.values.currentPassword}
                                    onChange={formik.handleChange} onBlur={formik.handleBlur}
                                    name="currentPassword"/>
-                            <Button color="olive" style={{marginLeft: 10}}
-                                    onClick={handleCurrentPasswordSubmit} content={"Authenticate"}>
-                            </Button>
+                            <Button color="olive" onClick={handleCurrentPasswordSubmit} content={"Authenticate"}
+                                    style={{marginLeft: 10}}/>
                         </Form>
                 )
             default:
@@ -367,7 +317,6 @@ export function CandidateManageAccount() {
                                         {user?.firstName}
                                         <Header.Subheader>{user?.lastName}</Header.Subheader>
                                     </Header></Item.Header>
-                                <Item.Meta>{getAge() + " years old"}</Item.Meta>
                                 <Item.Description>
                                     <Icon name={"envelope"}/>{"  " + user?.email}
                                 </Item.Description>
@@ -400,6 +349,11 @@ export function CandidateManageAccount() {
                     <strong>Change</strong>
                     <Menu fluid vertical secondary>
                         <Menu.Item
+                            name='Name'
+                            active={activeItem === 'name'}
+                            onClick={() => handleItemClick("name")}
+                        />
+                        <Menu.Item
                             name='Email'
                             active={activeItem === 'email'}
                             onClick={() => handleItemClick("email")}
@@ -408,11 +362,6 @@ export function CandidateManageAccount() {
                             name='Password'
                             active={activeItem === 'password'}
                             onClick={() => handleItemClick("password")}
-                        />
-                        <Menu.Item
-                            name='Account Links'
-                            active={activeItem === 'links'}
-                            onClick={() => handleItemClick("links")}
                         />
                         <Menu.Item
                             color={"red"}

@@ -1,48 +1,34 @@
 import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {
-    addCv,
-    changeCoverLetter,
-    changeCvJobExp,
-    changeCvLang,
-    changeCvSchool, changeCvSkill,
-    changeTitle, deleteCv
+    addCv, changeCoverLetter, changeCvJobExp, changeCvLang,
+    changeCvSchool, changeCvSkill, changeTitle, deleteCv
 } from "../store/actions/userActions";
 import {toast} from "react-toastify";
 import {useFormik} from "formik";
 import {
-    Button,
-    Card, Dropdown,
-    Form,
-    Grid,
-    Header,
-    Icon,
-    Input,
-    Menu,
-    Modal,
-    Popup,
-    Segment,
-    Table
+    Button, Card, Dropdown, Form, Grid, Header, Icon, Input,
+    Menu, Modal, Popup, Segment, Table
 } from "semantic-ui-react";
-
 import CandidateCvService from "../services/candidateCvService";
 
-const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-    'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-const months = ["January", "February", "March", "April", "May",
-    "June", "July", "August", "September", "October", "November", "December"]
-
-let color = colors[Math.floor(Math.random() * 12)]
-
-let candidateCvService = new CandidateCvService()
-
 export function CandidateManageCvs() {
+
+    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
+        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
+
+    const months = ["January", "February", "March", "April", "May",
+        "June", "July", "August", "September", "October", "November", "December"]
+
+    let color = colors[Math.floor(Math.random() * 12)]
+
+    let candidateCvService = new CandidateCvService()
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
 
     const [isCvAddPopupOpen, setIsCvAddPopupOpen] = useState(false);
+    const [isCvDeletePopupOpen, setIsCvDeletePopupOpen] = useState(false);
     const [isJobExpAddPopupOpen, setIsJobExpAddPopupOpen] = useState(false);
     const [isLangAddPopupOpen, setIsLangAddPopupOpen] = useState(false);
     const [isSchoolAddPopupOpen, setIsSchoolAddPopupOpen] = useState(false);
@@ -56,13 +42,8 @@ export function CandidateManageCvs() {
 
     const formik = useFormik({
         initialValues: {
-            title: "",
-            cvAddTitle: "",
-            coverLetter: "",
-            jobExperienceIds: [],
-            languageIds: [],
-            schoolIds: [],
-            skillIds: []
+            title: "", cvAddTitle: "", coverLetter: "",
+            jobExperienceIds: [], languageIds: [], schoolIds: [], skillIds: []
         }
     });
 
@@ -151,7 +132,7 @@ export function CandidateManageCvs() {
                 setSelectedCv(user.candidateCvs[user.candidateCvs.length - 1])
                 setActiveItem(formik.values.cvAddTitle)
                 if (refresh === 0) setRefresh(1);
-                if (refresh === 1) setRefresh(0)
+                else setRefresh(0)
             } else toast.warning("A problem has occurred")
             formik.values.cvAddTitle = ""
         }).catch(reason => {
@@ -168,7 +149,7 @@ export function CandidateManageCvs() {
                 if (user.candidateCvs.length === 0) setSelectedCv({})
                 else setSelectedCv(user.candidateCvs[0])
                 if (refresh === 0) setRefresh(1);
-                if (refresh === 1) setRefresh(0)
+                else setRefresh(0)
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
             toast.warning("A problem has occurred")
@@ -181,6 +162,8 @@ export function CandidateManageCvs() {
             console.log(r)
             if (r.data.success) {
                 dispatch(changeCoverLetter(selectedCv.id, formik.values.coverLetter))
+                if (refresh === 0) setRefresh(1);
+                else setRefresh(0)
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
             toast.warning("A problem has occurred")
@@ -208,6 +191,8 @@ export function CandidateManageCvs() {
             console.log(r)
             if (r.data.success) {
                 dispatch(changeTitle(selectedCv.id, formik.values.title))
+                if (refresh === 0) setRefresh(1);
+                else setRefresh(0)
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
             toast.warning("A problem has occurred")
@@ -225,7 +210,7 @@ export function CandidateManageCvs() {
         })
         candidateCvService.updateJobExperiences(selectedCv.id, formik.values.jobExperienceIds, "add").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -245,7 +230,7 @@ export function CandidateManageCvs() {
         })
         candidateCvService.updateLanguages(selectedCv.id, formik.values.languageIds, "add").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -265,7 +250,7 @@ export function CandidateManageCvs() {
         })
         candidateCvService.updateSchools(selectedCv.id, formik.values.schoolIds, "add").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -285,7 +270,7 @@ export function CandidateManageCvs() {
         })
         candidateCvService.updateSkills(selectedCv.id, formik.values.skillIds, "add").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -302,7 +287,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateJobExperiences.splice(index, 1)
         candidateCvService.updateJobExperiences(selectedCv.id, [candidateJobExpId], "delete").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -320,7 +305,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateLanguages.splice(index, 1)
         candidateCvService.updateLanguages(selectedCv.id, [candidateLangId], "delete").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -338,7 +323,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateSchools.splice(index, 1)
         candidateCvService.updateSchools(selectedCv.id, [candidateSchoolId], "delete").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -356,7 +341,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateSkills.splice(index, 1)
         candidateCvService.updateSkills(selectedCv.id, [candidateSkillId], "delete").then(r => {
             console.log(r)
-            if(r.data.success) {
+            if (r.data.success) {
                 dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
             } else toast.warning("A problem has occurred")
         }).catch(reason => {
@@ -365,37 +350,6 @@ export function CandidateManageCvs() {
         })
         if (refresh === 0) setRefresh(1);
         else setRefresh(0)
-    }
-
-    function coverLetterPopup() {
-        return (
-            <Modal basic onClose={() => setIsCoverLetterPopupOpen(false)} onOpen={() => setIsCoverLetterPopupOpen(true)}
-                   open={isCoverLetterPopupOpen} size='fullscreen'>
-                <Grid centered>
-                    <Grid.Column width="4"/>
-                    <Grid.Column width="8">
-                        <Form size="large" style={{marginLeft: "3em", marginBottom: 50}}>
-                            <label><b>Cover Letter</b></label>
-                            <Form.TextArea
-                                placeholder="Cover Letter"
-                                type="text"
-                                value={formik.values.coverLetter}
-                                name="coverLetter"
-                                onChange={formik.handleChange}
-                                onBlur={formik.handleBlur}
-                                style={{minHeight: 200, marginTop: 15}}
-                            />
-                            <Button color="blue" size="large" onClick={() => {
-                                handleCoverLetterSubmit()
-                                setIsCoverLetterPopupOpen(false)
-                            }
-                            }>Save</Button>
-                        </Form>
-                    </Grid.Column>
-                    <Grid.Column width="4"/>
-                </Grid>
-            </Modal>
-        )
     }
 
     function editTitle() {
@@ -434,37 +388,51 @@ export function CandidateManageCvs() {
         )
     }
 
+    function coverLetterPopup() {
+        return (
+            <Modal basic onClose={() => setIsCoverLetterPopupOpen(false)} onOpen={() => setIsCoverLetterPopupOpen(true)}
+                   open={isCoverLetterPopupOpen} size='small'>
+                <Form size="large" style={{marginLeft: "3em", marginBottom: 50}}>
+                    <label><b>Cover Letter</b></label>
+                    <Form.TextArea
+                        placeholder="Cover Letter"
+                        type="text"
+                        value={formik.values.coverLetter}
+                        name="coverLetter"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        style={{minHeight: 200, marginTop: 15, borderRadius: 10}}
+                    />
+                    <Button color="blue" size="large" onClick={() => {
+                        handleCoverLetterSubmit()
+                        setIsCoverLetterPopupOpen(false)
+                    }} content="Save"/>
+                </Form>
+            </Modal>
+        )
+    }
+
     function addJobExperiencePopup() {
         return (
             <Modal basic onClose={() => setIsJobExpAddPopupOpen(false)} onOpen={() => setIsJobExpAddPopupOpen(true)}
-                   open={isJobExpAddPopupOpen} size='large'>
-                <Grid>
-                    <Grid.Column width="5"/>
-                    <Grid.Column width="6" style={{marginLeft: "3em"}}>
-                        <Segment placeholder secondary attached>
-                            <Grid padded relaxed={"very"} centered>
-                                <Grid.Column>
-                                    <Header textAlign={"center"} dividing>
-                                        Your Job Experiences
-                                    </Header>
-                                    <Dropdown multiple clearable item placeholder="Select job experience(s)" search
-                                              selection fluid value={formik.values.jobExperienceIds}
-                                              options={candidateJobExperienceOption}
-                                              onChange={(event, data) => {
-                                                  handleChange(`jobExperienceIds`, data.value)
-                                              }}
-                                    />
-                                </Grid.Column>
-                            </Grid>
+                   open={isJobExpAddPopupOpen} size='mini'>
+                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}}>
+                    <Header textAlign={"center"} dividing>
+                        Your Job Experiences
+                    </Header>
+                    <Dropdown multiple clearable item placeholder="Select job experience(s)" search
+                              selection fluid value={formik.values.jobExperienceIds}
+                              options={candidateJobExperienceOption}
+                              onChange={(event, data) => {
+                                  handleChange(`jobExperienceIds`, data.value)
+                              }}
+                    />
 
-                        </Segment>
-                        <Button onClick={() => {
-                            handleCvJobExperiencesAdd()
-                            setIsJobExpAddPopupOpen(false)
-                        }} primary type="submit" attached>Add To CV</Button>
-                    </Grid.Column>
-                    <Grid.Column width="5"/>
-                </Grid>
+                </Segment>
+                <Button onClick={() => {
+                    handleCvJobExperiencesAdd()
+                    setIsJobExpAddPopupOpen(false)
+                }} primary attached = "bottom">Add To CV</Button>
             </Modal>
         )
     }
@@ -472,33 +440,23 @@ export function CandidateManageCvs() {
     function addSchoolPopup() {
         return (
             <Modal basic onClose={() => setIsSchoolAddPopupOpen(false)} onOpen={() => setIsSchoolAddPopupOpen(true)}
-                   open={isSchoolAddPopupOpen} size='large'>
-                <Grid>
-                    <Grid.Column width="5"/>
-                    <Grid.Column width="6" style={{marginLeft: "3em"}}>
-                        <Segment placeholder secondary attached>
-                            <Grid padded relaxed={"very"} centered>
-                                <Grid.Column>
-                                    <Header textAlign={"center"} dividing>
-                                        Your Schools
-                                    </Header>
-                                    <Dropdown multiple clearable item placeholder="Select school(s)" search
-                                              selection fluid value={formik.values.schoolIds}
-                                              options={candidateSchoolOption}
-                                              onChange={(event, data) => {
-                                                  handleChange(`schoolIds`, data.value)
-                                              }}
-                                    />
-                                </Grid.Column>
-                            </Grid>
-                        </Segment>
-                        <Button onClick={() => {
-                            handleCvSchoolAdd()
-                            setIsSchoolAddPopupOpen(false)
-                        }} primary type="submit" attached>Add To CV</Button>
-                    </Grid.Column>
-                    <Grid.Column width="5"/>
-                </Grid>
+                   open={isSchoolAddPopupOpen} size='mini'>
+                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}}>
+                    <Header textAlign={"center"} dividing>
+                        Your Schools
+                    </Header>
+                    <Dropdown multiple clearable item placeholder="Select school(s)" search
+                              selection fluid value={formik.values.schoolIds}
+                              options={candidateSchoolOption}
+                              onChange={(event, data) => {
+                                  handleChange(`schoolIds`, data.value)
+                              }}
+                    />
+                </Segment>
+                <Button onClick={() => {
+                    handleCvSchoolAdd()
+                    setIsSchoolAddPopupOpen(false)
+                }} primary attached>Add To CV</Button>
             </Modal>
         )
     }
@@ -506,33 +464,23 @@ export function CandidateManageCvs() {
     function addLanguagePopup() {
         return (
             <Modal basic onClose={() => setIsLangAddPopupOpen(false)} onOpen={() => setIsLangAddPopupOpen(true)}
-                   open={isLangAddPopupOpen} size='large'>
-                <Grid>
-                    <Grid.Column width="5"/>
-                    <Grid.Column width="6" style={{marginLeft: "3em"}}>
-                        <Segment placeholder secondary attached>
-                            <Grid padded relaxed={"very"} centered>
-                                <Grid.Column>
-                                    <Header textAlign={"center"} dividing>
-                                        Your Languages
-                                    </Header>
-                                    <Dropdown multiple clearable item placeholder="Select language(s)" search
-                                              selection fluid value={formik.values.languageIds}
-                                              options={candidateLanguageOption}
-                                              onChange={(event, data) => {
-                                                  handleChange(`languageIds`, data.value)
-                                              }}
-                                    />
-                                </Grid.Column>
-                            </Grid>
-                        </Segment>
-                        <Button onClick={() => {
-                            handleCvLanguageAdd()
-                            setIsLangAddPopupOpen(false)
-                        }} primary type="submit" attached>Add To CV</Button>
-                    </Grid.Column>
-                    <Grid.Column width="5"/>
-                </Grid>
+                   open={isLangAddPopupOpen} size='mini'>
+                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}} >
+                    <Header textAlign={"center"} dividing>
+                        Your Languages
+                    </Header>
+                    <Dropdown multiple clearable item placeholder="Select language(s)" search
+                              selection fluid value={formik.values.languageIds}
+                              options={candidateLanguageOption}
+                              onChange={(event, data) => {
+                                  handleChange(`languageIds`, data.value)
+                              }}
+                    />
+                </Segment>
+                <Button onClick={() => {
+                    handleCvLanguageAdd()
+                    setIsLangAddPopupOpen(false)
+                }} primary attached>Add To CV</Button>
             </Modal>
         )
     }
@@ -540,33 +488,23 @@ export function CandidateManageCvs() {
     function addSkillPopup() {
         return (
             <Modal basic onClose={() => setIsSkillAddPopupOpen(false)} onOpen={() => setIsSkillAddPopupOpen(true)}
-                   open={isSkillAddPopupOpen} size='large'>
-                <Grid>
-                    <Grid.Column width="5"/>
-                    <Grid.Column width="6" style={{marginLeft: "3em"}}>
-                        <Segment placeholder secondary attached>
-                            <Grid padded relaxed={"very"} centered>
-                                <Grid.Column>
-                                    <Header textAlign={"center"} dividing>
-                                        Your Skills
-                                    </Header>
-                                    <Dropdown multiple clearable item placeholder="Select skill(s)" search
-                                              selection fluid value={formik.values.skillIds}
-                                              options={candidateSkillOption}
-                                              onChange={(event, data) => {
-                                                  handleChange(`skillIds`, data.value)
-                                              }}
-                                    />
-                                </Grid.Column>
-                            </Grid>
-                        </Segment>
-                        <Button onClick={() => {
-                            handleCvSkillAdd()
-                            setIsSkillAddPopupOpen(false)
-                        }} primary type="submit" attached>Add To CV</Button>
-                    </Grid.Column>
-                    <Grid.Column width="5"/>
-                </Grid>
+                   open={isSkillAddPopupOpen} size='mini'>
+                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}}>
+                    <Header textAlign={"center"} dividing>
+                        Your Skills
+                    </Header>
+                    <Dropdown multiple clearable item placeholder="Select skill(s)" search
+                              selection fluid value={formik.values.skillIds}
+                              options={candidateSkillOption}
+                              onChange={(event, data) => {
+                                  handleChange(`skillIds`, data.value)
+                              }}
+                    />
+                </Segment>
+                <Button onClick={() => {
+                    handleCvSkillAdd()
+                    setIsSkillAddPopupOpen(false)
+                }} primary attached>Add To CV</Button>
             </Modal>
         )
     }
@@ -582,7 +520,7 @@ export function CandidateManageCvs() {
                 {addLanguagePopup()}
                 {addSkillPopup()}
 
-                <Card fluid color={color}>
+                <Card fluid color={color} style = {{borderRadius: 15}}>
                     <Card.Content>
                         <Card.Header>
                             Cover Letter
@@ -735,15 +673,18 @@ export function CandidateManageCvs() {
                             <Table.Cell>
                                 <Popup
                                     trigger={
-                                        <Button icon={"x"} content={"Delete CV"} negative/>}
+                                        <Button icon={"x"} content={"Delete CV"} negative onClick = {() => {
+                                            if (isCvDeletePopupOpen) setIsCvDeletePopupOpen(false)
+                                            if (!isCvDeletePopupOpen) setIsCvDeletePopupOpen(true)
+                                        }}/>}
                                     content={
                                         <Button icon={"x"} content={"Delete CV"} negative onClick={() => {
                                             handleCvDelete()
+                                            setIsCvDeletePopupOpen(false)
                                         }}/>}
-                                    on='hover' position='bottom center' size={"mini"}
-                                    style={{opacity: 0.9}} mouseEnterDelay={400} mouseLeaveDelay={2000}
+                                    on='focus' position='bottom center' size={"mini"} open = {isCvDeletePopupOpen}
+                                    style={{opacity: 0.9}}
                                 />
-
                             </Table.Cell>
                         </Table.Row>
                     </Table.Body>

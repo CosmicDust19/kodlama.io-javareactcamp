@@ -50,7 +50,7 @@ public interface CandidateCvDao extends JpaRepository<CandidateCv, Integer> {
 
     @Modifying
     @Query(value = "INSERT INTO candidates_cvs_skills VALUES (:cvId, :candidateSkillId)", nativeQuery = true)
-    void addSkillToToCandidateCv(@Param(value = "candidateSkillId") Integer candidateSkillId, @Param(value = "cvId") Integer cvId);
+    void addSkillToCandidateCv(@Param(value = "candidateSkillId") Integer candidateSkillId, @Param(value = "cvId") Integer cvId);
 
     @Modifying
     @Query(value = "DELETE FROM candidates_cvs_job_experiences WHERE cv_id = :cvId AND candidate_job_exp_id = :candidateJobExperienceId", nativeQuery = true)

@@ -2,15 +2,15 @@ import axios from "axios"
 
 export default class EmployerService {
     existsByEmailAndPassword(email, password){
-        return axios.get("http://localhost:8080/api/employers/existsByEmailAndPassword?email=" + email + "&password=" + password)
+        return axios.get(`http://localhost:8080/api/employers/existsByEmailAndPassword?email=${email}&password=${password}`)
     }
 
     existsByCompanyName(companyName){
-        return axios.get("http://localhost:8080/api/employers/existsByCompanyName?companyName=" + companyName)
+        return axios.get(`http://localhost:8080/api/employers/existsByCompanyName?companyName=${companyName}`)
     }
 
     existsByWebsite(website){
-        return axios.get("http://localhost:8080/api/employers/existsByWebsite?website=" + website)
+        return axios.get(`http://localhost:8080/api/employers/existsByWebsite?website=${website}`)
     }
 
     getEmployers(){
@@ -18,11 +18,11 @@ export default class EmployerService {
     }
 
     getById(id){
-        return axios.get("http://localhost:8080/api/employers/getById?id=" + id);
+        return axios.get(`http://localhost:8080/api/employers/getById?id=${id}`);
     }
 
     getByEmailAndPassword(email, password){
-        return axios.get("http://localhost:8080/api/employers/getByEmailAndPassword?email=" + email +  "&password=" + password)
+        return axios.get(`http://localhost:8080/api/employers/getByEmailAndPassword?email=${email}&password=${password}`)
     }
 
     add(values){
