@@ -49,7 +49,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
 
     @Override
     public DataResult<List<JobAdvertisement>> getByActivesAndVerifiedAndEmployer_Id(int employerId) {
-        return new SuccessDataResult<>("Success", jobAdvertisementDao.getAllByActivationStatusTrueAndSystemVerificationStatusTrueAndEmployer_Id(employerId));
+        return new SuccessDataResult<>("Success", jobAdvertisementDao.getAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineAfterAndEmployer_Id(LocalDate.now(), employerId));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlineFuture() {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        return new SuccessDataResult<>("Success", jobAdvertisementDao.findAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineAfter(LocalDate.now(),sort));
+        return new SuccessDataResult<>("Success", jobAdvertisementDao.findAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineAfterAndEmployer_SystemVerificationStatusTrue(LocalDate.now(),sort));
     }
 
     @Override
@@ -254,6 +254,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         if (id <= 0 || !jobAdvertisementDao.existsById(id))
             return new ErrorDataResult<>("id does not exist", false);
         jobAdvertisementDao.updateSystemVerificationStatus(systemVerificationStatus, id);
+        jobAdvertisementDao.updateSystemRejectionStatus(!systemVerificationStatus, id);
         return new SuccessResult("Success");
     }
 

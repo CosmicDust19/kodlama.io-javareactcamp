@@ -1,8 +1,7 @@
 import {Tab} from "semantic-ui-react";
-import React from "react";
-import EmployerList from "./EmployerList";
-import CandidateList from "./CandidateList";
-import SystemEmployeeList from "./SystemEmployeeList";
+import EmployerList from "./employer/EmployerList";
+import CandidateList from "./candidate/CandidateList";
+import SystemEmployeeList from "./system-employee/SystemEmployeeList";
 
 const panes = [
     {
@@ -27,6 +26,7 @@ const UsersTable = () => (
 )
 
 export default function UserList() {
+
     return (
         <UsersTable/>
     )

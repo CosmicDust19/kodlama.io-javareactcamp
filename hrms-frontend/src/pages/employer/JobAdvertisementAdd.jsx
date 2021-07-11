@@ -5,9 +5,9 @@ import {
     Button, Dropdown, Input, TextArea, Card, Form, Grid, GridColumn,
     Progress, Icon, Header
 } from "semantic-ui-react";
-import CityService from "../services/cityService";
-import PositionService from "../services/positionService";
-import JobAdvertisementService from "../services/jobAdvertisementService";
+import CityService from "../../services/cityService";
+import PositionService from "../../services/positionService";
+import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {useSelector} from "react-redux";
 import {toast} from "react-toastify";
 
@@ -64,7 +64,7 @@ export default function JobAdvertisementAdd() {
             values.employerId = userProps.user?.id;
             formik.values.position = {id: formik.values.positionId}
             formik.values.city = {id: formik.values.cityId}
-            if (values.minSalary && values.maxSalary && values.minSalary > values.maxSalary) {
+            if (values.minSalary && values.maxSalary && Number(values.minSalary) > Number(values.maxSalary)) {
                 toast.warning("Minimum salary cannot be bigger than maximum salary")
                 counter++
             }
@@ -75,9 +75,7 @@ export default function JobAdvertisementAdd() {
             if (counter === 0) {
                 jobAdvertisementService.add(values).then((result) => {
                     console.log(result)
-                    toast("Published 🎉", {
-                        autoClose: 2500
-                    })
+                    toast("Your advertisement received, it will be published after confirmation")
                     increment()
                     increment()
                     increment()
@@ -186,6 +184,14 @@ export default function JobAdvertisementAdd() {
                 return null
         }
         formik.setFieldValue(fieldName, value);
+    }
+
+    if (String(userProps.userType) !== "employer"){
+        return (
+            <Header>
+                Sorry You Do Not Have Access Here
+            </Header>
+        )
     }
 
     return (

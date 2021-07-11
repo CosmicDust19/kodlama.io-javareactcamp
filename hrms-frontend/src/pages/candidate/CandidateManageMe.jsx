@@ -6,17 +6,17 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     changeCvJobExp, changeCvLang, changeCvSchool, changeCvSkill, changeJobExps,
     changeLangs, changeSchools, changeSkills,
-} from "../store/actions/userActions";
-import PositionService from "../services/positionService";
-import SchoolService from "../services/schoolService";
-import DepartmentService from "../services/departmentService";
-import LanguageService from "../services/languageService";
-import SkillService from "../services/skillService";
-import CandidateJobExperienceService from "../services/candidateJobExperienceService";
-import CandidateLanguageService from "../services/candidateLanguageService";
-import CandidateSchoolService from "../services/candidateSchoolService";
-import CandidateSkillService from "../services/candidateSkillService";
-import CandidateCvService from "../services/candidateCvService";
+} from "../../store/actions/userActions";
+import PositionService from "../../services/positionService";
+import SchoolService from "../../services/schoolService";
+import DepartmentService from "../../services/departmentService";
+import LanguageService from "../../services/languageService";
+import SkillService from "../../services/skillService";
+import CandidateJobExperienceService from "../../services/candidateJobExperienceService";
+import CandidateLanguageService from "../../services/candidateLanguageService";
+import CandidateSchoolService from "../../services/candidateSchoolService";
+import CandidateSkillService from "../../services/candidateSkillService";
+import CandidateCvService from "../../services/candidateCvService";
 
 export function CandidateManageMe() {
 
@@ -31,6 +31,7 @@ export function CandidateManageMe() {
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
+    const userProps = useSelector(state => state?.user?.userProps)
 
     const [positions, setPositions] = useState([]);
     const [schools, setSchools] = useState([]);
@@ -413,6 +414,13 @@ export function CandidateManageMe() {
         })
     }
 
+    if (String(userProps.userType) !== "candidate"){
+        return (
+            <Header>
+                Sorry You Do Not Have Access Here
+            </Header>
+        )
+    }
 
     return (
         <div>

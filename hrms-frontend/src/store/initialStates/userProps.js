@@ -1,7 +1,8 @@
 export const userProps = {
     user: null,
     loggedIn: false,
-    userType: null
+    userType: null,
+    guest: true
 }
 
 export default userProps

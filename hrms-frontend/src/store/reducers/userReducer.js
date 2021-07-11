@@ -1,21 +1,12 @@
 import {userProps} from "../initialStates/userProps";
 import {
-    LOGIN,
-    SIGN_OUT,
-    CHANGE_EMAIl,
-    CHANGE_GITHUB,
-    CHANGE_LINKEDIN,
-    CHANGE_CV_TITLE,
-    CHANGE_CV_COVERLETTER,
-    CHANGE_CV_JOBEXP,
-    CHANGE_CV_LANG,
-    CHANGE_CV_SCHOOL,
-    CHANGE_CV_SKILL,
-    ADD_CV,
-    DELETE_CV,
-    CHANGE_JOBEXP,
-    CHANGE_LANG,
-    CHANGE_SCHOOL, CHANGE_SKILL, CHANGE_FAVORITE_JOB_ADVS, CHANGE_FIRSTNAME, CHANGE_LASTNAME
+    LOGIN, SIGN_OUT, CHANGE_EMAIl, CHANGE_GITHUB, CHANGE_LINKEDIN,
+    CHANGE_CV_TITLE, CHANGE_CV_COVERLETTER,
+    CHANGE_CV_JOBEXP, CHANGE_CV_LANG, CHANGE_CV_SCHOOL, CHANGE_CV_SKILL,
+    ADD_CV, DELETE_CV,
+    CHANGE_JOBEXP, CHANGE_LANG, CHANGE_SCHOOL, CHANGE_SKILL,
+    CHANGE_FAVORITE_JOB_ADVS,
+    CHANGE_FIRSTNAME, CHANGE_LASTNAME
 } from "../actions/userActions";
 
 const initialState = {
@@ -29,6 +20,7 @@ export default function userReducer(state = initialState, {type, payload}) {
             state.userProps.user = payload.user
             state.userProps.userType = payload.userType
             state.userProps.loggedIn = true
+            state.userProps.guest = false
             return {...state}
         case SIGN_OUT:
             state.userProps.user = null

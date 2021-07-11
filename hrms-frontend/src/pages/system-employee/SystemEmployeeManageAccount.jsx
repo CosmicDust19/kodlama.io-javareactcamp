@@ -1,15 +1,15 @@
 import {
     Header, Grid, Menu, Input, Icon, Form, Button,
-    Item, Modal,
+    Item, Modal, Image, Placeholder,
 } from "semantic-ui-react";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
-import UserService from "../services/userService";
+import UserService from "../../services/userService";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmail, changeFirstName, changeLastName, signOut} from "../store/actions/userActions";
+import {changeEmail, changeFirstName, changeLastName, signOut} from "../../store/actions/userActions";
 import {useHistory} from "react-router-dom";
-import SystemEmployeeService from "../services/systemEmployeeService";
+import SystemEmployeeService from "../../services/systemEmployeeService";
 
 const userService = new UserService()
 const systemEmployeeService = new SystemEmployeeService()
@@ -18,12 +18,20 @@ export function SystemEmployeeManageAccount() {
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
+    const userProps = useSelector(state => state?.user?.userProps)
     const history = useHistory()
 
     const [deletePopupOpen, setDeletePopupOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [activeItem, setActiveItem] = useState('name')
     const [refresh, setRefresh] = useState(0);
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false)
+        }, 1000)
+    }, [])
 
     const handleItemClick = (activeItem) => {
         setActiveItem(activeItem)
@@ -309,8 +317,16 @@ export function SystemEmployeeManageAccount() {
                 <Grid.Column width={8}>
                     <Item.Group unstackable>
                         <Item>
-                            <Item.Image
-                                src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
+                            {loading ?
+                                <Item.Image>
+                                    <Image circular>
+                                        <Placeholder style={{height: 175, width: 175}}>
+                                            <Placeholder.Image/>
+                                        </Placeholder>
+                                    </Image>
+                                </Item.Image> :
+                                <Item.Image src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
+                            }
                             <Item.Content verticalAlign={"middle"}>
                                 <Item.Header as='a'>
                                     <Header>
@@ -337,6 +353,14 @@ export function SystemEmployeeManageAccount() {
                     </Item.Group>
                 </Grid.Column>
             </Grid>
+        )
+    }
+
+    if (String(userProps.userType) !== "systemEmployee"){
+        return (
+            <Header>
+                Sorry You Do Not Have Access Here
+            </Header>
         )
     }
 
@@ -379,6 +403,7 @@ export function SystemEmployeeManageAccount() {
                     </Grid>
                 </Grid.Column>
             </Grid>
+            {loading ? <Image src={"https://freesvg.org/img/abstract-user-flat-1.png"} style={{opacity: 0}}/> : null}
         </div>
     )
 }

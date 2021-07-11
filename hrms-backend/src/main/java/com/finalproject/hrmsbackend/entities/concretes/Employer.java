@@ -1,6 +1,5 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.User;
 import lombok.AllArgsConstructor;
@@ -33,9 +32,12 @@ public class Employer extends User {
     private String phoneNumber;
 
     @Column(name = "is_system_verified", nullable = false)
-    private boolean systemVerificationStatus = true;
+    private boolean systemVerificationStatus;
 
-    @OneToMany(mappedBy = "employer")
+    @Column(name = "is_system_rejected")
+    private Boolean systemRejectionStatus;
+
+    @OneToMany(mappedBy = "employer", fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = {"employer"})
     private List<JobAdvertisement> jobAdvertisements;
 

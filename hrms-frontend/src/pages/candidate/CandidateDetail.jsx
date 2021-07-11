@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from "react";
 import {useParams} from "react-router-dom";
-import CandidateService from "../services/candidateService";
-import {Grid, Header, Table, Icon, Item, Tab, Card, Segment, Button} from "semantic-ui-react";
-import CandidateCvService from "../services/candidateCvService";
+import CandidateService from "../../services/candidateService";
+import {Grid, Header, Table, Icon, Item, Tab, Card, Segment, Button, Loader} from "semantic-ui-react";
+import CandidateCvService from "../../services/candidateCvService";
 
 export default function CandidateDetail() {
 
@@ -47,6 +47,10 @@ export default function CandidateDetail() {
 
     function doesHaveLinkedin() {
         return !!(candidate.linkedinAccountLink);
+    }
+
+    if (candidate === {}) {
+        return <Loader active inline='centered' size={"large"}/>
     }
 
     function mainInfos() {
@@ -115,12 +119,11 @@ export default function CandidateDetail() {
         return (
             <Grid>
                 <Header style={{marginTop: 20}}>
-                    {(candidateJobExperiences?.length === 0 && candidateSkills?.length === 0 &&
-                        candidateSchools?.length === 0 && candidateLanguages?.length === 0) ?
-                        "No additional info found." : null}
-                    {(!candidateJobExperiences && !candidateSkills &&
-                        !candidateSchools && !candidateLanguages) ?
-                        "No additional info found." : null}
+                    {((candidateJobExperiences?.length === 0 && candidateSkills?.length === 0 &&
+                        candidateSchools?.length === 0 && candidateLanguages?.length === 0) ||
+                        (!candidateJobExperiences && !candidateSkills &&
+                            !candidateSchools && !candidateLanguages)) ?
+                        "No info found." : null}
                 </Header>
                 <Grid stackable style={{marginTop: 10}}>
                     {candidateJobExperiences?.length !== 0 && candidateJobExperiences ?

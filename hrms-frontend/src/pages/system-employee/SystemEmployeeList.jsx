@@ -1,5 +1,5 @@
 import React from "react";
-import SystemEmployeeService from "../services/systemEmployeeService";
+import SystemEmployeeService from "../../services/systemEmployeeService";
 import {Table, Header, Image} from "semantic-ui-react";
 import {useState, useEffect} from "react";
 
@@ -8,11 +8,16 @@ export default function SystemEmployeeList() {
     let placeholderImageNames = ["ade", "chris", "christian", "daniel", "elliot", "helen", "jenny",
         "joe", "justen", "laura", "matt", "nan", "steve", "stevie", "veronika"]
 
-    const [systemEmployees, setSystemEmployee] = useState([]);
+    const [systemEmployees, setSystemEmployees] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setLoading(true);
         let systemEmployeeService = new SystemEmployeeService();
-        systemEmployeeService.getSystemEmployees().then((result) => setSystemEmployee(result.data.data));
+        systemEmployeeService.getSystemEmployees().then((result) => setSystemEmployees(result.data.data));
+        setTimeout(() => {
+            setLoading(false);
+        }, 500)
     }, []);
 
     return (
@@ -28,8 +33,9 @@ export default function SystemEmployeeList() {
                     <Table.Row key={systemEmployee.id}>
                         <Table.Cell>
                             <Header as='h4' image>
-                                <Image src={`https://semantic-ui.com/images/avatar/small/${placeholderImageNames[Math.floor(Math.random() * 15)]}.jpg`}
-                                    rounded size='mini'/>
+                                <Image
+                                    src={`https://semantic-ui.com/images/avatar/small/${placeholderImageNames[Math.floor(Math.random() * 15)]}.jpg`}
+                                    rounded size='mini' style={{opacity: loading ? 0 : 1}}/>
                                 <Header.Content>{systemEmployee.firstName}
                                     <Header.Subheader>{systemEmployee.lastName}</Header.Subheader>
                                 </Header.Content>

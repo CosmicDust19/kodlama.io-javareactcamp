@@ -13,7 +13,7 @@ const userService = new UserService()
 const systemEmployeeService = new SystemEmployeeService()
 
 const errorPopUpStyle = {
-    borderRadius: 0,
+    borderRadius: 3,
     opacity: 0.7,
     color: "rgb(201,201,201)"
 }
@@ -149,7 +149,7 @@ export function SignUpSystemEmployee() {
             </Header>
             <Grid centered stackable padded>
                 <Grid.Column width={6}>
-                    <Segment placeholder color={"purple"} padded textAlign={"center"}>
+                    <Segment placeholder color={"purple"} padded textAlign={"center"} raised style = {{borderRadius: 15}}>
                         <Form size="large" onSubmit={formik.handleSubmit} inverted>
 
                             <Grid padded>
@@ -270,7 +270,9 @@ export function SignUpSystemEmployee() {
                 <Grid.Column width={10}>
                     <Message attached='bottom' warning>
                         <Icon name='help'/>
-                        Already signed up?&nbsp;<Link to={"/login"}>Login Here</Link>&nbsp;instead.
+                        Already signed up ?&nbsp;<Link to={"/login"} onClick={() => {
+                        window.scrollTo(0, 0)
+                    }}>Login Here</Link>&nbsp;instead.
                     </Message>
                 </Grid.Column>
             </Grid>

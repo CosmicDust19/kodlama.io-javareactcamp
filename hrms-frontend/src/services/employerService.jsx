@@ -13,8 +13,12 @@ export default class EmployerService {
         return axios.get(`http://localhost:8080/api/employers/existsByWebsite?website=${website}`)
     }
 
-    getEmployers(){
+    getAllEmployers(){
         return axios.get("http://localhost:8080/api/employers/getAll");
+    }
+
+    getEmployers(){
+        return axios.get("http://localhost:8080/api/employers/getPublicEmployers");
     }
 
     getById(id){
@@ -28,4 +32,9 @@ export default class EmployerService {
     add(values){
         return axios.post("http://localhost:8080/api/employers/add",values)
     }
+
+    updateSystemVerificationStatus(id, status){
+        return axios.put(`http://localhost:8080/api/employers/updateSystemVerificationStatus?id=${id}&systemVerificationStatus=${status}`)
+    }
+
 }

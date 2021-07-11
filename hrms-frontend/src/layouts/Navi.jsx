@@ -7,13 +7,10 @@ export default function Navi() {
 
     const userProps = useSelector(state => state?.user?.userProps)
 
-    useSelector(state => state?.user?.userProps?.user)
-
     const [isAuthenticated, setIsAuthenticated] = useState(false)
 
     useEffect(() => {
-        if (userProps.loggedIn)
-            setIsAuthenticated(true)
+        if (userProps.loggedIn) setIsAuthenticated(true)
         else setIsAuthenticated(false)
     }, [userProps.loggedIn]);
 

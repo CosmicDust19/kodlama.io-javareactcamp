@@ -51,4 +51,8 @@ public interface EmployerDao extends JpaRepository<Employer,Integer> {
     @Query("update Employer employer set employer.systemVerificationStatus = :systemVerificationStatus where employer.id = :id")
     void updateSystemVerificationStatus(@Param(value = "systemVerificationStatus") boolean systemVerificationStatus, @Param(value = "id") Integer id);
 
+    @Modifying
+    @Query("update Employer employer set employer.systemRejectionStatus = :systemRejectionStatus where employer.id = :id")
+    void updateSystemRejectionStatus(@Param(value = "systemRejectionStatus") boolean systemRejectionStatus, @Param(value = "id") Integer id);
+
 }

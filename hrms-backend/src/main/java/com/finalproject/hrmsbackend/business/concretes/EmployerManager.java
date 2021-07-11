@@ -52,10 +52,12 @@ public class EmployerManager implements EmployerService {
         return new SuccessDataResult<>("Success", employerDao.findAll());
     }
 
+    @Override
     public DataResult<List<Employer>> getAllBySystemVerificationStatusTrue() {
         return new SuccessDataResult<>("Success", employerDao.getAllBySystemVerificationStatusTrue());
     }
 
+    @Override
     public DataResult<List<Employer>> getAllBySystemVerificationStatusFalse() {
         return new SuccessDataResult<>("Success", employerDao.getAllBySystemVerificationStatusFalse());
     }
@@ -167,6 +169,7 @@ public class EmployerManager implements EmployerService {
         if (id <= 0 || !employerDao.existsById(id))
             return new ErrorResult("id: does not exist");
         employerDao.updateSystemVerificationStatus(systemVerificationStatus, id);
+        employerDao.updateSystemRejectionStatus(!systemVerificationStatus, id);
         return new SuccessResult("Success");
     }
 

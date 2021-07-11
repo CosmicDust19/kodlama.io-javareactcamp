@@ -46,13 +46,13 @@ public class EmployersController {
         return employerService.getAll();
     }
 
-    @GetMapping("/getAllBySystemVerificationStatusTrue")
-    public DataResult<List<Employer>> getAllBySystemVerificationStatusTrue(){
+    @GetMapping("/getPublicEmployers")
+    public DataResult<List<Employer>> getPublicEmployers(){
         return employerService.getAllBySystemVerificationStatusTrue();
     }
 
-    @GetMapping("/getAllBySystemVerificationStatusFalse")
-    public DataResult<List<Employer>> getAllBySystemVerificationStatusFalse(){
+    @GetMapping("/getUnconfirmeds")
+    public DataResult<List<Employer>> getUnconfirmeds(){
         return employerService.getAllBySystemVerificationStatusFalse();
     }
 

@@ -9,6 +9,8 @@ import SystemEmployeeService from "../services/systemEmployeeService";
 import * as Yup from "yup";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
+import {changeFilteredEmployers, changeFilteredJobAdverts} from "../store/actions/filterActions";
+import JobAdvertisementService from "../services/jobAdvertisementService";
 
 export default function Login() {
 
@@ -70,14 +72,28 @@ export default function Login() {
                 return
             }
 
-            if (candidate && candidate !== {}  ) {
+            if (candidate && candidate !== {}) {
                 handleLogin(candidate, "candidate")
+                let jobAdvertisementService = new JobAdvertisementService();
+                jobAdvertisementService.getJobAdvertisements().then((result) => {
+                    dispatch(changeFilteredJobAdverts(result.data.data))
+                })
                 history.push("/")
-            } else if (employer &&  employer !== {}) {
+            } else if (employer && employer !== {}) {
                 handleLogin(employer, "employer")
+                let jobAdvertisementService = new JobAdvertisementService();
+                jobAdvertisementService.getJobAdvertisements().then((result) => {
+                    dispatch(changeFilteredJobAdverts(result.data.data))
+                })
                 history.push("/")
             } else if (systemEmployee && systemEmployee !== {}) {
                 handleLogin(systemEmployee, "systemEmployee")
+                let jobAdvertisementService = new JobAdvertisementService();
+                jobAdvertisementService.getAllJobAdvertisements().then((result) =>
+                    dispatch(changeFilteredJobAdverts(result.data.data)))
+                let employerService = new EmployerService()
+                employerService.getAllEmployers().then(result =>
+                    dispatch(changeFilteredEmployers(result.data.data)))
                 history.push("/")
             } else {
                 toast.warning("Please check your email and password")
@@ -121,9 +137,9 @@ export default function Login() {
             <Header color="yellow" textAlign="center">
                 Login
             </Header>
-            <Grid textAlign="center">
-                <Grid.Column width="7">
-                    <Segment placeholder color={"yellow"} padded textAlign={"center"}>
+            <Grid centered stackable padded>
+                <Grid.Column mobile={6}>
+                    <Segment placeholder color={"yellow"} padded textAlign={"center"} raised style={{borderRadius: 15}}>
                         <Form size="large" onSubmit={formik.handleSubmit} inverted>
 
                             <Grid padded>
@@ -182,8 +198,9 @@ export default function Login() {
                     <Message attached='bottom' warning>
                         <Icon name='help'/>
                         Don't you signed up yet ? Sign up as a&nbsp;
-                        <Link to={"/candidateSignUp"}>candidate</Link>&nbsp;or&nbsp;
-                        <Link to={"/employerSignUp"}>employer</Link>.
+                        <Link to={"/signUpCandidate"}
+                              onClick={() => window.scrollTo(0, 100)}>candidate</Link>&nbsp;or&nbsp;
+                        <Link to={"/signUpEmployer"} onClick={() => window.scrollTo(0, 50)}>employer</Link>.
                     </Message>
                 </Grid.Column>
             </Grid>

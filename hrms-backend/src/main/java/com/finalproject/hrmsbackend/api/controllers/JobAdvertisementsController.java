@@ -14,7 +14,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,22 +41,20 @@ public class JobAdvertisementsController {
         return jobAdvertisementService.getAllActivesAndVerifiedSortedByDate(sortDirection);
     }
 
-    @GetMapping("/getByActivationStatusTrueAndEmployerId")
-    public DataResult<List<JobAdvertisement>> getByActivationStatusTrueAndEmployer_Id(@RequestParam int employerId) {
+    @GetMapping("/getPublicEmployerJobs")
+    public DataResult<List<JobAdvertisement>> getPublicEmployerJobs(@RequestParam int employerId) {
         return jobAdvertisementService.getByActivesAndVerifiedAndEmployer_Id(employerId);
     }
 
     @GetMapping("/getAllBySystemVerificationStatusFalse")
-    public DataResult<List<JobAdvertisement>> getAllBySystemVerificationStatusFalse() {
+    public DataResult<List<JobAdvertisement>> getUnconfirmedJobs() {
         return jobAdvertisementService.getAllBySystemVerificationStatusFalse();
     }
 
-
-    @GetMapping("/findAllByActivesAndVerifiedAndApplicationDeadlineFuture")
-    public DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlineFuture() {
+    @GetMapping("/getPublicJobs")
+    public DataResult<List<JobAdvertisement>> getPublicJobs() {
         return jobAdvertisementService.findAllByActivesAndVerifiedAndApplicationDeadlineFuture();
     }
-
 
     @GetMapping("/findAllByActivesAndVerifiedAndApplicationDeadlinePast")
     public DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlinePast() {

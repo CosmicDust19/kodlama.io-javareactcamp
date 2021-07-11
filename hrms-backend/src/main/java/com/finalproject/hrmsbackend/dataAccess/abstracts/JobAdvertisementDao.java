@@ -24,13 +24,13 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
 
     List<JobAdvertisement> findAllByActivationStatusTrueAndSystemVerificationStatusTrue(Sort sort);
 
-    List<JobAdvertisement> findAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineAfter(LocalDate date , Sort sort);
+    List<JobAdvertisement> findAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineAfterAndEmployer_SystemVerificationStatusTrue(LocalDate date , Sort sort);
 
     List<JobAdvertisement> findAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineBefore(LocalDate date);
 
     List<JobAdvertisement> getAllBySystemVerificationStatusFalse(Sort sort);
 
-    List<JobAdvertisement> getAllByActivationStatusTrueAndSystemVerificationStatusTrueAndEmployer_Id(Integer employerId);
+    List<JobAdvertisement> getAllByActivationStatusTrueAndSystemVerificationStatusTrueAndApplicationDeadlineAfterAndEmployer_Id(LocalDate date, Integer employerId);
 
     @Modifying
     @Query("update JobAdvertisement j set j.position = :position where j.id = :id")
@@ -71,5 +71,9 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
     @Modifying
     @Query("update JobAdvertisement j set j.systemVerificationStatus = :systemVerificationStatus where j.id = :id")
     void updateSystemVerificationStatus(@Param(value = "systemVerificationStatus") Boolean systemVerificationStatus, @Param(value = "id") Integer id);
+
+    @Modifying
+    @Query("update JobAdvertisement j set j.systemRejectionStatus = :systemRejectionStatus where j.id = :id")
+    void updateSystemRejectionStatus(@Param(value = "systemRejectionStatus") Boolean systemRejectionStatus, @Param(value = "id") Integer id);
 
 }

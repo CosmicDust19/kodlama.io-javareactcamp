@@ -1,23 +1,28 @@
 import React from "react";
-import EmployerService from "../services/employerService";
-import {Icon, Table, Card, Header} from "semantic-ui-react";
+import EmployerService from "../../services/employerService";
+import {Icon, Table, Card, Header, Loader} from "semantic-ui-react";
 import {useState, useEffect} from "react";
 import {useHistory} from "react-router-dom";
 
 export default function EmployerList() {
 
-    const [employers, setEmployer] = useState([]);
+    const [employers, setEmployers] = useState([]);
 
     useEffect(() => {
         let employerService = new EmployerService();
-        employerService.getEmployers().then((result) => setEmployer(result.data.data));
+        employerService.getEmployers().then((result) => setEmployers(result.data.data));
     }, []);
 
     let history = useHistory();
 
     const handleEmployerDetailClick = id => {
         history.push(`/employers/${id}`);
+        window.scrollTo(0,0);
     };
+
+    if (employers.length === 0){
+        return <Loader active inline='centered' size={"large"}/>
+    }
 
     return (
         <div>

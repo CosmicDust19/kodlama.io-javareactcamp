@@ -1,29 +1,37 @@
 import {
     Header, Grid, Menu, Input, Icon, Form, Button,
-    Item, Modal,
+    Item, Modal, Image, Placeholder,
 } from "semantic-ui-react";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
-import UserService from "../services/userService";
-import CandidateService from "../services/candidateService";
+import UserService from "../../services/userService";
+import CandidateService from "../../services/candidateService";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmail, changeGithub, changeLinkedin, signOut} from "../store/actions/userActions";
+import {changeEmail, changeGithub, changeLinkedin, signOut} from "../../store/actions/userActions";
 import {useHistory} from "react-router-dom";
 
-const userService = new UserService()
-const candidateService = new CandidateService()
-
 export function CandidateManageAccount() {
+
+    const userService = new UserService()
+    const candidateService = new CandidateService()
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
     const history = useHistory()
+    const userProps = useSelector(state => state?.user?.userProps)
 
     const [deletePopupOpen, setDeletePopupOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [activeItem, setActiveItem] = useState('email')
     const [refresh, setRefresh] = useState(0);
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setTimeout(() => {
+            setLoading(false)
+        }, 1000)
+    }, [])
 
     const handleItemClick = (activeItem) => {
         setActiveItem(activeItem)
@@ -318,7 +326,7 @@ export function CandidateManageAccount() {
                                     onClick={handleGithubLinkRemove} content={"Remove"}>
                             </Button>
                         </Form>
-                        <Form style = {{marginTop: 10}}>
+                        <Form style={{marginTop: 10}}>
                             <Input icon="world" iconPosition="left" placeholder="Your Linkedin Link"
                                    type="text" value={formik.values.linkedinAccountLink}
                                    onChange={formik.handleChange} onBlur={formik.handleBlur}
@@ -359,8 +367,16 @@ export function CandidateManageAccount() {
                 <Grid.Column width={8}>
                     <Item.Group unstackable>
                         <Item>
-                            <Item.Image
-                                src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
+                            {loading ?
+                                <Item.Image>
+                                    <Image circular>
+                                        <Placeholder style={{height: 175, width: 175}}>
+                                            <Placeholder.Image/>
+                                        </Placeholder>
+                                    </Image>
+                                </Item.Image> :
+                                <Item.Image src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
+                            }
                             <Item.Content verticalAlign={"middle"}>
                                 <Item.Header as='a'>
                                     <Header>
@@ -388,6 +404,14 @@ export function CandidateManageAccount() {
                     </Item.Group>
                 </Grid.Column>
             </Grid>
+        )
+    }
+
+    if (String(userProps.userType) !== "candidate") {
+        return (
+            <Header>
+                Sorry You Do Not Have Access Here
+            </Header>
         )
     }
 
@@ -430,8 +454,7 @@ export function CandidateManageAccount() {
                     </Grid>
                 </Grid.Column>
             </Grid>
+            {loading ? <Image src={"https://freesvg.org/img/abstract-user-flat-1.png"} style={{opacity: 0}}/> : null}
         </div>
     )
 }
-
-

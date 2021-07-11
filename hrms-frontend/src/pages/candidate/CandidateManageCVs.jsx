@@ -3,14 +3,14 @@ import React, {useEffect, useState} from "react";
 import {
     addCv, changeCoverLetter, changeCvJobExp, changeCvLang,
     changeCvSchool, changeCvSkill, changeTitle, deleteCv
-} from "../store/actions/userActions";
+} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import {useFormik} from "formik";
 import {
     Button, Card, Dropdown, Form, Grid, Header, Icon, Input,
     Menu, Modal, Popup, Segment, Table
 } from "semantic-ui-react";
-import CandidateCvService from "../services/candidateCvService";
+import CandidateCvService from "../../services/candidateCvService";
 
 export function CandidateManageCvs() {
 
@@ -26,6 +26,7 @@ export function CandidateManageCvs() {
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
+    const userProps = useSelector(state => state?.user?.userProps)
 
     const [isCvAddPopupOpen, setIsCvAddPopupOpen] = useState(false);
     const [isCvDeletePopupOpen, setIsCvDeletePopupOpen] = useState(false);
@@ -690,6 +691,14 @@ export function CandidateManageCvs() {
                     </Table.Body>
                 </Table>
             </div>
+        )
+    }
+
+    if (String(userProps.userType) !== "candidate"){
+        return (
+            <Header>
+                Sorry You Do Not Have Access Here
+            </Header>
         )
     }
 

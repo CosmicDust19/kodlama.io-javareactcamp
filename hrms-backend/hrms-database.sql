@@ -226,7 +226,7 @@ CREATE TABLE public.candidates_cvs_skills
 
 CREATE TABLE public.candidates_favorite_job_advertisements
 (
-    candidate_id        integer NOT NULL,
+    candidate_id         integer NOT NULL,
     job_advertisement_id integer NOT NULL,
     CONSTRAINT pk_candidates_favorite_job_advertisements PRIMARY KEY (candidate_id, job_advertisement_id),
     CONSTRAINT fk_candidates_favorite_job_adverts_candidate_id FOREIGN KEY (candidate_id)
@@ -244,6 +244,7 @@ CREATE TABLE public.employers
     website            character varying(200) NOT NULL,
     phone_number       character varying(22)  NOT NULL,
     is_system_verified boolean                NOT NULL DEFAULT FALSE,
+    is_system_rejected boolean                         DEFAULT NULL,
     CONSTRAINT pk_employers PRIMARY KEY (user_id),
     CONSTRAINT uk_employers_company_name UNIQUE (company_name),
     CONSTRAINT uk_employers_website UNIQUE (website),
@@ -267,6 +268,7 @@ CREATE TABLE public.job_advertisements
     application_deadline         date,
     is_active                    boolean                        NOT NULL DEFAULT TRUE,
     is_system_verified           boolean                        NOT NULL DEFAULT FALSE,
+    is_system_rejected           boolean                                 DEFAULT NULL,
     created_at                   timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
     last_modified_at             timestamp(0) without time zone,
     CONSTRAINT pk_job_advertisements PRIMARY KEY (id),

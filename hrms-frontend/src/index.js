@@ -15,7 +15,8 @@ const store = configureStore();
 
 store.subscribe(throttle(() => {
     saveState({
-        user: store.getState().user
+        user: store.getState().user,
+        filter: store.getState().filter
     });
 }, 1000))
 
