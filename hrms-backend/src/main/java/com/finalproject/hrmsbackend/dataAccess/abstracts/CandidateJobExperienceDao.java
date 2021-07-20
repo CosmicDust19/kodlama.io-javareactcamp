@@ -1,6 +1,5 @@
 package com.finalproject.hrmsbackend.dataAccess.abstracts;
 
-import com.finalproject.hrmsbackend.entities.concretes.Candidate;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateJobExperience;
 import com.finalproject.hrmsbackend.entities.concretes.Position;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +13,6 @@ import javax.transaction.Transactional;
 @Transactional
 @Repository
 public interface CandidateJobExperienceDao extends JpaRepository<CandidateJobExperience, Integer> {
-
-    Boolean existsByCandidateAndWorkPlaceAndPosition(Candidate candidate, String workPlace, Position position);
 
     @Modifying
     @Query("update CandidateJobExperience cJ set cJ.workPlace = :workPlace where cJ.id = :id")

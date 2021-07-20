@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -63,12 +62,6 @@ public class CandidateManager implements CandidateService {
         candidateDao.save(candidate);
         emailService.sendVerificationMail(candidateAddDto.getEmail());
         return new SuccessResult(MSGs.SAVED.get());
-    }
-
-    @Override
-    public DataResult<Boolean> deleteById(int id) {
-        candidateDao.deleteById(id);
-        return new SuccessDataResult<>(MSGs.DELETED.get(), true);
     }
 
     @Override

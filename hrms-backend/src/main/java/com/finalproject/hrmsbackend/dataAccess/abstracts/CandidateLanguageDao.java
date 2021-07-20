@@ -1,6 +1,5 @@
 package com.finalproject.hrmsbackend.dataAccess.abstracts;
 
-import com.finalproject.hrmsbackend.entities.concretes.Candidate;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateLanguage;
 import com.finalproject.hrmsbackend.entities.concretes.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +13,6 @@ import javax.transaction.Transactional;
 @Transactional
 @Repository
 public interface CandidateLanguageDao extends JpaRepository<CandidateLanguage, Integer> {
-
-    boolean existsByCandidateAndLanguage(Candidate candidate, Language language);
 
     @Modifying
     @Query("update CandidateLanguage cL set cL.language = :language where cL.id = :id")

@@ -19,8 +19,6 @@ public interface CandidateService {
 
     Result add(CandidateAddDto candidateAddDto);
 
-    DataResult<Boolean> deleteById(int id);
-
     Result updateGithubAccount(String githubAccountLink, int id);
 
     Result updateLinkedinAccount(String linkedinAccountLink, int id);

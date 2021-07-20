@@ -19,12 +19,12 @@ import java.util.regex.Pattern;
 public class CheckManager implements CheckService {
 
     @Override
-    public boolean notExistsById(CrudRepository dao, int id) {
+    public boolean notExistsById(CrudRepository<?, Integer> dao, int id) {
         return id <= 0 || !dao.existsById(id);
     }
 
     @Override
-    public boolean notExistsById(CrudRepository dao, short id) {
+    public boolean notExistsById(CrudRepository<?, Short> dao, short id) {
         return id <= 0 || !dao.existsById(id);
     }
 

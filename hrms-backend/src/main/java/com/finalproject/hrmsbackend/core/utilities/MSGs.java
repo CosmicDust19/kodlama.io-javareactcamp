@@ -24,22 +24,19 @@ public enum MSGs {
     WRONG("wrong"),
     THE_SAME("the same as before"),
     ALREADY_CONTAINS("already contains this"),
-    ALREADY_HAVE("already have this"),
     DIFF_DOMAIN("different domain"),
     EXTERNAL_INTERVENTION("can have been intervened externally"),
     EMPTY("Empty"),
     NO_ID_FOUND("No ids found, nothing executed"),
     NO_UPDATE("No updates available"),
-    UK("Violates the unique key constraint"),
     START_END_CONFLICT("The end year cannot be a date before the start year"),
     MIN_MAX_CONFLICT("Min value cannot be greater than max value"),
-    INVALID_ENGLISH_LEVEL("Not an english level according to the common european framework (A1, A2 etc.)"),
+    INVALID_LANG_LVL("Not a language level according to the common european framework (A1, A2 etc.)"),
     MERNIS_FAIL("Mernis verification failed"),
     SORT_DIRECTION("Negative & Null -> Desc, Positive & Zero -> Asc"),
     NOT_AN_IMAGE("Not an image"),
     IMG_VALIDATION_ERR("An error has occurred while validating image"),
-    MALFORMED_JSON_REQUEST("Malformed JSON request"),
-    DATA_INTEGRITY_VIOLATION("Data integrity violation");
+    MALFORMED_JSON_REQUEST("Malformed JSON request");
 
     private final String MSG;
 

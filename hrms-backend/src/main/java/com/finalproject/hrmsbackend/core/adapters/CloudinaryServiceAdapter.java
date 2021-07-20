@@ -14,7 +14,7 @@ import java.util.Objects;
 @Component
 public class CloudinaryServiceAdapter implements CloudinaryService {
 
-    Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
 
     public CloudinaryServiceAdapter() {
         this.cloudinary = new Cloudinary(ObjectUtils.asMap(
@@ -25,7 +25,7 @@ public class CloudinaryServiceAdapter implements CloudinaryService {
     }
 
     @Override
-    public Map upload(MultipartFile multipartFile) {
+    public Map<?, ?> upload(MultipartFile multipartFile) {
         try {
             return cloudinary.uploader().upload(convert(multipartFile), ObjectUtils.emptyMap());
         } catch (IOException e) {
@@ -35,7 +35,7 @@ public class CloudinaryServiceAdapter implements CloudinaryService {
     }
 
     @Override
-    public Map delete(String id) {
+    public Map<?, ?> delete(String id) {
         try {
             return cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
         } catch (IOException e) {
@@ -59,5 +59,3 @@ public class CloudinaryServiceAdapter implements CloudinaryService {
     }
 
 }
-
-//"cloudinary://679978937925928:UqnesSlyURtTNFsomM0H_x4INNU@cloudinary73"

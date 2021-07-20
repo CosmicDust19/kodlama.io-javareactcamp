@@ -7,9 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 
 public interface CheckService {
-    boolean notExistsById(CrudRepository dao, int id);
+    boolean notExistsById(CrudRepository<?, Integer> dao, int id);
 
-    boolean notExistsById(CrudRepository dao, short id);
+    boolean notExistsById(CrudRepository<?, Short> dao, short id);
 
     boolean invalidLength(String value, int min, int max);
 

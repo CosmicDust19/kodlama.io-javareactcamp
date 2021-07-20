@@ -1,6 +1,5 @@
 package com.finalproject.hrmsbackend.dataAccess.abstracts;
 
-import com.finalproject.hrmsbackend.entities.concretes.Candidate;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateSchool;
 import com.finalproject.hrmsbackend.entities.concretes.Department;
 import com.finalproject.hrmsbackend.entities.concretes.School;
@@ -15,8 +14,6 @@ import javax.transaction.Transactional;
 @Transactional
 @Repository
 public interface CandidateSchoolDao extends JpaRepository<CandidateSchool, Integer> {
-
-    boolean existsByCandidateAndSchoolAndDepartment(Candidate candidate, School school, Department department);
 
     @Modifying
     @Query("update CandidateSchool cSc set cSc.school = :school where cSc.id = :id")

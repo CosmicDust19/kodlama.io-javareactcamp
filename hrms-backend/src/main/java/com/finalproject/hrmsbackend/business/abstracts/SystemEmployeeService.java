@@ -17,8 +17,6 @@ public interface SystemEmployeeService {
 
     Result add(SystemEmployeesAddDto systemEmployeesAddDto);
 
-    Result deleteById(int id);
-
     Result updateFirstName(String firstName, int id);
 
     Result updateLastName(String lastName, int id);

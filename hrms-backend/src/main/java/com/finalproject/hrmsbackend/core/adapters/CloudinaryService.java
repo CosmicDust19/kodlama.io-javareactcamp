@@ -7,9 +7,9 @@ import java.util.Map;
 
 public interface CloudinaryService {
 
-    Map upload(MultipartFile multipartFile);
+    Map<?, ?> upload(MultipartFile multipartFile);
 
-    Map delete(String id);
+    Map<?, ?> delete(String id);
 
     File convert(MultipartFile multipartFile);
 

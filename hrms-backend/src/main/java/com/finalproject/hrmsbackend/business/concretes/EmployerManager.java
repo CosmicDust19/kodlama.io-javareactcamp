@@ -83,12 +83,6 @@ public class EmployerManager implements EmployerService {
     }
 
     @Override
-    public Result deleteById(int id) {
-        employerDao.deleteById(id);
-        return new SuccessResult(MSGs.DELETED.get());
-    }
-
-    @Override
     public Result updateCompanyName(String companyName, int id) {
         if (check.notExistsById(employerDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
 

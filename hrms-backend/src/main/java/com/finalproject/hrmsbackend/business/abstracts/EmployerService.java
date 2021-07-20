@@ -25,8 +25,6 @@ public interface EmployerService {
 
     Result add(EmployerAddDto employerAddDto);
 
-    Result deleteById(int id);
-
     Result updateCompanyName(String companyName, int id);
 
     Result updateEmailAndWebsite(String website, String email, int id);

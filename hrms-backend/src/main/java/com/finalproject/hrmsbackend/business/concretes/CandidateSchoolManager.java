@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSchoolService;
 import com.finalproject.hrmsbackend.core.business.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateSchoolDao;
@@ -17,7 +18,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class CandidateSchoolManager implements CandidateSchoolService {
 
     @Override
     public DataResult<List<CandidateSchool>> getAllByGradYear(Short sortDirection) {
-        Sort sort = Sort.by(Sort.Direction.DESC, "graduationYear");
+        Sort sort = Utils.getSortByDirection(sortDirection, "graduationYear");
         return new SuccessDataResult<>(MSGs.SORT_DIRECTION.getCustom("%s (graduationYear)"), candidateSchoolDao.findAll(sort));
     }
 

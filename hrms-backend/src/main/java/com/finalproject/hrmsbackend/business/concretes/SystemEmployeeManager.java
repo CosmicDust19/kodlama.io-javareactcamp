@@ -13,9 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -46,12 +44,6 @@ public class SystemEmployeeManager implements SystemEmployeeService {
         SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
         systemEmployeeDao.save(systemEmployee);
         return new SuccessResult(MSGs.SAVED.get());
-    }
-
-    @Override
-    public Result deleteById(int id) {
-        systemEmployeeDao.deleteById(id);
-        return new SuccessResult(MSGs.DELETED.get());
     }
 
     @Override

@@ -30,7 +30,7 @@ public class ImageManager implements ImageService {
         Result uploadErr = check.validateImage(multipartFile);
         if (uploadErr != null) return uploadErr;
 
-        Map uploadRes = cloudinaryService.upload(multipartFile);
+        Map<?, ?> uploadRes = cloudinaryService.upload(multipartFile);
         if (uploadRes == null) return new ErrorResult(MSGs.UPLOAD_ERROR.get());
 
         Image image = new Image(0, (String) uploadRes.get("public_id"), (String) uploadRes.get("original_filename"), new User(userId), (String) uploadRes.get("url"));
@@ -43,7 +43,7 @@ public class ImageManager implements ImageService {
         if (check.notExistsById(imageDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
         Image image = imageDao.getById(id);
 
-        Map uploadRes = cloudinaryService.delete(image.getPublicId());
+        Map<?, ?> uploadRes = cloudinaryService.delete(image.getPublicId());
         if (uploadRes == null)
             return new ErrorDataResult<>(MSGs.DELETE_ERROR.get(), MSGs.EXTERNAL_INTERVENTION.get("public id"));
 
@@ -53,7 +53,7 @@ public class ImageManager implements ImageService {
 
     @Override
     public Result deleteByPublicId(String publicId) {
-        Map uploadRes = cloudinaryService.delete(publicId);
+        Map<?, ?> uploadRes = cloudinaryService.delete(publicId);
         if (uploadRes == null) return new ErrorDataResult<>(MSGs.NOT_EXIST.get("publicId"));
 
         imageDao.deleteByPublicId(publicId);
