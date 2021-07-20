@@ -1,21 +1,20 @@
 package com.finalproject.hrmsbackend.core.utilities.filter.request;
 
+import javax.servlet.ReadListener;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.ReadListener;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-
-public class RequestReaderHttpServletRequestWrapper extends HttpServletRequestWrapper{
+public class RequestReaderHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     private final byte[] body;
 
-    public RequestReaderHttpServletRequestWrapper(HttpServletRequest request){
+    public RequestReaderHttpServletRequestWrapper(HttpServletRequest request) {
         super(request);
         body = HttpHelper.getBodyString(request).getBytes(StandardCharsets.UTF_8);
     }
@@ -33,7 +32,7 @@ public class RequestReaderHttpServletRequestWrapper extends HttpServletRequestWr
         return new ServletInputStream() {
 
             @Override
-            public int read(){
+            public int read() {
                 return bais.read();
             }
 

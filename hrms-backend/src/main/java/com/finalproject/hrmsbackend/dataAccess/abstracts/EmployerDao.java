@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.dataAccess.abstracts;
 
 import com.finalproject.hrmsbackend.entities.concretes.Employer;
+import com.finalproject.hrmsbackend.entities.concretes.EmployerUpdate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,10 +13,7 @@ import java.util.List;
 
 @Transactional
 @Repository
-public interface EmployerDao extends JpaRepository<Employer,Integer> {
-    boolean existsByEmailAndPassword(String email, String password);
-
-    boolean existsByEmail(String email);
+public interface EmployerDao extends JpaRepository<Employer, Integer> {
 
     boolean existsByWebsite(String website);
 
@@ -23,36 +21,28 @@ public interface EmployerDao extends JpaRepository<Employer,Integer> {
 
     Employer getByEmailAndPassword(String email, String password);
 
-    List<Employer> getAllBySystemVerificationStatusTrue();
+    List<Employer> getAllByVerifiedTrue();
 
-    List<Employer> getAllBySystemVerificationStatusFalse();
-
-    @Modifying
-    @Query("update Employer employer set employer.email = :email where employer.id = :id")
-    void updateEmail(@Param(value = "email") String email, @Param(value = "id") Integer id);
+    List<Employer> getAllByVerifiedFalse();
 
     @Modifying
-    @Query("update Employer employer set employer.password = :password where employer.id = :id")
-    void updatePassword(@Param(value = "password") String password, @Param(value = "id") Integer id);
+    @Query(value = "update employers set update_id = :updateId where user_id = :id", nativeQuery = true)
+    void updateUpdateId(@Param(value = "updateId") Integer updateId, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update Employer employer set employer.companyName = :companyName where employer.id = :id")
-    void updateCompanyName(@Param(value = "companyName") String companyName, @Param(value = "id") Integer id);
+    @Query("update Employer e set e.verified = :status where e.id = :id")
+    void updateVerification(@Param(value = "status") boolean status, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update Employer employer set employer.website = :website where employer.id = :id")
-    void updateWebsite(@Param(value = "website") String website, @Param(value = "id") Integer id);
+    @Query("update Employer e set e.rejected = :status where e.id = :id")
+    void updateRejection(@Param(value = "status") boolean status, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update Employer employer set employer.phoneNumber = :phoneNumber where employer.id = :id")
-    void updatePhoneNumber(@Param(value = "phoneNumber") String phoneNumber, @Param(value = "id") Integer id);
+    @Query("update Employer e set e.updateVerified = :status where e.id = :id")
+    void updateUpdateVerification(@Param(value = "status") boolean status, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update Employer employer set employer.systemVerificationStatus = :systemVerificationStatus where employer.id = :id")
-    void updateSystemVerificationStatus(@Param(value = "systemVerificationStatus") boolean systemVerificationStatus, @Param(value = "id") Integer id);
-
-    @Modifying
-    @Query("update Employer employer set employer.systemRejectionStatus = :systemRejectionStatus where employer.id = :id")
-    void updateSystemRejectionStatus(@Param(value = "systemRejectionStatus") boolean systemRejectionStatus, @Param(value = "id") Integer id);
+    @Query("update Employer e set e.companyName = :#{#eU.companyName}, e.website = :#{#eU.website}, e.email = :#{#eU.email}, e.phoneNumber = :#{#eU.phoneNumber} where e.id = :id")
+    void applyUpdates(EmployerUpdate eU, Integer id);
 
 }

@@ -7,7 +7,9 @@ import com.finalproject.hrmsbackend.entities.concretes.Skill;
 import java.util.List;
 
 public interface SkillService {
+
     DataResult<List<Skill>> getAll();
 
     Result add(Skill skill);
+
 }

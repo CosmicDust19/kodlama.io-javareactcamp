@@ -1,6 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
-import com.finalproject.hrmsbackend.entities.abstracts.BaseEntity;
+import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,17 +20,14 @@ public class School implements BaseEntity<Integer> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schools_id_generator")
     @SequenceGenerator(name = "schools_id_generator", sequenceName = "schools_id_seq", allocationSize = 1, initialValue = 54)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
-    @NotBlank(message = "cannot be empty.")
-    @Column(name = "name", nullable = false, unique = true)
+    @NotBlank(message = "Empty")
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
+    public School(int id) {
         this.id = id;
     }
+
 }

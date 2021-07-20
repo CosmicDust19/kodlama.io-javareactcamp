@@ -21,31 +21,27 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Candidate extends User {
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "nationality_id", nullable = false, unique = true)
+    @Column(name = "nationality_id", nullable = false, unique = true, length = 11)
     private String nationalityId;
 
     @Column(name = "birth_year", nullable = false)
-    private short birthYear;
+    private Short birthYear;
 
-    @Column(name = "github_account_link")
-    private String githubAccountLink;
+    @Column(name = "github_account", length = 100)
+    private String githubAccount;
 
-    @Column(name = "linkedin_account_link")
-    private String linkedinAccountLink;
-
-    @OneToMany(mappedBy = "candidate")
-    @JsonIgnoreProperties(value = {"candidate"})
-    private List<CandidateCv> candidateCvs;
+    @Column(name = "linkedin_account", length = 100)
+    private String linkedinAccount;
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
-    private List<CandidateImage> candidateImages;
+    private List<Cv> cvs;
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
@@ -72,4 +68,5 @@ public class Candidate extends User {
     public Candidate(int id) {
         super(id);
     }
+
 }

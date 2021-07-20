@@ -7,7 +7,9 @@ import com.finalproject.hrmsbackend.entities.concretes.Language;
 import java.util.List;
 
 public interface LanguageService {
+
     DataResult<List<Language>> getAll();
 
     Result add(Language language);
+
 }

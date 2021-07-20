@@ -5,23 +5,24 @@ import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.JobAdvertisement;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementAddDto;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface JobAdvertisementService {
 
     DataResult<List<JobAdvertisement>> getAll();
 
-    DataResult<List<JobAdvertisement>> getAllActivesAndVerified();
+    DataResult<List<JobAdvertisement>> getAllActiveVerified();
 
-    DataResult<List<JobAdvertisement>> getAllActivesAndVerifiedSortedByDate(int sortDirection);
+    DataResult<List<JobAdvertisement>> getAllActiveVerifiedByDate(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> getByActivesAndVerifiedAndEmployer_Id(int employerId);
+    DataResult<List<JobAdvertisement>> getAllPublicByEmployer(int employerId);
 
-    DataResult<List<JobAdvertisement>> getAllBySystemVerificationStatusFalse();
+    DataResult<List<JobAdvertisement>> getAllUnverified(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlineFuture();
+    DataResult<List<JobAdvertisement>> getAllPublic(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlinePast();
+    DataResult<List<JobAdvertisement>> getAllActiveVerifiedPast();
 
     DataResult<JobAdvertisement> getById(int jobAdvertisementId);
 
@@ -31,7 +32,7 @@ public interface JobAdvertisementService {
 
     Result updatePosition(short positionId, int id);
 
-    Result updateJobDescription(String jobDescription, int id);
+    Result updateJobDesc(String jobDescription, int id);
 
     Result updateCity(short cityId, int id);
 
@@ -43,9 +44,14 @@ public interface JobAdvertisementService {
 
     Result updateWorkTime(String workTime, int id);
 
-    Result updateApplicationDeadLine(String applicationDeadLine, int id);
+    Result updateOpenPositions(short num, int id);
 
-    Result updateActivationStatus(boolean isActive, int id);
+    Result updateDeadLine(LocalDate deadLine, int id);
 
-    Result updateSystemVerificationStatus(boolean systemVerificationStatus, int id);
+    Result applyUpdates(int jobAdvId);
+
+    Result updateActivation(boolean isActive, int id);
+
+    Result updateVerification(boolean systemVerificationStatus, int id);
+
 }

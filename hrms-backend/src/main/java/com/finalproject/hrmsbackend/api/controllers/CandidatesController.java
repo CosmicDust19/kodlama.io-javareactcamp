@@ -1,24 +1,18 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateService;
-import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.Result;
-import com.finalproject.hrmsbackend.entities.concretes.Candidate;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateAddDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.validation.constraints.Size;
 
 @CrossOrigin
+@Validated
 @RestController
 @RequestMapping("/api/candidates")
 @RequiredArgsConstructor
@@ -26,78 +20,52 @@ public class CandidatesController {
 
     private final CandidateService candidateService;
 
-    @GetMapping("/existsByEmailAndPassword")
-    public DataResult<Boolean> existsByEmailAndPassword(@RequestParam String email, @RequestParam String password){
-        return candidateService.existsByEmailAndPassword(email, password);
-    }
-
-    @GetMapping("/existsByNationalityId")
-    public DataResult<Boolean> existsByNationalityId(@RequestParam String nationalityId){
-        return candidateService.existsByNationalityId(nationalityId);
+    @GetMapping("/existsByNatId")
+    public ResponseEntity<?> existsByNatId(@RequestParam String nationalityId) {
+        return Utils.getResponseEntity(candidateService.existsByNatId(nationalityId));
     }
 
     @GetMapping("/getAll")
-    public DataResult<List<Candidate>> getAll() {
-        return candidateService.getAll();
+    public ResponseEntity<?> getAll() {
+        return Utils.getResponseEntity(candidateService.getAll());
     }
 
     @GetMapping("/getById")
-    public DataResult<Candidate> getById(@RequestParam int id) {
-        return candidateService.getById(id);
+    public ResponseEntity<?> getById(@RequestParam int id) {
+        return Utils.getResponseEntity(candidateService.getById(id));
     }
 
-    @GetMapping("/getByEmailAndPassword")
-    public DataResult<Candidate> getByEmailAndPassword(@RequestParam String email, @RequestParam String password){
-        return candidateService.getByEmailAndPassword(email, password);
+    @GetMapping("/getByEmailAndPW")
+    public ResponseEntity<?> getByEmailAndPW(@RequestParam String email, @RequestParam String password) {
+        return Utils.getResponseEntity(candidateService.getByEmailAndPW(email, password));
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateAddDto candidateAddDto) {
-        return ResponseEntity.ok(candidateService.add(candidateAddDto));
+        return Utils.getResponseEntity(candidateService.add(candidateAddDto));
     }
 
-    @DeleteMapping(value = "/deleteById")
-    public DataResult<Boolean> deleteById(@RequestParam int id) {
-        return candidateService.deleteById(id);
+    @PutMapping(value = "/updateGithubAccount")
+    public ResponseEntity<?> updateGithubAccount(@RequestParam(required = false)
+                                                 @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String githubAccountLink,
+                                                 @RequestParam int id) {
+        return Utils.getResponseEntity(candidateService.updateGithubAccount(githubAccountLink, id));
     }
 
-    @PutMapping(value = "/updateEmail")
-    public Result updateEmail(@RequestParam String email, @RequestParam int id) {
-        return candidateService.updateEmail(email, id);
+    @PutMapping(value = "/updateLinkedinAccount")
+    public ResponseEntity<?> updateLinkedinAccount(@RequestParam(required = false)
+                                                   @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String linkedinAccountLink, @RequestParam int id) {
+        return Utils.getResponseEntity(candidateService.updateLinkedinAccount(linkedinAccountLink, id));
     }
 
-    @PutMapping(value = "/updatePassword")
-    public Result updatePassword(@RequestParam String password, @RequestParam String oldPassword, @RequestParam int id) {
-        return candidateService.updatePassword(password, oldPassword, id);
+    @PutMapping(value = "/addJobAdvToFavorites")
+    public ResponseEntity<?> addJobAdvToFavorites(@RequestParam int jobAdvId, @RequestParam int id) {
+        return Utils.getResponseEntity(candidateService.updateFavoriteJobAdverts(jobAdvId, id, Utils.UpdateType.ADD));
     }
 
-    @PutMapping(value = "/updateGithubAccountLink")
-    public Result updateGithubAccountLink(String githubAccountLink, @RequestParam int id) {
-        return candidateService.updateGithubAccountLink(githubAccountLink, id);
+    @PutMapping(value = "/deleteJobAdvFromFavorites")
+    public ResponseEntity<?> deleteJobAdvFromFavorites(@RequestParam int jobAdvId, @RequestParam int id) {
+        return Utils.getResponseEntity(candidateService.updateFavoriteJobAdverts(jobAdvId, id, Utils.UpdateType.DEL));
     }
 
-    @PutMapping(value = "/updateLinkedinAccountLink")
-    public Result updateLinkedinAccountLink(String linkedinAccountLink, @RequestParam int id) {
-        return candidateService.updateLinkedinAccountLink(linkedinAccountLink, id);
-    }
-
-    @PutMapping(value = "/addJobAdvertisementToFavorites")
-    public Result addJobAdvertisementToFavorites(@RequestParam int jobAdvertisementId,@RequestParam int id) {
-        return candidateService.addJobAdvertisementToFavorites(jobAdvertisementId, id);
-    }
-
-    @PutMapping(value = "/deleteJobAdvertisementFromFavorites")
-    public Result deleteJobAdvertisementFromFavorites(@RequestParam int jobAdvertisementId,@RequestParam int id) {
-        return candidateService.deleteJobAdvertisementFromFavorites(jobAdvertisementId, id);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
-        Map<String, String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
-            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
-        return new ErrorDataResult<>("Error", validationErrors);
-    }
 }

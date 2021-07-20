@@ -20,4 +20,5 @@ public class Result {
     public String getMessage() {
         return message;
     }
+
 }

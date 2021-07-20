@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface LanguageDao extends JpaRepository<Language, Short> {
-    Language getByName(String name);
+
 }

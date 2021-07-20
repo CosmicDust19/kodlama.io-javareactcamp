@@ -1,6 +1,8 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.entities.UserAddDto;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,11 +17,12 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class SystemEmployeesAddDto extends UserAddDto {
 
-    @NotBlank(message = "cannot be empty")
-    @Size(min = 2, max = 50, message = "invalid first name")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN)
     private String firstName;
 
-    @NotBlank(message = "cannot be empty")
-    @Size(min = 2, max = 50, message = "invalid last name")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN)
     private String lastName;
+
 }

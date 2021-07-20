@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PositionDao extends JpaRepository<Position, Short> {
-    Position getByTitle(String title);
+
 }
 

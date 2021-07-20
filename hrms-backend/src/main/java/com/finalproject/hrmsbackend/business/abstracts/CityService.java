@@ -7,7 +7,9 @@ import com.finalproject.hrmsbackend.entities.concretes.City;
 import java.util.List;
 
 public interface CityService {
+
     DataResult<List<City>> getAll();
 
     Result add(City city);
+
 }

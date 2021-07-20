@@ -22,20 +22,27 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Employer extends User {
 
-    @Column(name = "company_name", nullable = false, unique = true)
+    @Column(name = "company_name", nullable = false, unique = true, length = 100)
     private String companyName;
 
-    @Column(name = "website", nullable = false, unique = true)
+    @Column(name = "website", nullable = false, unique = true, length = 200)
     private String website;
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = false, length = 22)
     private String phoneNumber;
 
-    @Column(name = "is_system_verified", nullable = false)
-    private boolean systemVerificationStatus;
+    @OneToOne
+    @JoinColumn(name = "update_id", referencedColumnName = "employer_update_id")
+    private EmployerUpdate employerUpdate;
 
-    @Column(name = "is_system_rejected")
-    private Boolean systemRejectionStatus;
+    @Column(name = "verified", nullable = false)
+    private boolean verified;
+
+    @Column(name = "rejected")
+    private Boolean rejected;
+
+    @Column(name = "update_verified")
+    private Boolean updateVerified;
 
     @OneToMany(mappedBy = "employer", fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = {"employer"})

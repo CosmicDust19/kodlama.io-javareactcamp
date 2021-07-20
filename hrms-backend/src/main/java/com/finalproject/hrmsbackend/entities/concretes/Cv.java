@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,35 +19,35 @@ import java.util.List;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Table(name = "candidates_cvs")
+@Table(name = "cvs")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class CandidateCv {
+public class Cv implements BaseEntity<Integer> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidates_cvs_id_generator")
     @SequenceGenerator(name = "candidates_cvs_id_generator", sequenceName = "candidates_cvs_id_seq", allocationSize = 1)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
-    @JsonIgnoreProperties(value = {"candidateCvs","candidateImages", "candidateJobExperiences",
+    @JsonIgnoreProperties(value = {"candidateCvs", "candidateImages", "candidateJobExperiences",
             "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 
-    @Column(name = "title", nullable = false, unique = true)
+    @Column(name = "title", nullable = false, unique = true, length = 50)
     private String title;
 
-    @Column(name = "cover_letter")
+    @Column(name = "cover_letter", length = 200)
     private String coverLetter;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = "last_modified_at")
-    private LocalDate lastModifiedAt;
+    private LocalDateTime lastModifiedAt;
 
     @ManyToMany
     @JoinTable(name = "candidates_cvs_job_experiences",
@@ -75,4 +76,5 @@ public class CandidateCv {
             inverseJoinColumns = {@JoinColumn(name = "candidate_skill_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateSkill> candidateSkills;
+
 }

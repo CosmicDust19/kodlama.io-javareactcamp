@@ -1,6 +1,8 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.entities.UserAddDto;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -15,14 +18,17 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 public class EmployerAddDto extends UserAddDto {
 
-    @NotBlank(message = "cannot be empty")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(max = Utils.Const.MAX_COMPANY_NAME)
     private String companyName;
 
-    @NotBlank(message = "cannot be empty")
-    @Pattern(regexp = "^[\\w\\d-_?%$+#!^><|`é]+(\\.[\\w\\d-_?%$+#!^><|`é]+)+$", message = "not a website")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Pattern(regexp = Utils.Const.WEBSITE_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT)
     private String website;
+    // domain extensions: https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains
 
-    @NotBlank(message = "cannot be empty")
-    @Pattern(regexp = "^((\\+\\d{1,3})?0?[\\s-]?)?\\(?0?\\d{3}\\)?[\\s-]?\\d{3}[\\s-]?\\d{2}[\\s-]?\\d{2}$", message = "not a phone number")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Pattern(regexp = Utils.Const.PHONE_NUM_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT)
     private String phoneNumber;
+
 }

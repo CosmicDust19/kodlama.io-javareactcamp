@@ -1,139 +1,147 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.JobAdvertisementService;
-import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.Result;
-import com.finalproject.hrmsbackend.entities.concretes.JobAdvertisement;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementAddDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.validation.constraints.Future;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 @CrossOrigin
+@Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/jobAdvertisements")
 public class JobAdvertisementsController {
 
-    private final JobAdvertisementService jobAdvertisementService;
+    private final JobAdvertisementService jobAdvService;
 
     @GetMapping("/getAll")
-    public DataResult<List<JobAdvertisement>> getAll() {
-        return jobAdvertisementService.getAll();
+    public ResponseEntity<?> getAll() {
+        return Utils.getResponseEntity(jobAdvService.getAll());
     }
 
     @GetMapping("/getAllActives")
-    public DataResult<List<JobAdvertisement>> getAllActives() {
-        return jobAdvertisementService.getAllActivesAndVerified();
+    public ResponseEntity<?> getAllActiveVerified() {
+        return Utils.getResponseEntity(jobAdvService.getAllActiveVerified());
     }
 
-    @GetMapping("/getAllActivesSortedByDate")
-    public DataResult<List<JobAdvertisement>> getAllActivesSortedByDate(@RequestParam int sortDirection) {
-        return jobAdvertisementService.getAllActivesAndVerifiedSortedByDate(sortDirection);
+    @GetMapping("/getAllActiveVerifiedByCreatedAt")
+    public ResponseEntity<?> getAllActiveVerifiedByCreatedAt(@RequestParam(required = false) Short sortDirection) {
+        return Utils.getResponseEntity(jobAdvService.getAllActiveVerifiedByDate(sortDirection));
     }
 
-    @GetMapping("/getPublicEmployerJobs")
-    public DataResult<List<JobAdvertisement>> getPublicEmployerJobs(@RequestParam int employerId) {
-        return jobAdvertisementService.getByActivesAndVerifiedAndEmployer_Id(employerId);
+    @GetMapping("/getAllPublicByEmployer")
+    public ResponseEntity<?> getAllPublicByEmployer(@RequestParam int employerId) {
+        return Utils.getResponseEntity(jobAdvService.getAllPublicByEmployer(employerId));
     }
 
-    @GetMapping("/getAllBySystemVerificationStatusFalse")
-    public DataResult<List<JobAdvertisement>> getUnconfirmedJobs() {
-        return jobAdvertisementService.getAllBySystemVerificationStatusFalse();
+    @GetMapping("/getAllNotVerified")
+    public ResponseEntity<?> getAllNotVerified(@RequestParam(required = false) Short sortDirection) {
+        return Utils.getResponseEntity(jobAdvService.getAllUnverified(sortDirection));
     }
 
-    @GetMapping("/getPublicJobs")
-    public DataResult<List<JobAdvertisement>> getPublicJobs() {
-        return jobAdvertisementService.findAllByActivesAndVerifiedAndApplicationDeadlineFuture();
+    @GetMapping("/getAllPublic")
+    public ResponseEntity<?> getAllPublic(@RequestParam(required = false) Short sortDirection) {
+        return Utils.getResponseEntity(jobAdvService.getAllPublic(sortDirection));
     }
 
-    @GetMapping("/findAllByActivesAndVerifiedAndApplicationDeadlinePast")
-    public DataResult<List<JobAdvertisement>> findAllByActivesAndVerifiedAndApplicationDeadlinePast() {
-        return jobAdvertisementService.findAllByActivesAndVerifiedAndApplicationDeadlinePast();
+    @GetMapping("/getAllActiveVerifiedPast")
+    public ResponseEntity<?> getAllActiveVerifiedPast() {
+        return Utils.getResponseEntity(jobAdvService.getAllActiveVerifiedPast());
     }
 
     @GetMapping("/getById")
-    public DataResult<JobAdvertisement> getById(@RequestParam int jobAdvertisementId) {
-        return jobAdvertisementService.getById(jobAdvertisementId);
+    public ResponseEntity<?> getById(@RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.getById(id));
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@RequestBody @Valid JobAdvertisementAddDto jobAdvertisementAddDto) {
-        return ResponseEntity.ok(jobAdvertisementService.add(jobAdvertisementAddDto));
+        return Utils.getResponseEntity(jobAdvService.add(jobAdvertisementAddDto));
     }
 
     @DeleteMapping(value = "/deleteById")
-    public DataResult<Boolean> deleteById(@RequestParam int id) {
-        return jobAdvertisementService.deleteById(id);
+    public ResponseEntity<?> deleteById(@RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.deleteById(id));
     }
 
     @PutMapping(value = "/updatePosition")
-    public Result updatePosition(@RequestParam short positionId, @RequestParam int id) {
-        return jobAdvertisementService.updatePosition(positionId, id);
+    public ResponseEntity<?> updatePosition(@RequestParam short positionId, @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updatePosition(positionId, id));
     }
 
-    @PutMapping("/updateJobDescription")
-    public Result updateJobDescription(@RequestParam String jobDescription, @RequestParam int id) {
-        return jobAdvertisementService.updateJobDescription(jobDescription, id);
+    @PutMapping("/updateJobDesc")
+    public ResponseEntity<?> updateJobDesc(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY) String jobDescription,
+                                           @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateJobDesc(jobDescription, id));
     }
 
     @PutMapping("/updateCity")
-    public Result updateCity(@RequestParam short cityId, @RequestParam int id) {
-        return jobAdvertisementService.updateCity(cityId, id);
+    public ResponseEntity<?> updateCity(@RequestParam short cityId, @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateCity(cityId, id));
     }
 
     @PutMapping("/updateMinSalary")
-    public Result updateMinSalary(@RequestParam Double minSalary, @RequestParam int id) {
-        return jobAdvertisementService.updateMinSalary(minSalary, id);
+    public ResponseEntity<?> updateMinSalary(@RequestParam(required = false) @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE) Double minSalary,
+                                             @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateMinSalary(minSalary, id));
     }
 
     @PutMapping("/updateMaxSalary")
-    public Result updateMaxSalary(@RequestParam Double maxSalary, @RequestParam int id) {
-        return jobAdvertisementService.updateMaxSalary(maxSalary, id);
+    public ResponseEntity<?> updateMaxSalary(@RequestParam(required = false) @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE) Double maxSalary,
+                                             @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateMaxSalary(maxSalary, id));
     }
 
     @PutMapping("/updateWorkModel")
-    public Result updateWorkModel(@RequestParam String workModel, @RequestParam int id) {
-        return jobAdvertisementService.updateWorkModel(workModel, id);
+    public ResponseEntity<?> updateWorkModel(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+                                             @Size(max = Utils.Const.MAX_JOB_ADV_WORK_MODEL) String workModel,
+                                             @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateWorkModel(workModel, id));
     }
 
     @PutMapping("/updateWorkTime")
-    public Result updateWorkTime(@RequestParam String workTime, @RequestParam int id) {
-        return jobAdvertisementService.updateWorkTime(workTime, id);
+    public ResponseEntity<?> updateWorkTime(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+                                            @Size(max = Utils.Const.MAX_JOB_ADV_WORK_TIME) String workTime,
+                                            @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateWorkTime(workTime, id));
     }
 
-    @PutMapping(value = "/updateApplicationDeadLine")
-    public Result updateApplicationDeadLine(@RequestParam String applicationDeadLine, @RequestParam int id) {
-        return jobAdvertisementService.updateApplicationDeadLine(applicationDeadLine, id);
+    @PutMapping(value = "/updateDeadLine")
+    public ResponseEntity<?> updateDeadLine(@RequestParam(required = false) @Future(message = MSGs.ForAnnotation.PAST_OR_PRESENT) LocalDate deadLine,
+                                            @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateDeadLine(deadLine, id));
     }
 
-    @PutMapping("/updateActivationStatus")
-    public Result updateActivationStatus(@RequestParam boolean activationStatus, @RequestParam int id) {
-        return jobAdvertisementService.updateActivationStatus(activationStatus, id);
+    @PutMapping(value = "/updateOpenPositions")
+    public ResponseEntity<?> updateOpenPositions(@RequestParam @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE) short number,
+                                                 @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateOpenPositions(number, id));
     }
 
-    @PutMapping("/updateSystemVerificationStatus")
-    public Result updateSystemVerificationStatus(@RequestParam boolean systemVerificationStatus, @RequestParam int id) {
-        return jobAdvertisementService.updateSystemVerificationStatus(systemVerificationStatus, id);
+    @PutMapping(value = "/applyUpdates")
+    public ResponseEntity<?> applyUpdates(@RequestParam int jobAdvId) {
+        return Utils.getResponseEntity(jobAdvService.applyUpdates(jobAdvId));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
-        Map<String, String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
-            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
-        return new ErrorDataResult<>("Error", validationErrors);
+    @PutMapping("/updateActivation")
+    public ResponseEntity<?> updateActivation(@RequestParam boolean status, @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateActivation(status, id));
+    }
+
+    @PutMapping("/updateVerification")
+    public ResponseEntity<?> updateVerification(@RequestParam boolean status, @RequestParam int id) {
+        return Utils.getResponseEntity(jobAdvService.updateVerification(status, id));
     }
 
 }

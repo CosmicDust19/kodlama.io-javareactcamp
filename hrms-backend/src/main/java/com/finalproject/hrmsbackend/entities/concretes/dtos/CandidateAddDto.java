@@ -1,6 +1,8 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.entities.UserAddDto;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,20 +16,21 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class CandidateAddDto extends UserAddDto {
 
-    @NotBlank(message = "cannot be empty")
-    @Size(min = 2, max = 50, message = "invalid first name")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN)
     private String firstName;
 
-    @NotBlank(message = "cannot be empty")
-    @Size(min = 2, max = 50, message = "invalid last name")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN)
     private String lastName;
 
-    @NotBlank(message = "cannot be empty")
-    @Pattern(regexp = "\\d{11}", message = "invalid nationality id")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Pattern(regexp = Utils.Const.NAT_ID_REGEXP, message = MSGs.ForAnnotation.INVALID_NAT_ID)
     private String nationalityId;
 
-    @Min(value = 1900, message = "invalid birth year")
-    @Max(value = 2030, message = "invalid birth year")
-    private short birthYear;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @Min(value = Utils.Const.MIN_YEAR)
+    @Max(value = Utils.Const.THIS_YEAR)
+    private Short birthYear;
 
 }

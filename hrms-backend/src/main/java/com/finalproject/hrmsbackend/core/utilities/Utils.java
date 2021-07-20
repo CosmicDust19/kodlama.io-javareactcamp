@@ -1,39 +1,78 @@
 package com.finalproject.hrmsbackend.core.utilities;
 
-import com.finalproject.hrmsbackend.entities.abstracts.BaseEntity;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import lombok.experimental.UtilityClass;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 
 @UtilityClass
 public class Utils {
 
-    public String formName(String name){
-        if (name != null) {
-            StringBuilder sb = new StringBuilder(name.trim().toLowerCase());
-            if (sb.length() == 0) return "";
-            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-            int index = -1;
-            while ((index = sb.indexOf(" ", index + 1)) != -1) {
-                sb.setCharAt(index + 1, Character.toUpperCase(sb.charAt(index + 1)));
-            }
-            return sb.toString();
-        }
-        return null;
+    @UtilityClass
+    public class CheckType {
+        public final String ALL = "ALL";
+        public final String PARTLY = "PARTLY";
     }
 
-    public <S, T extends BaseEntity<S>> boolean tryToSaveIfNotExists(T baseEntity, JpaRepository<T, S> jpaRepository) {
-        try {
-            if (!jpaRepository.existsById(baseEntity.getId())) {
-                //if it throws an error while saving, then entity saved before and the id was wrong
-                T savedEntity = jpaRepository.save(baseEntity);
-                baseEntity.setId(savedEntity.getId());
-            }
-            //success (this boolean value , expresses that the id is available in the database)
-            return true;
-        } catch (Exception exception){
-            //fail (if the return value is false, then threw an error and the id needed to be set after this method)
-            System.out.println(exception.getMessage());
-            return false;
-        }
+    @UtilityClass
+    public class UpdateType {
+        public final String DEL = "DEL";
+        public final String ADD = "ADD";
     }
+
+    @UtilityClass
+    public class Const {
+
+        public static final int MIN_FN = 2;
+        public static final int MAX_FN = 50;
+        public static final int MIN_LN = 2;
+        public static final int MAX_LN = 50;
+        public static final int MIN_PW = 6;
+        public static final int MAX_PW = 20;
+        public static final int MIN_ACCOUNT_LINK = 4;
+        public static final int MAX_ACCOUNT_LINK = 100;
+        public static final int MAX_JOB_EXP_WORKPLACE = 100;
+        public static final int MAX_CV_TITLE = 50;
+        public static final int MAX_CV_COVER_LETTER = 200;
+        public static final int MAX_COMPANY_NAME = 100;
+        public static final int MIN_YEAR = 1900;
+        public static final int THIS_YEAR = 2021;
+        public static final int MAX_JOB_ADV_WORK_MODEL = 20;
+        public static final int MAX_JOB_ADV_WORK_TIME = 20;
+
+        public static final String NAT_ID_REGEXP = "\\d{11}";
+        public static final String LANG_LVL_REGEXP = "[ABC][12]";
+        public static final String EMAIL_REGEXP = "^\\w+(\\.\\w+)*@\\p{javaLowerCase}{2,12}+(\\.\\p{javaLowerCase}{2,6})+$";
+        public static final String WEBSITE_REGEXP = "^(w{3}\\.)?[^.]+(\\.\\p{javaLowerCase}{2,12})+$";
+        public static final String PHONE_NUM_REGEXP = "^((\\+?\\d{1,3})?0?[\\s-]?)?\\(?0?\\d{3}\\)?[\\s-]?\\d{3}[\\s-]?\\d{2}[\\s-]?\\d{2}$";
+        public static final String DATE_REGEXP = "^\\d{4}-\\d{2}-\\d{2}$";
+
+    }
+
+    public ResponseEntity<?> getResponseEntity(Result result) {
+        if (result.isSuccess()) return ResponseEntity.ok(result);
+        else return ResponseEntity.badRequest().body(result);
+    }
+
+    public Sort getSortByDirection(Short sortDirection, String propName) {
+        if (sortDirection == null || sortDirection < 0) return Sort.by(Sort.Direction.DESC, propName);
+        else return Sort.by(Sort.Direction.ASC, propName);
+    }
+
+    public String getEditedPhoneNumber(String phone) {
+        if (phone == null) return null;
+        String rawPhone = phone.replaceAll("[\\s-()]", "");
+        StringBuilder body = new StringBuilder(rawPhone.substring(rawPhone.length() - 10));
+        body.insert(8, " ");
+        body.insert(6, " ");
+        body.insert(3, " ");
+        body.insert(0, " ");
+        StringBuilder countryCode = new StringBuilder(rawPhone.substring(0, rawPhone.length() - 10));
+        if (countryCode.length() > 0 && countryCode.charAt(0) != '+') countryCode.insert(0, "+");
+        if (countryCode.length() == 2 && countryCode.charAt(0) == '+' && countryCode.charAt(1) == '0') countryCode.deleteCharAt(0);
+        if (countryCode.length() == 0) countryCode.insert(0, "0");
+        countryCode.append(body);
+        return countryCode.toString();
+    }
+
 }

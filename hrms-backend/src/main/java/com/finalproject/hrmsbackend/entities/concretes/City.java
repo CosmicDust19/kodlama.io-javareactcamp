@@ -1,8 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import com.finalproject.hrmsbackend.entities.abstracts.BaseEntity;
+import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,21 +23,17 @@ public class City implements BaseEntity<Short> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cities_id_generator")
     @SequenceGenerator(name = "cities_id_generator", sequenceName = "cities_id_seq", allocationSize = 1, initialValue = 82)
     @Column(name = "id")
-    private short id;
+    private Short id;
 
-    @NotBlank(message = "cannot be empty")
-    @Column(name = "name", nullable = false, unique = true)
+    @NotBlank(message = "Empty")
+    @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
     @OneToMany(mappedBy = "city")
     @JsonIgnoreProperties(value = {"city"})
     private List<JobAdvertisement> jobAdvertisements;
 
-    public Short getId() {
-        return id;
-    }
-
-    public void setId(Short id) {
+    public City(short id) {
         this.id = id;
     }
 }

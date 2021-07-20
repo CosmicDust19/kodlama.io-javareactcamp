@@ -11,27 +11,16 @@ import javax.transaction.Transactional;
 
 @Transactional
 @Repository
-public interface SystemEmployeeDao extends JpaRepository<SystemEmployee,Integer> {
-    boolean existsByEmailAndPassword(String email, String password);
-
-    boolean existsByEmail(String email);
+public interface SystemEmployeeDao extends JpaRepository<SystemEmployee, Integer> {
 
     SystemEmployee getByEmailAndPassword(String email, String password);
 
     @Modifying
-    @Query("update SystemEmployee systemEmployee set systemEmployee.email = :email where systemEmployee.id = :id")
-    void updateEmail(@Param(value = "email") String email, @Param(value = "id") Integer id);
-
-    @Modifying
-    @Query("update SystemEmployee systemEmployee set systemEmployee.password = :password where systemEmployee.id = :id")
-    void updatePassword(@Param(value = "password") String password, @Param(value = "id") Integer id);
-
-    @Modifying
-    @Query("update SystemEmployee systemEmployee set systemEmployee.firstName = :firstName where systemEmployee.id = :id")
+    @Query("update SystemEmployee sE set sE.firstName = :firstName where sE.id = :id")
     void updateFirstName(@Param(value = "firstName") String firstName, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update SystemEmployee systemEmployee set systemEmployee.lastName = :lastName where systemEmployee.id = :id")
+    @Query("update SystemEmployee sE set sE.lastName = :lastName where sE.id = :id")
     void updateLastName(@Param(value = "lastName") String lastName, @Param(value = "id") Integer id);
 
 }

@@ -8,9 +8,10 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateJobExperien
 import java.util.List;
 
 public interface CandidateJobExperienceService {
+
     DataResult<List<CandidateJobExperience>> getAll();
 
-    DataResult<List<CandidateJobExperience>> getAllSortedDesc();
+    DataResult<List<CandidateJobExperience>> getAllByQuitYear(Short sortDirection);
 
     Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto);
 
@@ -23,4 +24,5 @@ public interface CandidateJobExperienceService {
     Result updateStartYear(short startYear, int id);
 
     Result updateQuitYear(Short quitYear, int id);
+
 }

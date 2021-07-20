@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SkillDao extends JpaRepository<Skill, Short> {
-    Skill getByName(String name);
+
 }

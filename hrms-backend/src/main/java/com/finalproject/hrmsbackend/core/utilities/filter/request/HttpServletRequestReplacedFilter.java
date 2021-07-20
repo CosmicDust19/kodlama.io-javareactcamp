@@ -14,12 +14,12 @@ public class HttpServletRequestReplacedFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response,
                          FilterChain chain) throws IOException, ServletException {
         ServletRequest requestWrapper = null;
-        if(request instanceof HttpServletRequest) {
+        if (request instanceof HttpServletRequest) {
             requestWrapper = new RequestReaderHttpServletRequestWrapper((HttpServletRequest) request);
         }
         //Get the stream in the request, convert the fetched string into a stream, and put it into the new request object.
         // Pass the new request object in the chain.doFiler method
-        if(requestWrapper == null) {
+        if (requestWrapper == null) {
             chain.doFilter(request, response);
         } else {
             chain.doFilter(requestWrapper, response);

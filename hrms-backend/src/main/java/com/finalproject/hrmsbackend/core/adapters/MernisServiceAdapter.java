@@ -1,12 +1,13 @@
 package com.finalproject.hrmsbackend.core.adapters;
 
+import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateAddDto;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MernisServiceAdapter {
+public class MernisServiceAdapter implements MernisService {
 
-    //I removed mernis for now because it causes an error when deploying the app to heroku
-    public boolean isRealPerson(String tcno, String name, String surname, short birthYear) {
+    //I removed mernis for now because it causes an error while deploying the app
+    public boolean isRealPerson(CandidateAddDto dto) {
 
         return true;
 

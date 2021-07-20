@@ -7,9 +7,10 @@ import org.springframework.stereotype.Service;
 public class EmployerCheckManager implements EmployerCheckService {
 
     @Override
-    public boolean isCompatibleEmailAndWebSite(String email, String website) {
+    public boolean emailWebsiteDiffDomain(String email, String website) {
+        if (email == null || website == null) return true;
         String emailDomain = email.substring(email.indexOf("@") + 1);
-        return website.contains(emailDomain);
+        return !website.contains(emailDomain);
     }
 
 }

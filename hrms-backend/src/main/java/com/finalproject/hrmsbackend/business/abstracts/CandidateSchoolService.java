@@ -8,9 +8,10 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateSchoolAddDt
 import java.util.List;
 
 public interface CandidateSchoolService {
+
     DataResult<List<CandidateSchool>> getAll();
 
-    DataResult<List<CandidateSchool>> getAllSortedDesc();
+    DataResult<List<CandidateSchool>> getAllByGradYear(Short sortDirection);
 
     Result add(CandidateSchoolAddDto candidateSchoolAddDto);
 
@@ -22,5 +23,6 @@ public interface CandidateSchoolService {
 
     Result updateStartYear(short schoolStartYear, int id);
 
-    Result updateGraduationYear(Short graduationYear, int id);
+    Result updateGradYear(Short graduationYear, int id);
+
 }

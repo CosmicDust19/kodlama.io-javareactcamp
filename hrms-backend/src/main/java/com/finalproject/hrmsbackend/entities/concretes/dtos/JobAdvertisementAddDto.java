@@ -1,5 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.City;
 import com.finalproject.hrmsbackend.entities.concretes.Position;
 import lombok.AllArgsConstructor;
@@ -14,33 +16,37 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class JobAdvertisementAddDto {
 
-    private int employerId;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    private Integer employerId;
 
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private Position position;
 
-    @NotBlank(message = "cannot be empty")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
     private String jobDescription;
 
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private City city;
 
-    //If i do not declare this variable in a nullable type,
-    //when i execute getAll method, it can throw an error
-    //because this field may be null in the database.
-    @PositiveOrZero(message = "not a positive integer")
-    private Integer minSalary;
+    @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
+    private Double minSalary;
 
-    //The same can be said for this field.
-    @PositiveOrZero(message = "not a positive integer")
-    private Integer maxSalary;
+    @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
+    private Double maxSalary;
 
-    @Positive(message = "not a positive integer")
-    private short numberOfPeopleToBeHired;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
+    private Short openPositions;
 
-    @Future(message = "not a date in the future")
-    private LocalDate applicationDeadline;
+    @Future(message = MSGs.ForAnnotation.PAST_OR_PRESENT)
+    private LocalDate deadline;
 
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(max = Utils.Const.MAX_JOB_ADV_WORK_MODEL)
     private String workModel;
 
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(max = Utils.Const.MAX_JOB_ADV_WORK_TIME)
     private String workTime;
 
 }

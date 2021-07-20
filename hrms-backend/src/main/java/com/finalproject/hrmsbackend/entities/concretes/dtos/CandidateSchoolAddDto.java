@@ -1,5 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.Department;
 import com.finalproject.hrmsbackend.entities.concretes.School;
 import lombok.AllArgsConstructor;
@@ -8,26 +10,31 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CandidateSchoolAddDto {
 
-    private int id;
+    private Integer id;
 
-    private int candidateId;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    private Integer candidateId;
 
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private School school;
 
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private Department department;
 
-    @Min(value = 1900, message = "invalid school start year")
-    @Max(value = 2030, message = "invalid school start year")
-    private short schoolStartYear;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @Min(value = Utils.Const.MIN_YEAR)
+    @Max(value = Utils.Const.THIS_YEAR)
+    private Short startYear;
 
-    @Min(value = 1900, message = "invalid graduation year")
-    @Max(value = 2030, message = "invalid graduation year")
+    @Min(value = Utils.Const.MIN_YEAR)
+    @Max(value = Utils.Const.THIS_YEAR)
     private Short graduationYear;
 
 }

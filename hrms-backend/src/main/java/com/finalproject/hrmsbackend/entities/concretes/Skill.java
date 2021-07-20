@@ -1,6 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
-import com.finalproject.hrmsbackend.entities.abstracts.BaseEntity;
+import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,17 +20,14 @@ public class Skill implements BaseEntity<Short> {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "skills_id_generator")
     @SequenceGenerator(name = "skills_id_generator", sequenceName = "skills_id_seq", allocationSize = 1, initialValue = 19)
     @Column(name = "id")
-    private short id;
+    private Short id;
 
-    @NotBlank(message = "cannot be empty")
+    @NotBlank(message = "Empty")
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
-    public Short getId() {
-        return id;
-    }
-
-    public void setId(Short id) {
+    public Skill(short id) {
         this.id = id;
     }
+
 }

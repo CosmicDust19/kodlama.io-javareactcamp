@@ -8,6 +8,7 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateLanguageAdd
 import java.util.List;
 
 public interface CandidateLanguageService {
+
     DataResult<List<CandidateLanguage>> getAll();
 
     Result add(CandidateLanguageAddDto candidateLanguageAddDto);
@@ -16,5 +17,6 @@ public interface CandidateLanguageService {
 
     Result updateLanguage(short languageId, int id);
 
-    Result updateLanguageLevel(String languageLevel, int id);
+    Result updateLangLevel(String languageLevel, int id);
+
 }

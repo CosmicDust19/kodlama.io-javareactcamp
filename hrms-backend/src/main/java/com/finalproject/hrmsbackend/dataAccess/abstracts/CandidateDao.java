@@ -11,40 +11,26 @@ import javax.transaction.Transactional;
 
 @Transactional
 @Repository
-public interface CandidateDao extends JpaRepository<Candidate,Integer> {
-    boolean existsByEmailAndPassword(String email, String password);
-
-    boolean existsByEmail(String email);
+public interface CandidateDao extends JpaRepository<Candidate, Integer> {
 
     boolean existsByNationalityId(String nationalityId);
 
     Candidate getByEmailAndPassword(String email, String password);
 
     @Modifying
-    @Query("update Candidate candidate set candidate.email = :email where candidate.id = :id")
-    void updateEmail(@Param(value = "email") String email, @Param(value = "id") Integer id);
+    @Query("update Candidate c set c.githubAccount = :githubAccount where c.id = :id")
+    void updateGithubAccount(@Param(value = "githubAccount") String githubAccount, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update Candidate candidate set candidate.password = :password where candidate.id = :id")
-    void updatePassword(@Param(value = "password") String password, @Param(value = "id") Integer id);
-
-    @Modifying
-    @Query("update Candidate candidate set candidate.githubAccountLink = :githubAccountLink where candidate.id = :id")
-    void updateGithubAccountLink(@Param(value = "githubAccountLink") String githubAccountLink, @Param(value = "id") Integer id);
-
-    @Modifying
-    @Query("update Candidate candidate set candidate.linkedinAccountLink = :linkedinAccountLink where candidate.id = :id")
-    void updateLinkedinAccountLink(@Param(value = "linkedinAccountLink") String linkedinAccountLink, @Param(value = "id") Integer id);
-
-    @Query(value = "select exists(select 1 from candidates_favorite_job_advertisements where job_advertisement_id= :jobAdvertisementId and candidate_id = :candidateId)", nativeQuery = true)
-    boolean existsFavoriteCandidateJobAdvertisement(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
+    @Query("update Candidate c set c.linkedinAccount = :linkedinAccount where c.id = :id")
+    void updateLinkedinAccount(@Param(value = "linkedinAccount") String linkedinAccount, @Param(value = "id") Integer id);
 
     @Modifying
     @Query(value = "INSERT INTO candidates_favorite_job_advertisements VALUES (:candidateId, :jobAdvertisementId)", nativeQuery = true)
-    void addJobAdvertisementToCandidateFavorites(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
+    void addJobAdvToFavorites(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
 
     @Modifying
     @Query(value = "DELETE FROM candidates_favorite_job_advertisements WHERE candidate_id = :candidateId AND job_advertisement_id = :jobAdvertisementId", nativeQuery = true)
-    void deleteJobExperienceFromCandidateCv(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
+    void deleteJobAdvFromFavorites(@Param(value = "jobAdvertisementId") Integer jobAdvertisementId, @Param(value = "candidateId") Integer candidateId);
 
 }

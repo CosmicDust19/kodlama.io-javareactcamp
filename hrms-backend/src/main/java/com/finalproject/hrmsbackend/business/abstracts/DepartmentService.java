@@ -11,4 +11,5 @@ public interface DepartmentService {
     DataResult<List<Department>> getAll();
 
     Result add(Department department);
+
 }

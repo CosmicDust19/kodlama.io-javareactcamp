@@ -8,9 +8,11 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateSkillAddDto
 import java.util.List;
 
 public interface CandidateSkillService {
+
     DataResult<List<CandidateSkill>> getAll();
 
     Result add(CandidateSkillAddDto candidateSkillAddDto);
 
-    DataResult<Boolean> deleteById(int id);
+    Result deleteById(int id);
+
 }

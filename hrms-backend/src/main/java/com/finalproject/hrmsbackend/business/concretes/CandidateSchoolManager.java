@@ -1,7 +1,8 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSchoolService;
-import com.finalproject.hrmsbackend.core.utilities.Utils;
+import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateSchoolDao;
@@ -16,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,49 +31,33 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     private final SchoolDao schoolDao;
     private final DepartmentDao departmentDao;
     private final ModelMapper modelMapper;
+    private final CheckService check;
 
     @Override
     public DataResult<List<CandidateSchool>> getAll() {
-        return new SuccessDataResult<>("Success", candidateSchoolDao.findAll());
+        return new SuccessDataResult<>(candidateSchoolDao.findAll());
     }
 
     @Override
-    public DataResult<List<CandidateSchool>> getAllSortedDesc() {
+    public DataResult<List<CandidateSchool>> getAllByGradYear(Short sortDirection) {
         Sort sort = Sort.by(Sort.Direction.DESC, "graduationYear");
-        return new SuccessDataResult<>("Success", candidateSchoolDao.findAll(sort));
+        return new SuccessDataResult<>(MSGs.SORT_DIRECTION.getCustom("%s (graduationYear)"), candidateSchoolDao.findAll(sort));
     }
 
     @Override
     public Result add(CandidateSchoolAddDto candidateSchoolAddDto) {
-        CandidateSchool candidateSchool = modelMapper.map(candidateSchoolAddDto, CandidateSchool.class);
-
         Map<String, String> errors = new HashMap<>();
-        if (!candidateDao.existsById(candidateSchool.getCandidate().getId()))
-            errors.put("candidateId", "does not exist");
-        if (candidateSchool.getGraduationYear() != null && candidateSchool.getSchoolStartYear() > candidateSchool.getGraduationYear())
-            errors.put("start year - graduation year", "the graduation year cannot be a date before the start year");
-        if (candidateSchool.getSchool() == null) errors.put("school", "null");
-        if (candidateSchool.getDepartment() == null) errors.put("department", "null");
-        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
+        if (!candidateDao.existsById(candidateSchoolAddDto.getCandidateId()))
+            errors.put("candidateId", MSGs.NOT_EXIST.get());
+        if (check.notExistsById(schoolDao, candidateSchoolAddDto.getSchool().getId()))
+            errors.put("school.id", MSGs.NOT_EXIST.get());
+        if (check.notExistsById(departmentDao, candidateSchoolAddDto.getDepartment().getId()))
+            errors.put("department.id", MSGs.NOT_EXIST.get());
+        if (check.startEndConflict(candidateSchoolAddDto.getStartYear(), candidateSchoolAddDto.getGraduationYear()))
+            errors.put("start year - graduation year", MSGs.START_END_CONFLICT.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
 
-        School school = candidateSchool.getSchool();
-        school.setName(Utils.formName(school.getName()));
-        if (school.getId() <= 0  || !schoolDao.existsById(school.getId()))
-            if(school.getName() == null || school.getName().length() == 0)
-                return new ErrorResult("school id or school name should be given");
-        Department department = candidateSchool.getDepartment();
-        department.setName(Utils.formName(department.getName()));
-        if (department.getId() <= 0  || !departmentDao.existsById(department.getId()))
-            if(department.getName() == null || department.getName().length() == 0)
-                return new ErrorResult("department id or department name should be given");
-
-        if (!Utils.tryToSaveIfNotExists(school, schoolDao))
-            school.setId(schoolDao.getByName(school.getName()).getId());
-        if (!Utils.tryToSaveIfNotExists(department, departmentDao))
-            department.setId(departmentDao.getByName(department.getName()).getId());
-
-        if (candidateSchoolDao.existsByCandidateAndSchoolAndDepartment(candidateSchool.getCandidate(), school, department))
-            return new ErrorResult("this candidate already have this school and this department together");
+        CandidateSchool candidateSchool = modelMapper.map(candidateSchoolAddDto, CandidateSchool.class);
 
         CandidateSchool savedCandidateSchool = candidateSchoolDao.save(candidateSchool);
         return new SuccessResult(Integer.toString(savedCandidateSchool.getId()));
@@ -79,82 +65,58 @@ public class CandidateSchoolManager implements CandidateSchoolService {
 
     @Override
     public DataResult<Boolean> deleteById(int id) {
-        if (id <= 0 || !candidateSchoolDao.existsById(id))
-            return new ErrorDataResult<>("id does not exist", false);
         candidateSchoolDao.deleteById(id);
-        return new SuccessDataResult<>("Success", true);
+        return new SuccessDataResult<>(MSGs.DELETED.get(), true);
     }
 
     @Override
-    public Result updateSchool(int schoolId, int id){
-        School school = new School();
-        school.setId(schoolId);
+    public Result updateSchool(int schoolId, int id) {
         Map<String, String> errors = new HashMap<>();
-        if (id <= 0 || !candidateSchoolDao.existsById(id))
-            errors.put("candidateId", "does not exist");
-        if (school.getId() <= 0 || !schoolDao.existsById(school.getId()))
-            errors.put("school", "does not exist");
-        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
-        CandidateSchool candidateSchool = candidateSchoolDao.getById(id);
-        if (candidateSchool.getSchool().getId() == schoolId)
-            return new ErrorResult("school is the same");
-        if (candidateSchoolDao.existsByCandidateAndSchoolAndDepartment(candidateSchool.getCandidate(), school, candidateSchool.getDepartment()))
-            return new ErrorResult("the candidateSchool that you want to create is already exists");
-        candidateSchoolDao.updateSchool(school, id);
-        return new SuccessResult("Success");
+        if (check.notExistsById(candidateSchoolDao, id)) errors.put("id", MSGs.NOT_EXIST.get());
+        if (check.notExistsById(schoolDao, schoolId)) errors.put("schoolId", MSGs.NOT_EXIST.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+
+        candidateSchoolDao.updateSchool(new School(schoolId), id);
+        return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateDepartment(short departmentId, int id){
-        Department department = new Department();
-        department.setId(departmentId);
+    public Result updateDepartment(short departmentId, int id) {
         Map<String, String> errors = new HashMap<>();
-        if (id <= 0 || !candidateSchoolDao.existsById(id))
-            errors.put("candidateId", "does not exist");
-        if (department.getId() <= 0 || !departmentDao.existsById(department.getId()))
-            errors.put("department", "does not exist");
-        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
-        CandidateSchool candidateSchool = candidateSchoolDao.getById(id);
-        if (candidateSchool.getDepartment().getId() == departmentId)
-            return new ErrorResult("department is the same");
-        if (candidateSchoolDao.existsByCandidateAndSchoolAndDepartment(candidateSchool.getCandidate(), candidateSchool.getSchool(), department))
-            return new ErrorResult("the candidateSchool that you want to create is already exists");
-        candidateSchoolDao.updateDepartment(department, id);
-        return new SuccessResult("Success");
+        if (check.notExistsById(candidateSchoolDao, id)) errors.put("candidateId", MSGs.NOT_EXIST.get());
+        if (check.notExistsById(departmentDao, departmentId)) errors.put("department", MSGs.NOT_EXIST.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+
+        candidateSchoolDao.updateDepartment(new Department(departmentId), id);
+        return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateStartYear(short schoolStartYear, int id){
-        Map<String, String> errors = new HashMap<>();
-        if (id <= 0 || !candidateSchoolDao.existsById(id))
-            errors.put("candidateId", "does not exist");
-        if (schoolStartYear < 1900 || schoolStartYear > 2030)
-            errors.put("startYear", "invalid startYear");
-        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
+    public Result updateStartYear(short startYear, int id) {
+        if (check.notExistsById(candidateSchoolDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+
         CandidateSchool candidateSchool = candidateSchoolDao.getById(id);
-        if (candidateSchool.getSchoolStartYear() == schoolStartYear)
-            return new ErrorResult("schoolStartYear is the same");
-        if (candidateSchool.getGraduationYear() != null && candidateSchool.getGraduationYear() < schoolStartYear)
-            return new ErrorResult("schoolStartYear cannot be grater than graduationYear");
-        candidateSchoolDao.updateStartYear(schoolStartYear, id);
-        return new SuccessResult("Success");
+        if (candidateSchool.getStartYear() == startYear)
+            return new ErrorResult(MSGs.THE_SAME.get("startYear"));
+        if (check.startEndConflict(candidateSchool.getGraduationYear(), startYear))
+            return new ErrorResult(MSGs.START_END_CONFLICT.get());
+
+        candidateSchoolDao.updateStartYear(startYear, id);
+        return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateGraduationYear(Short graduationYear, int id){
-        Map<String, String> errors = new HashMap<>();
-        if (id <= 0 || !candidateSchoolDao.existsById(id))
-            errors.put("candidateId", "does not exist");
-        if (graduationYear != null && (graduationYear < 1900 || graduationYear > 2030))
-            errors.put("graduationYear", "invalid graduationYear");
-        if (!errors.isEmpty()) return new ErrorDataResult<>("Error", errors);
+    public Result updateGradYear(Short graduationYear, int id) {
+        if (check.notExistsById(candidateSchoolDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+
         CandidateSchool candidateSchool = candidateSchoolDao.getById(id);
-        if (candidateSchool.getGraduationYear() != null && candidateSchool.getGraduationYear().equals(graduationYear) ||
-                (candidateSchool.getGraduationYear() == null && graduationYear == null))
-            return new ErrorResult("graduationYear is the same");
-        if (graduationYear != null && candidateSchool.getSchoolStartYear() > graduationYear)
-            return new ErrorResult("graduationYear cannot be less than schoolStartYear");
+        if (check.equals(candidateSchool.getGraduationYear(), graduationYear))
+            return new ErrorResult(MSGs.THE_SAME.get("graduationYear"));
+        if (check.startEndConflict(candidateSchool.getStartYear(), graduationYear))
+            return new ErrorResult(MSGs.START_END_CONFLICT.get());
+
         candidateSchoolDao.updateGraduationYear(graduationYear, id);
-        return new SuccessResult("Success");
+        return new SuccessResult(MSGs.UPDATED.get());
     }
+
 }

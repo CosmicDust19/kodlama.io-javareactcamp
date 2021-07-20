@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DepartmentDao extends JpaRepository<Department, Short> {
-    Department getByName(String name);
+
 }

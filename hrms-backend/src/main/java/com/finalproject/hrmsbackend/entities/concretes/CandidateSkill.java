@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.finalproject.hrmsbackend.entities.abstracts.BaseEntity;
+import com.finalproject.hrmsbackend.entities.abstracts.CvProp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,31 +13,22 @@ import javax.persistence.*;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "candidates_skills",
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"candidate_id", "skill_id"})})
-public class CandidateSkill implements BaseEntity<Integer> {
+@Table(name = "candidates_skills", uniqueConstraints = {@UniqueConstraint(columnNames = {"candidate_id", "skill_id"})})
+public class CandidateSkill implements CvProp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidates_skills_id_generator")
     @SequenceGenerator(name = "candidates_skills_id_generator", sequenceName = "candidates_skills_id_seq", allocationSize = 1)
     @Column(name = "id")
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
-    @JsonIgnoreProperties(value = {"candidateCvs","candidateImages", "candidateJobExperiences",
+    @JsonIgnoreProperties(value = {"candidateCvs", "candidateImages", "candidateJobExperiences",
             "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 
     @ManyToOne
     @JoinColumn(name = "skill_id", nullable = false)
     private Skill skill;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }

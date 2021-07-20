@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,22 +14,25 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class CandidateJobExperienceAddDto {
 
-    private int id;
+    private Integer id;
 
-    private int candidateId;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    private Integer candidateId;
 
-    @Size(min = 1, max = 100, message = "invalid workplace")
+    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @Size(max = Utils.Const.MAX_JOB_EXP_WORKPLACE)
     private String workPlace;
 
-    @JsonIgnoreProperties(value = {"jobAdvertisements"})
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private Position position;
 
-    @Min(value = 1900, message = "invalid start year")
-    @Max(value = 2030, message = "invalid start year")
-    private short startYear;
+    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @Min(value = Utils.Const.MIN_YEAR)
+    @Max(value = Utils.Const.THIS_YEAR)
+    private Short startYear;
 
-    @Min(value = 1900, message = "invalid quit year")
-    @Max(value = 2030, message = "invalid quit year")
+    @Min(value = Utils.Const.MIN_YEAR)
+    @Max(value = Utils.Const.THIS_YEAR)
     private Short quitYear;
 
 }

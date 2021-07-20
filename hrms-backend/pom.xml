@@ -42,11 +42,6 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>io.springfox</groupId>
@@ -60,6 +55,11 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
@@ -69,7 +69,7 @@
         </dependency>
         <dependency>
             <groupId>com.cloudinary</groupId>
-            <artifactId>cloudinary-core</artifactId>
+            <artifactId>cloudinary-http44</artifactId>
             <version>1.29.0</version>
         </dependency>
     </dependencies>

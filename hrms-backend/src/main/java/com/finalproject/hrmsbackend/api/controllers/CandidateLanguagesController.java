@@ -1,24 +1,19 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateLanguageService;
-import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.Result;
-import com.finalproject.hrmsbackend.entities.concretes.CandidateLanguage;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateLanguageAddDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.validation.constraints.Pattern;
 
 @CrossOrigin
+@Validated
 @RestController
 @RequestMapping("/api/cvsLanguages")
 @RequiredArgsConstructor
@@ -27,37 +22,30 @@ public class CandidateLanguagesController {
     private final CandidateLanguageService candidateLanguageService;
 
     @GetMapping("/getAll")
-    public DataResult<List<CandidateLanguage>> getAll() {
-        return candidateLanguageService.getAll();
+    public ResponseEntity<?> getAll() {
+        return Utils.getResponseEntity(candidateLanguageService.getAll());
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> add(@Valid @RequestBody CandidateLanguageAddDto candidateLanguageAddDto) {
-        return ResponseEntity.ok(candidateLanguageService.add(candidateLanguageAddDto));
+        return Utils.getResponseEntity(candidateLanguageService.add(candidateLanguageAddDto));
     }
 
     @DeleteMapping(value = "/deleteById")
-    public DataResult<Boolean> deleteById(@RequestParam int id) {
-        return candidateLanguageService.deleteById(id);
+    public ResponseEntity<?> deleteById(@RequestParam int id) {
+        return Utils.getResponseEntity(candidateLanguageService.deleteById(id));
     }
 
     @PutMapping(value = "/updateLanguage")
-    public Result updateLanguage(@RequestParam short languageId, @RequestParam int id) {
-        return candidateLanguageService.updateLanguage(languageId, id);
+    public ResponseEntity<?> updateLanguage(@RequestParam short languageId, @RequestParam int id) {
+        return Utils.getResponseEntity(candidateLanguageService.updateLanguage(languageId, id));
     }
 
-    @PutMapping(value = "/updateLanguageLevel")
-    public Result updateLanguageLevel(@RequestParam String languageLevel, @RequestParam int id) {
-        return candidateLanguageService.updateLanguageLevel(languageLevel, id);
+    @PutMapping(value = "/updateLangLevel")
+    public ResponseEntity<?> updateLangLevel(@RequestParam
+                                             @Pattern(regexp = Utils.Const.LANG_LVL_REGEXP, message = MSGs.ForAnnotation.INVALID_LANG_LVL) String languageLevel,
+                                             @RequestParam int id) {
+        return Utils.getResponseEntity(candidateLanguageService.updateLangLevel(languageLevel, id));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDataResult<Object> handleValidationExceptions(MethodArgumentNotValidException exceptions) {
-        Map<String, String> validationErrors = new HashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
-            validationErrors.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
-        return new ErrorDataResult<>("Error", validationErrors);
-    }
 }

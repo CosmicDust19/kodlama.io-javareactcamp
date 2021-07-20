@@ -52,14 +52,27 @@ CREATE TABLE public.departments
 
 CREATE TABLE public.users
 (
-    id                integer                        NOT NULL,
-    email             character varying(100)         NOT NULL,
-    password          character varying(100)         NOT NULL,
-    is_email_verified boolean                        NOT NULL DEFAULT FALSE,
-    created_at        timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
-    last_modified_at  timestamp(0) without time zone,
+    id               integer                        NOT NULL,
+    email            character varying(100)         NOT NULL,
+    password         character varying(100)         NOT NULL,
+    email_verified   boolean                        NOT NULL DEFAULT FALSE,
+    created_at       timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
+    last_modified_at timestamp(0) without time zone,
     CONSTRAINT pk_users PRIMARY KEY (id),
     CONSTRAINT uk_users_email UNIQUE (email)
+);
+
+CREATE TABLE public.images
+(
+    id        integer                NOT NULL,
+    public_id character varying(30)  NOT NULL,
+    name      character varying(100),
+    user_id   integer                NOT NULL,
+    image_url character varying(150) NOT NULL,
+    CONSTRAINT pk_images PRIMARY KEY (id),
+    CONSTRAINT fk_images_user_id FOREIGN KEY (user_id)
+        REFERENCES public.users (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE public.system_employees
@@ -73,15 +86,97 @@ CREATE TABLE public.system_employees
         ON DELETE CASCADE
 );
 
+CREATE TABLE public.employers_updates
+(
+    employer_update_id integer NOT NULL,
+    email              character varying(100),
+    company_name       character varying(100),
+    website            character varying(200),
+    phone_number       character varying(22),
+    CONSTRAINT pk_employers_updates PRIMARY KEY (employer_update_id)
+);
+
+CREATE TABLE public.employers
+(
+    user_id         integer                NOT NULL,
+    company_name    character varying(100) NOT NULL,
+    website         character varying(200) NOT NULL,
+    phone_number    character varying(22)  NOT NULL,
+    update_id       integer,
+    verified        boolean                NOT NULL DEFAULT FALSE,
+    rejected        boolean                         DEFAULT NULL,
+    update_verified boolean                         DEFAULT NULL,
+    CONSTRAINT pk_employers PRIMARY KEY (user_id),
+    CONSTRAINT uk_employers_company_name UNIQUE (company_name),
+    CONSTRAINT uk_employers_website UNIQUE (website),
+    CONSTRAINT fk_employers_employer_id_users_id FOREIGN KEY (user_id)
+        REFERENCES public.users (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_employers_update_id_employers_update_id FOREIGN KEY (update_id)
+        REFERENCES public.employers_updates (employer_update_id)
+);
+
+CREATE TABLE public.job_advertisements_update
+(
+    job_adv_update_id integer,
+    position_id       smallint,
+    job_description   text,
+    city_id           smallint,
+    min_salary        integer,
+    max_salary        integer,
+    open_positions    smallint,
+    work_model        char varying(20),
+    work_time         char varying(20),
+    deadline          date,
+    CONSTRAINT pk_job_advertisements_update PRIMARY KEY (job_adv_update_id),
+    CONSTRAINT fk_job_advertisements_city_id FOREIGN KEY (city_id)
+        REFERENCES public.cities (id),
+    CONSTRAINT fk_job_advertisements_position_id FOREIGN KEY (position_id)
+        REFERENCES public.positions (id)
+);
+
+CREATE TABLE public.job_advertisements
+(
+    id               integer                        NOT NULL,
+    employer_id      integer                        NOT NULL,
+    position_id      smallint                       NOT NULL,
+    job_description  text                           NOT NULL,
+    city_id          smallint                       NOT NULL,
+    min_salary       integer,
+    max_salary       integer,
+    open_positions   smallint                       NOT NULL,
+    work_model       char varying(20)               NOT NULL,
+    work_time        char varying(20)               NOT NULL,
+    deadline         date,
+    update_id        integer,
+    active           boolean                        NOT NULL DEFAULT TRUE,
+    verified         boolean                        NOT NULL DEFAULT FALSE,
+    rejected         boolean                                 DEFAULT NULL,
+    update_verified  boolean                                 DEFAULT NULL,
+    created_at       timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
+    last_modified_at timestamp(0) without time zone,
+    CONSTRAINT pk_job_advertisements PRIMARY KEY (id),
+    CONSTRAINT uk_job_advertisements_emp_pos_desc_city UNIQUE (employer_id, position_id, job_description, city_id),
+    CONSTRAINT fk_job_advertisements_employer_id FOREIGN KEY (employer_id)
+        REFERENCES public.employers (user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_job_advertisements_city_id FOREIGN KEY (city_id)
+        REFERENCES public.cities (id),
+    CONSTRAINT fk_job_advertisements_position_id FOREIGN KEY (position_id)
+        REFERENCES public.positions (id),
+    CONSTRAINT fk_job_adv_update_id_job_adv_id FOREIGN KEY (update_id)
+        REFERENCES public.job_advertisements_update (job_adv_update_id)
+);
+
 CREATE TABLE public.candidates
 (
-    user_id               integer               NOT NULL,
-    first_name            character varying(50) NOT NULL,
-    last_name             character varying(50) NOT NULL,
-    nationality_id        character varying(11) NOT NULL,
-    birth_year            smallint              NOT NULL,
-    github_account_link   char varying(100),
-    linkedin_account_link char varying(100),
+    user_id          integer               NOT NULL,
+    first_name       character varying(50) NOT NULL,
+    last_name        character varying(50) NOT NULL,
+    nationality_id   character varying(11) NOT NULL,
+    birth_year       smallint              NOT NULL,
+    github_account   char varying(100),
+    linkedin_account char varying(100),
     CONSTRAINT pk_candidates PRIMARY KEY (user_id),
     CONSTRAINT uk_candidates_nationality_id UNIQUE (nationality_id),
     CONSTRAINT fk_candidates_user_id_users_id FOREIGN KEY (user_id)
@@ -108,12 +203,12 @@ CREATE TABLE public.candidates_job_experiences
 
 CREATE TABLE public.candidates_schools
 (
-    id                integer  NOT NULL,
-    candidate_id      integer  NOT NULL,
-    school_id         integer  NOT NULL,
-    department_id     smallint NOT NULL,
-    school_start_year smallint NOT NULL,
-    graduation_year   smallint,
+    id              integer  NOT NULL,
+    candidate_id    integer  NOT NULL,
+    school_id       integer  NOT NULL,
+    department_id   smallint NOT NULL,
+    start_year      smallint NOT NULL,
+    graduation_year smallint,
     CONSTRAINT pk_candidates_schools PRIMARY KEY (id),
     CONSTRAINT uk_candidates_schools_candidate_school_department UNIQUE (candidate_id, school_id, department_id),
     CONSTRAINT fk_candidates_schools_school_id FOREIGN KEY (school_id)
@@ -151,18 +246,7 @@ CREATE TABLE public.candidates_skills
         REFERENCES public.skills (id)
 );
 
-CREATE TABLE public.candidates_images
-(
-    id           integer NOT NULL,
-    candidate_id integer NOT NULL,
-    image_url    character varying(100),
-    CONSTRAINT pk_images PRIMARY KEY (id),
-    CONSTRAINT fk_images_candidate_id FOREIGN KEY (candidate_id)
-        REFERENCES public.candidates (user_id)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE public.candidates_cvs
+CREATE TABLE public.cvs
 (
     id               integer                        NOT NULL,
     title            char varying(50)               NOT NULL,
@@ -182,7 +266,7 @@ CREATE TABLE public.candidates_cvs_schools
     candidate_school_id integer NOT NULL,
     CONSTRAINT pk_candidates_cvs_schools PRIMARY KEY (cv_id, candidate_school_id),
     CONSTRAINT fk_candidates_cvs_schools_cv_id FOREIGN KEY (cv_id)
-        REFERENCES public.candidates_cvs (id)
+        REFERENCES public.cvs (id)
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_schools_candidate_school_id FOREIGN KEY (candidate_school_id)
         REFERENCES public.candidates_schools (id)
@@ -194,7 +278,7 @@ CREATE TABLE public.candidates_cvs_languages
     candidate_language_id integer NOT NULL,
     CONSTRAINT pk_candidates_cvs_languages PRIMARY KEY (cv_id, candidate_language_id),
     CONSTRAINT fk_candidates_cvs_languages_cv_id FOREIGN KEY (cv_id)
-        REFERENCES public.candidates_cvs (id)
+        REFERENCES public.cvs (id)
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_languages_candidate_language_id FOREIGN KEY (candidate_language_id)
         REFERENCES public.candidates_languages (id)
@@ -206,7 +290,7 @@ CREATE TABLE public.candidates_cvs_job_experiences
     candidate_job_exp_id integer NOT NULL,
     CONSTRAINT pk_candidates_cvs_job_experiences PRIMARY KEY (cv_id, candidate_job_exp_id),
     CONSTRAINT fk_candidates_cvs_job_experiences_cv_id FOREIGN KEY (cv_id)
-        REFERENCES public.candidates_cvs (id)
+        REFERENCES public.cvs (id)
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_job_experiences_candidate_job_exp_id FOREIGN KEY (candidate_job_exp_id)
         REFERENCES public.candidates_job_experiences (id)
@@ -218,7 +302,7 @@ CREATE TABLE public.candidates_cvs_skills
     candidate_skill_id integer NOT NULL,
     CONSTRAINT pk_candidates_cvs_skills PRIMARY KEY (cv_id, candidate_skill_id),
     CONSTRAINT fk_candidates_cvs_skills_cv_id FOREIGN KEY (cv_id)
-        REFERENCES public.candidates_cvs (id)
+        REFERENCES public.cvs (id)
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_skills_candidates_sk_id FOREIGN KEY (candidate_skill_id)
         REFERENCES public.candidates_skills (id)
@@ -235,51 +319,6 @@ CREATE TABLE public.candidates_favorite_job_advertisements
     CONSTRAINT fk_candidates_favorite_job_adverts_job_advertisement_id FOREIGN KEY (job_advertisement_id)
         REFERENCES public.job_advertisements (id)
         ON DELETE CASCADE
-);
-
-CREATE TABLE public.employers
-(
-    user_id            integer                NOT NULL,
-    company_name       character varying(100) NOT NULL,
-    website            character varying(200) NOT NULL,
-    phone_number       character varying(22)  NOT NULL,
-    is_system_verified boolean                NOT NULL DEFAULT FALSE,
-    is_system_rejected boolean                         DEFAULT NULL,
-    CONSTRAINT pk_employers PRIMARY KEY (user_id),
-    CONSTRAINT uk_employers_company_name UNIQUE (company_name),
-    CONSTRAINT uk_employers_website UNIQUE (website),
-    CONSTRAINT fk_employers_employer_id_users_id FOREIGN KEY (user_id)
-        REFERENCES public.users (id)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE public.job_advertisements
-(
-    id                           integer                        NOT NULL,
-    employer_id                  integer                        NOT NULL,
-    position_id                  smallint                       NOT NULL,
-    job_description              text                           NOT NULL,
-    city_id                      smallint                       NOT NULL,
-    min_salary                   integer,
-    max_salary                   integer,
-    number_of_people_to_be_hired smallint                       NOT NULL,
-    work_model                   char varying(20)               NOT NULL,
-    work_time                    char varying(20)               NOT NULL,
-    application_deadline         date,
-    is_active                    boolean                        NOT NULL DEFAULT TRUE,
-    is_system_verified           boolean                        NOT NULL DEFAULT FALSE,
-    is_system_rejected           boolean                                 DEFAULT NULL,
-    created_at                   timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
-    last_modified_at             timestamp(0) without time zone,
-    CONSTRAINT pk_job_advertisements PRIMARY KEY (id),
-    CONSTRAINT uk_job_advertisements_emp_pos_desc_city UNIQUE (employer_id, position_id, job_description, city_id),
-    CONSTRAINT fk_job_advertisements_employer_id FOREIGN KEY (employer_id)
-        REFERENCES public.employers (user_id)
-        ON DELETE CASCADE,
-    CONSTRAINT fk_job_advertisements_city_id FOREIGN KEY (city_id)
-        REFERENCES public.cities (id),
-    CONSTRAINT fk_job_advertisements_position_id FOREIGN KEY (position_id)
-        REFERENCES public.positions (id)
 );
 
 INSERT INTO schools
@@ -558,11 +597,11 @@ VALUES (4, 'examplefn4', 'exampleln4', '12345678910', 1994),
        (6, 'examplefn6', 'exampleln6', '34567891012', 1996);
 
 UPDATE candidates
-SET github_account_link   = 'https://github.com/CosmicDust19',
-    linkedin_account_link = 'https://www.linkedin.com/in/semih-kayan/'
+SET github_account   = 'https://github.com/CosmicDust19',
+    linkedin_account = 'https://www.linkedin.com/in/semih-kayan/'
 WHERE user_id = 4;
 
 INSERT INTO employers
-VALUES (7, 'example_company7', 'www.example_web_site7.com', '05005005057', true),
-       (8, 'example_company8', 'www.example_web_site8.com', '05005005058', true),
-       (9, 'example_company9', 'www.example_web_site9.com', '05005005059', true);
+VALUES (7, 'example_company7', 'www.example_web_site7.com', '05005005057', null, true),
+       (8, 'example_company8', 'www.example_web_site8.com', '05005005058', null, true),
+       (9, 'example_company9', 'www.example_web_site9.com', '05005005059', null, true);

@@ -14,26 +14,23 @@ import javax.transaction.Transactional;
 @Transactional
 @Repository
 public interface CandidateJobExperienceDao extends JpaRepository<CandidateJobExperience, Integer> {
-    CandidateJobExperience getByCandidateAndWorkPlaceAndPosition(Candidate candidate, String workPlace, Position position);
 
     Boolean existsByCandidateAndWorkPlaceAndPosition(Candidate candidate, String workPlace, Position position);
 
-    Boolean existsByIdAndCandidate(Integer id, Candidate candidate);
-
     @Modifying
-    @Query("update CandidateJobExperience candidateJobExperience set candidateJobExperience.workPlace = :workPlace where candidateJobExperience.id = :id")
+    @Query("update CandidateJobExperience cJ set cJ.workPlace = :workPlace where cJ.id = :id")
     void updateWorkPlace(@Param(value = "workPlace") String workPlace, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update CandidateJobExperience candidateJobExperience set candidateJobExperience.position = :position where candidateJobExperience.id = :id")
+    @Query("update CandidateJobExperience cJ set cJ.position = :position where cJ.id = :id")
     void updatePosition(@Param(value = "position") Position position, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update CandidateJobExperience candidateJobExperience set candidateJobExperience.startYear = :startYear where candidateJobExperience.id = :id")
+    @Query("update CandidateJobExperience cJ set cJ.startYear = :startYear where cJ.id = :id")
     void updateStartYear(@Param(value = "startYear") Short startYear, @Param(value = "id") Integer id);
 
     @Modifying
-    @Query("update CandidateJobExperience candidateJobExperience set candidateJobExperience.quitYear = :quitYear where candidateJobExperience.id = :id")
+    @Query("update CandidateJobExperience cJ set cJ.quitYear = :quitYear where cJ.id = :id")
     void updateQuitYear(@Param(value = "quitYear") Short quitYear, @Param(value = "id") Integer id);
 
 }

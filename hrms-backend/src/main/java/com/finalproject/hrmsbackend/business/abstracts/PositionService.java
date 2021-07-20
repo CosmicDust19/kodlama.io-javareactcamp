@@ -7,7 +7,9 @@ import com.finalproject.hrmsbackend.entities.concretes.Position;
 import java.util.List;
 
 public interface PositionService {
+
     DataResult<List<Position>> getAll();
 
     Result add(Position position);
+
 }
