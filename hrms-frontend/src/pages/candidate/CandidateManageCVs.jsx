@@ -1,14 +1,31 @@
 import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {
-    addCv, changeCoverLetter, changeCvJobExp, changeCvLang,
-    changeCvSchool, changeCvSkill, changeTitle, deleteCv
+    addCv,
+    changeCoverLetter,
+    changeCvJobExp,
+    changeCvLang,
+    changeCvSchool,
+    changeCvSkill,
+    changeTitle,
+    deleteCv
 } from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import {useFormik} from "formik";
 import {
-    Button, Card, Dropdown, Form, Grid, Header, Icon, Input,
-    Menu, Modal, Popup, Segment, Table
+    Button,
+    Card,
+    Dropdown,
+    Form,
+    Grid,
+    Header,
+    Icon,
+    Input,
+    Menu,
+    Modal,
+    Popup,
+    Segment,
+    Table
 } from "semantic-ui-react";
 import CandidateCvService from "../../services/candidateCvService";
 
@@ -49,13 +66,22 @@ export function CandidateManageCvs() {
     });
 
     useEffect(() => {
-        if (user.candidateCvs && user.candidateCvs[index]) setSelectedCv(user?.candidateCvs[index]);
-    }, [index, user?.candidateCvs]);
+        if (user.cvs && user.cvs[index]) setSelectedCv(user?.cvs[index]);
+    }, [index, user?.cvs]);
 
-    const candidateJobExperienceOption = user.candidateJobExperiences?.filter((candidateJobExperience) => {
-        let index = (selectedCv.candidateJobExperiences?.findIndex((candidateJobExperience2) => {
-            return candidateJobExperience2.id === candidateJobExperience.id
-        }))
+    const refreshPage = () => {
+        if (refresh === 0) setRefresh(1);
+        else setRefresh(0)
+    }
+
+    const handleCatch = (error) => {
+        toast.warning("An error has occurred")
+        console.log(error.response)
+        refreshPage()
+    }
+
+    const candidateJobExperienceOption = user.candidateJobExperiences?.filter((candJobExp) => {
+        const index = (selectedCv.candidateJobExperiences?.findIndex((cvCandJobExp) => cvCandJobExp.id === candJobExp.id))
         return index === -1;
     }).map((candidateJobExperience, index) => ({
         key: index,
@@ -64,9 +90,7 @@ export function CandidateManageCvs() {
     }));
 
     const candidateLanguageOption = user.candidateLanguages?.filter((candidateLanguage) => {
-        let index = (selectedCv.candidateLanguages?.findIndex((candidateLanguage2) => {
-            return candidateLanguage2.id === candidateLanguage.id
-        }))
+        const index = (selectedCv.candidateLanguages?.findIndex((candidateLanguage2) => candidateLanguage2.id === candidateLanguage.id))
         return index === -1;
     }).map((candidateLanguage, index) => ({
         key: index,
@@ -75,9 +99,7 @@ export function CandidateManageCvs() {
     }));
 
     const candidateSchoolOption = user.candidateSchools?.filter((candidateSchool) => {
-        let index = (selectedCv.candidateSchools?.findIndex((candidateSchool2) => {
-            return candidateSchool2.id === candidateSchool.id
-        }))
+        const index = (selectedCv.candidateSchools?.findIndex((candidateSchool2) => candidateSchool2.id === candidateSchool.id))
         return index === -1;
     }).map((candidateSchool, index) => ({
         key: index,
@@ -86,9 +108,7 @@ export function CandidateManageCvs() {
     }));
 
     const candidateSkillOption = user.candidateSkills?.filter((candidateSkill) => {
-        let index = (selectedCv.candidateSkills?.findIndex((candidateSkill2) => {
-            return candidateSkill2.id === candidateSkill.id
-        }))
+        const index = (selectedCv.candidateSkills?.findIndex((candidateSkill2) => candidateSkill2.id === candidateSkill.id))
         return index === -1;
     }).map((candidateSkill, index) => ({
         key: index,
@@ -107,250 +127,151 @@ export function CandidateManageCvs() {
 
     const handleCvAdd = () => {
         if (!formik.values.cvAddTitle || formik.values.cvAddTitle === "") {
-            toast.warning("Please give a title to add a new CV", {
-                autoClose: 1800
-            })
+            toast.warning("Please give a title to add a new CV")
             return
         }
-        let index = user.candidateCvs.findIndex((candidateCv) => {
-            return candidateCv.title === formik.values.cvAddTitle
-        })
+        const index = user.cvs.findIndex((cv) => cv.title === formik.values.cvAddTitle)
         if (index !== -1) {
-            toast.warning("Please choose an unused title", {
-                autoClose: 2500
-            })
+            toast.warning("Please choose an unused title")
             return
         }
-        let CV = {title: formik.values.cvAddTitle, candidateId: user.id}
+        const CV = {title: formik.values.cvAddTitle, candidateId: user.id}
         candidateCvService.add(CV).then(response => {
-            console.log(response)
-            if (response.data.success) {
-                const createdId = Number(response.data.message)
-                dispatch(addCv({
-                    id: createdId, title: formik.values.cvAddTitle, createdAt: new Date(),
-                    candidateJobExperiences: [], candidateLanguages: [], candidateSchools: [], candidateSkills: []
-                }))
-                setSelectedCv(user.candidateCvs[user.candidateCvs.length - 1])
-                setActiveItem(formik.values.cvAddTitle)
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
+            const createdId = response.data.data.CV.data
+            dispatch(addCv({
+                id: createdId, title: formik.values.cvAddTitle, createdAt: new Date(),
+                candidateJobExperiences: [], candidateLanguages: [], candidateSchools: [], candidateSkills: []
+            }))
+            setSelectedCv(user.cvs[user.cvs.length - 1])
+            setActiveItem(formik.values.cvAddTitle)
+            refreshPage()
             formik.values.cvAddTitle = ""
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
+        }).catch(handleCatch)
     }
 
     const handleCvDelete = () => {
-        candidateCvService.delete(selectedCv.id).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(deleteCv(selectedCv.id))
-                if (user.candidateCvs.length === 0) setSelectedCv({})
-                else setSelectedCv(user.candidateCvs[0])
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
+        candidateCvService.deleteById(selectedCv.id).then(() => {
+            dispatch(deleteCv(selectedCv.id))
+            if (user.cvs.length === 0) setSelectedCv({})
+            else setSelectedCv(user.cvs[0])
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const handleCoverLetterSubmit = () => {
-        candidateCvService.updateCoverLetter(selectedCv.id, formik.values.coverLetter).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCoverLetter(selectedCv.id, formik.values.coverLetter))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
+        if (formik.values.coverLetter === "") formik.values.coverLetter = undefined
+        candidateCvService.updateCoverLetter(selectedCv.id, formik.values.coverLetter).then(() => {
+            dispatch(changeCoverLetter(selectedCv.id, formik.values.coverLetter))
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const handleTitleSubmit = () => {
         if (formik.values.title.length === 0) {
-            toast.warning("Title should be at least 1 character", {
-                autoClose: 1800
-            })
+            toast.warning("The CV should have a title")
             return
         }
-        let index = user.candidateCvs.findIndex((candidateCv) => {
-            return candidateCv.title === formik.values.title
-        })
+        const index = user.cvs.findIndex((cv) => cv.title === formik.values.title)
         if (index !== -1) {
-            toast.warning("Please choose an unused title", {
-                autoClose: 1800
-            })
+            toast.warning("Please choose an unused title")
             return
         }
-        candidateCvService.updateTitle(selectedCv.id, formik.values.title).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeTitle(selectedCv.id, formik.values.title))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
+        candidateCvService.updateTitle(selectedCv.id, formik.values.title).then(() => {
+            dispatch(changeTitle(selectedCv.id, formik.values.title))
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const handleCvJobExperiencesAdd = () => {
         if (formik.values.jobExperienceIds.length === 0) return
         formik.values.jobExperienceIds.forEach((jobExperienceId) => {
-            let index = user.candidateJobExperiences.findIndex((candidateJobExperience) => {
-                return candidateJobExperience.id === jobExperienceId
-            })
+            const index = user.candidateJobExperiences.findIndex((candJobExp) => candJobExp.id === jobExperienceId)
             selectedCv.candidateJobExperiences.push(user.candidateJobExperiences[index])
         })
-        candidateCvService.updateJobExperiences(selectedCv.id, formik.values.jobExperienceIds, "add").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        formik.values.jobExperienceIds = []
+        candidateCvService.updateJobExperiences(selectedCv.id, formik.values.jobExperienceIds, "add").then(() => {
+            dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
+            formik.values.jobExperienceIds = []
+            toast("Saved")
+        }).catch(handleCatch)
     }
 
     const handleCvLanguageAdd = () => {
         if (formik.values.languageIds.length === 0) return
         formik.values.languageIds.forEach((languageId) => {
-            let index = user.candidateLanguages.findIndex((candidateLanguage) => {
-                return candidateLanguage.id === languageId
-            })
+            const index = user.candidateLanguages.findIndex((candidateLanguage) => candidateLanguage.id === languageId)
             selectedCv.candidateLanguages.push(user.candidateLanguages[index])
         })
-        candidateCvService.updateLanguages(selectedCv.id, formik.values.languageIds, "add").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        formik.values.languageIds = []
+        candidateCvService.updateLanguages(selectedCv.id, formik.values.languageIds, "add").then(() => {
+            dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
+            formik.values.languageIds = []
+            toast("Saved")
+        }).catch(handleCatch)
     }
 
     const handleCvSchoolAdd = () => {
         if (formik.values.schoolIds.length === 0) return
         formik.values.schoolIds.forEach((schoolId) => {
-            let index = user.candidateSchools.findIndex((candidateSchool) => {
-                return candidateSchool.id === schoolId
-            })
+            const index = user.candidateSchools.findIndex((candidateSchool) => candidateSchool.id === schoolId)
             selectedCv.candidateSchools.push(user.candidateSchools[index])
         })
-        candidateCvService.updateSchools(selectedCv.id, formik.values.schoolIds, "add").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        formik.values.schoolIds = []
+        candidateCvService.updateSchools(selectedCv.id, formik.values.schoolIds, "add").then(() => {
+            dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
+            formik.values.schoolIds = []
+            toast("Saved")
+        }).catch(handleCatch)
     }
 
     const handleCvSkillAdd = () => {
         if (formik.values.skillIds.length === 0) return
         formik.values.skillIds.forEach((skillId) => {
-            let index = user.candidateSkills.findIndex((candidateSkill) => {
-                return candidateSkill.id === skillId
-            })
+            const index = user.candidateSkills.findIndex((candidateSkill) => candidateSkill.id === skillId)
             selectedCv.candidateSkills.push(user.candidateSkills[index])
         })
-        candidateCvService.updateSkills(selectedCv.id, formik.values.skillIds, "add").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        formik.values.skillIds = []
+        candidateCvService.updateSkills(selectedCv.id, formik.values.skillIds, "add").then(() => {
+            dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
+            formik.values.skillIds = []
+            toast("Saved")
+        }).catch(handleCatch)
     }
 
-    const handleCvJobExperiencesDelete = (candidateJobExpId) => {
-        let index = selectedCv.candidateJobExperiences.findIndex((candidateJobExperience) => {
-            return candidateJobExperience.id === candidateJobExpId
-        })
+    const handleCvJobExperiencesDelete = (candJobExpId) => {
+        const index = selectedCv.candidateJobExperiences.findIndex((candJobExp) => candJobExp.id === candJobExpId)
         selectedCv.candidateJobExperiences.splice(index, 1)
-        candidateCvService.updateJobExperiences(selectedCv.id, [candidateJobExpId], "delete").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        if (refresh === 0) setRefresh(1);
-        else setRefresh(0)
+        candidateCvService.updateJobExperiences(selectedCv.id, [candJobExpId], "remove").then(() => {
+            dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
+            refreshPage()
+            toast("Deleted")
+        }).catch(handleCatch)
     }
 
     const handleCvLanguageDelete = (candidateLangId) => {
-        let index = selectedCv.candidateLanguages.findIndex((candidateLanguage) => {
-            return candidateLanguage.id === candidateLangId
-        })
+        const index = selectedCv.candidateLanguages.findIndex((candLang) => candLang.id === candidateLangId)
         selectedCv.candidateLanguages.splice(index, 1)
-        candidateCvService.updateLanguages(selectedCv.id, [candidateLangId], "delete").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        if (refresh === 0) setRefresh(1);
-        else setRefresh(0)
+        candidateCvService.updateLanguages(selectedCv.id, [candidateLangId], "remove").then(() => {
+            dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
+            refreshPage()
+            toast("Deleted")
+        }).catch(handleCatch)
     }
 
     const handleCvSchoolDelete = (candidateSchoolId) => {
-        let index = selectedCv.candidateSchools.findIndex((candidateSchool) => {
-            return candidateSchool.id === candidateSchoolId
-        })
+        const index = selectedCv.candidateSchools.findIndex((candSchool) => candSchool.id === candidateSchoolId)
         selectedCv.candidateSchools.splice(index, 1)
-        candidateCvService.updateSchools(selectedCv.id, [candidateSchoolId], "delete").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        if (refresh === 0) setRefresh(1);
-        else setRefresh(0)
+        candidateCvService.updateSchools(selectedCv.id, [candidateSchoolId], "remove").then(() => {
+            dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
+            refreshPage()
+            toast("Deleted")
+        }).catch(handleCatch)
     }
 
     const handleCvSkillDelete = (candidateSkillId) => {
-        let index = selectedCv.candidateSkills.findIndex((candidateSkill) => {
-            return candidateSkill.id === candidateSkillId
-        })
+        const index = selectedCv.candidateSkills.findIndex((candSkill) => candSkill.id === candidateSkillId)
         selectedCv.candidateSkills.splice(index, 1)
-        candidateCvService.updateSkills(selectedCv.id, [candidateSkillId], "delete").then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            toast.warning("A problem has occurred")
-            console.log(reason)
-        })
-        if (refresh === 0) setRefresh(1);
-        else setRefresh(0)
+        candidateCvService.updateSkills(selectedCv.id, [candidateSkillId], "remove").then(() => {
+            dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
+            refreshPage()
+            toast("Deleted")
+        }).catch(handleCatch)
     }
 
     function editTitle() {
@@ -396,7 +317,7 @@ export function CandidateManageCvs() {
                 <Form size="large" style={{marginLeft: "3em", marginBottom: 50}}>
                     <label><b>Cover Letter</b></label>
                     <Form.TextArea
-                        placeholder="Cover Letter"
+                        placeholder="Cover Letter (Max. 200 character)"
                         type="text"
                         value={formik.values.coverLetter}
                         name="coverLetter"
@@ -417,7 +338,7 @@ export function CandidateManageCvs() {
         return (
             <Modal basic onClose={() => setIsJobExpAddPopupOpen(false)} onOpen={() => setIsJobExpAddPopupOpen(true)}
                    open={isJobExpAddPopupOpen} size='mini'>
-                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}}>
+                <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Job Experiences
                     </Header>
@@ -433,7 +354,7 @@ export function CandidateManageCvs() {
                 <Button onClick={() => {
                     handleCvJobExperiencesAdd()
                     setIsJobExpAddPopupOpen(false)
-                }} primary attached = "bottom">Add To CV</Button>
+                }} primary attached="bottom">Add To CV</Button>
             </Modal>
         )
     }
@@ -442,7 +363,7 @@ export function CandidateManageCvs() {
         return (
             <Modal basic onClose={() => setIsSchoolAddPopupOpen(false)} onOpen={() => setIsSchoolAddPopupOpen(true)}
                    open={isSchoolAddPopupOpen} size='mini'>
-                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}}>
+                <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Schools
                     </Header>
@@ -466,7 +387,7 @@ export function CandidateManageCvs() {
         return (
             <Modal basic onClose={() => setIsLangAddPopupOpen(false)} onOpen={() => setIsLangAddPopupOpen(true)}
                    open={isLangAddPopupOpen} size='mini'>
-                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}} >
+                <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Languages
                     </Header>
@@ -490,7 +411,7 @@ export function CandidateManageCvs() {
         return (
             <Modal basic onClose={() => setIsSkillAddPopupOpen(false)} onOpen={() => setIsSkillAddPopupOpen(true)}
                    open={isSkillAddPopupOpen} size='mini'>
-                <Segment placeholder secondary attached = "bottom" style = {{borderRadius: 15}}>
+                <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Skills
                     </Header>
@@ -521,7 +442,7 @@ export function CandidateManageCvs() {
                 {addLanguagePopup()}
                 {addSkillPopup()}
 
-                <Card fluid color={color} style = {{borderRadius: 15}}>
+                <Card fluid color={color} style={{borderRadius: 15}}>
                     <Card.Content>
                         <Card.Header>
                             Cover Letter
@@ -591,7 +512,7 @@ export function CandidateManageCvs() {
                                 <Table.Row key={candidateSchool.id}>
                                     <Table.Cell>{candidateSchool.school?.name}</Table.Cell>
                                     <Table.Cell>{candidateSchool.department?.name}</Table.Cell>
-                                    <Table.Cell>{candidateSchool.schoolStartYear}</Table.Cell>
+                                    <Table.Cell>{candidateSchool.startYear}</Table.Cell>
                                     <Table.Cell>{!candidateSchool.graduationYear ? "Continues" : candidateSchool.graduationYear}</Table.Cell>
                                     <Table.Cell icon={"x"} onClick={() => {
                                         handleCvSchoolDelete(candidateSchool.id)
@@ -674,7 +595,7 @@ export function CandidateManageCvs() {
                             <Table.Cell>
                                 <Popup
                                     trigger={
-                                        <Button icon={"x"} content={"Delete CV"} negative onClick = {() => {
+                                        <Button icon={"x"} content={"Delete CV"} negative onClick={() => {
                                             if (isCvDeletePopupOpen) setIsCvDeletePopupOpen(false)
                                             if (!isCvDeletePopupOpen) setIsCvDeletePopupOpen(true)
                                         }}/>}
@@ -683,7 +604,7 @@ export function CandidateManageCvs() {
                                             handleCvDelete()
                                             setIsCvDeletePopupOpen(false)
                                         }}/>}
-                                    on='focus' position='bottom center' size={"mini"} open = {isCvDeletePopupOpen}
+                                    on='focus' position='bottom center' size={"mini"} open={isCvDeletePopupOpen}
                                     style={{opacity: 0.9}}
                                 />
                             </Table.Cell>
@@ -694,7 +615,7 @@ export function CandidateManageCvs() {
         )
     }
 
-    if (String(userProps.userType) !== "candidate"){
+    if (String(userProps.userType) !== "candidate") {
         return (
             <Header>
                 Sorry You Do Not Have Access Here
@@ -708,12 +629,12 @@ export function CandidateManageCvs() {
                 <Grid.Column width={4}>
                     <strong>Manage Your CVs</strong>
                     <Menu fluid vertical secondary>
-                        {user?.candidateCvs?.map((candidateCv) => (
+                        {user?.cvs?.map((cv) => (
                             <Menu.Item
-                                key={candidateCv?.id}
-                                name={candidateCv?.title}
-                                active={activeItem === candidateCv?.title}
-                                onClick={() => handleMenuItemClick(candidateCv?.title, user.candidateCvs.indexOf(candidateCv))}
+                                key={cv?.id}
+                                name={cv?.title}
+                                active={activeItem === cv?.title}
+                                onClick={() => handleMenuItemClick(cv?.title, user.cvs.indexOf(cv))}
                             />
                         ))}
                         <Popup

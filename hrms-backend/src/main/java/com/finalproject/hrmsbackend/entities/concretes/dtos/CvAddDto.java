@@ -9,14 +9,12 @@ import lombok.NoArgsConstructor;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class CvAddDto {
-
-    private Integer id;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private Integer candidateId;
@@ -28,12 +26,12 @@ public class CvAddDto {
     @Size(max = Utils.Const.MAX_CV_COVER_LETTER)
     private String coverLetter;
 
-    private List<@NotNull CandidateJobExperienceAddDto> candidateJobExperiences;
+    private Set<@NotNull Integer> candidateJobExperienceIds;
 
-    private List<@NotNull CandidateLanguageAddDto> candidateLanguages;
+    private Set<@NotNull Integer> candidateLanguageIds;
 
-    private List<@NotNull CandidateSchoolAddDto> candidateSchools;
+    private Set<@NotNull Integer> candidateSchoolIds;
 
-    private List<@NotNull CandidateSkillAddDto> candidateSkills;
+    private Set<@NotNull Integer> candidateSkillIds;
 
 }

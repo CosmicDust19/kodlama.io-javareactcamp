@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
 @RestController
 @RequestMapping("/api/candidateSkills")
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class CandidateSkillsController {
 
     private final CandidateSkillService candidateSkillService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(candidateSkillService.getAll());
     }
@@ -27,9 +27,9 @@ public class CandidateSkillsController {
         return Utils.getResponseEntity(candidateSkillService.add(candidateSkillAddDto));
     }
 
-    @DeleteMapping(value = "/deleteById")
-    public ResponseEntity<?> deleteById(@RequestParam int id) {
-        return Utils.getResponseEntity(candidateSkillService.deleteById(id));
+    @DeleteMapping(value = "/delete/byId")
+    public ResponseEntity<?> deleteById(@RequestParam int candSkillId) {
+        return Utils.getResponseEntity(candidateSkillService.deleteById(candSkillId));
     }
 
 }

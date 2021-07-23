@@ -45,7 +45,7 @@ export default function JobAdvertisementsList() {
     const [workTimes] = useState(["Part Time", "Full Time"]);
     const [workModels] = useState(["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]);
     const [jobAdvertisements, setJobAdvertisements] = useState([]);
-    const [refresh, setRefresh] = useState(0);
+    const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
         let cityService = new CityService();
@@ -53,13 +53,13 @@ export default function JobAdvertisementsList() {
         let employerService = new EmployerService();
         cityService.getCities().then((result) => setCities(result.data.data));
         positionService.getPositions().then((result) => setPositions(result.data.data));
-        employerService.getEmployers().then((result) => setEmployers(result.data.data));
-        jobAdvertisementService.getJobAdvertisements().then((result) => {
+        employerService.getPublic().then((result) => setEmployers(result.data.data));
+        jobAdvertisementService.getPublic().then((result) => {
             setJobAdvertisements(result.data.data)
         });
     }, []);
 
-    if (isFirstVisit) {
+    if (filteredJobAdvertisements.length === 0 && isFirstVisit) {
         const _ = require('lodash');
         if (_.isEqual(filters, filter.jobAdvertsFilters)) filteredJobAdvertisements = jobAdvertisements
     }
@@ -116,6 +116,17 @@ export default function JobAdvertisementsList() {
         }
     });
 
+    const refreshPage = () => {
+        if (refresh === true) setRefresh(false);
+        else setRefresh(true)
+    }
+
+    const handleCatch = (error) => {
+        toast.warning("An error has occurred")
+        console.log(error.response)
+        refreshPage()
+    }
+
     const handleChangeFilter = (fieldName, value) => {
         if (fieldName === "today" && value === true) formik.setFieldValue("thisWeek", false);
         else if (fieldName === "thisWeek" && value === true) formik.setFieldValue("today", false);
@@ -135,41 +146,24 @@ export default function JobAdvertisementsList() {
     const handlePaginationChange = (e, {activePage}) => setCurrentPage(activePage)
 
     const handleAddToFavorites = (jobAdvId) => {
-        candidateService.addJobAdvertisementToFavorites(user.id, jobAdvId).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                let index = jobAdvertisements.findIndex((jobAdvertisement) => {
-                    return jobAdvertisement.id === jobAdvId
-                })
-                user.favoriteJobAdvertisements.push(jobAdvertisements[index])
-                dispatch(changeFavoriteJobAdv(user.favoriteJobAdvertisements))
-                toast.error("Added To Favorites  😍")
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        console.log(jobAdvId)
+        candidateService.addJobAdvToFavorites(user.id, jobAdvId).then(() => {
+            const index = jobAdvertisements.findIndex((jobAdvertisement) => jobAdvertisement.id === jobAdvId)
+            user.favoriteJobAdvertisements.push(jobAdvertisements[index])
+            dispatch(changeFavoriteJobAdv(user.favoriteJobAdvertisements))
+            toast.error("Added To Favorites  😍")
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const handleDeleteFromFavorites = (jobAdvId) => {
-        candidateService.deleteJobAdvertisementToFavorites(user.id, jobAdvId).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                let index = user.favoriteJobAdvertisements.findIndex((jobAdvertisement) => {
-                    return jobAdvertisement.id === jobAdvId
-                })
-                user.favoriteJobAdvertisements.splice(index, 1)
-                dispatch(changeFavoriteJobAdv(user.favoriteJobAdvertisements))
-                toast("Deleted From Favorites")
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        candidateService.removeJobAdvFromFavorites(user.id, jobAdvId).then(() => {
+            const index = user.favoriteJobAdvertisements.findIndex((jobAdvertisement) => jobAdvertisement.id === jobAdvId)
+            user.favoriteJobAdvertisements.splice(index, 1)
+            dispatch(changeFavoriteJobAdv(user.favoriteJobAdvertisements))
+            toast("Deleted From Favorites")
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const setFavoriteJobAdvertsMode = () => {

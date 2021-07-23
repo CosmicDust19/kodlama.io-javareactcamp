@@ -11,18 +11,18 @@ public interface CandidateSchoolService {
 
     DataResult<List<CandidateSchool>> getAll();
 
-    DataResult<List<CandidateSchool>> getAllByGradYear(Short sortDirection);
+    DataResult<List<CandidateSchool>> getByGradYear(Short sortDirection);
 
     Result add(CandidateSchoolAddDto candidateSchoolAddDto);
 
-    DataResult<Boolean> deleteById(int id);
+    DataResult<Boolean> deleteById(int candSchId);
 
-    Result updateSchool(int schoolId, int id);
+    Result updateSchool(int schoolId, int candSchId);
 
-    Result updateDepartment(short departmentId, int id);
+    Result updateDepartment(short departmentId, int candSchId);
 
-    Result updateStartYear(short schoolStartYear, int id);
+    Result updateStartYear(short schoolStartYear, int candSchId);
 
-    Result updateGradYear(Short graduationYear, int id);
+    Result updateGradYear(Short graduationYear, int candSchId);
 
 }

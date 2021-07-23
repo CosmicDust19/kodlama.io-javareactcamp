@@ -1,9 +1,11 @@
-import {Container, Dropdown, Icon, Image, Menu, Modal, Header, Button, Grid} from "semantic-ui-react";
+import {Button, Container, Dropdown, Grid, Header, Icon, Image, Menu, Modal} from "semantic-ui-react";
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {signOut} from "../store/actions/userActions";
+import {login, signOut} from "../store/actions/userActions";
 import {Link, useHistory} from "react-router-dom";
 import SignedOut from "./SignedOut";
+import CandidateService from "../services/candidateService";
+import {toast} from "react-toastify";
 
 
 export default function SignedIn() {
@@ -62,6 +64,13 @@ export default function SignedIn() {
                         window.scrollTo(0, 40)
                     }}>Users</Menu.Item>
 
+                    {/*<Menu.Item name="sync" onClick={() => {
+                        const candidateService = new CandidateService();
+                        candidateService.getById(userProps.user.id).then((result) => {
+                            dispatch(login(result.data.data, "candidate"))
+                        });
+                    }}/>*/}
+
                     <Menu.Menu position='right'>
                         <Menu.Item>
                             <Image size="mini" circular
@@ -74,7 +83,7 @@ export default function SignedIn() {
                                     <Dropdown.Item as={Link} to={"/candidateManageCVs"} onClick={handleScrollToTop}>
                                         <Icon name="file alternate outline" color="blue"/>My CVs
                                     </Dropdown.Item>
-                                    <Dropdown.Item as={Link} to={"/candidateManageMe"} onClick={handleScrollToTop}>
+                                    <Dropdown.Item as={Link} to={"/candidateManageProfile"} onClick={handleScrollToTop}>
                                         <Icon name="address book" color="red"/>About Me
                                     </Dropdown.Item>
                                     <Dropdown.Item as={Link} to={"/candidateManageAccount"} onClick={handleScrollToTop}>
@@ -123,7 +132,10 @@ export default function SignedIn() {
                             <Dropdown simple item text={userProps.user?.companyName}>
                                 <Dropdown.Menu
                                     style={{marginTop: 0, backgroundColor: "rgba(250,250,250, 0.3)", borderRadius: 10}}>
-                                    <Dropdown.Item as={Link} to={"/employerAccount"} onClick={handleScrollToTop}>
+                                    <Dropdown.Item as={Link} to={"/employerManageAccount"} onClick={() => {
+                                        handleScrollToTop()
+                                        toast.warning("THIS PAGE IS NOT WORKING PROPERLY")
+                                    }}>
                                         <Icon name="setting" color="yellow"/>Account
                                     </Dropdown.Item>
                                     <Dropdown.Item as={Link} to={"/employerJobAdverts"} onClick={handleScrollToTop}>
@@ -145,7 +157,7 @@ export default function SignedIn() {
 
     function systemEmployeeSignedIn() {
         return (
-            <Menu size="large" fixed="top" secondary >
+            <Menu size="large" fixed="top" secondary>
                 {areYouSurePopup()}
                 <Container>
                     <Menu.Item>
@@ -179,7 +191,8 @@ export default function SignedIn() {
                                     borderRadius: 10
                                 }}>
                                 <Dropdown.Item as={Link} to={"/jobAdvertisements"}>
-                                    <Icon name="file alternate" style={{color: "rgba(186,20,84,0.9)"}}/> Job Advertisements
+                                    <Icon name="file alternate" style={{color: "rgba(186,20,84,0.9)"}}/> Job
+                                    Advertisements
                                 </Dropdown.Item>
                                 <Dropdown.Item as={Link} to={"/users"}>
                                     <Icon name="user" style={{color: "rgba(189,167,32,0.9)"}}/> Users

@@ -21,9 +21,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
+import java.util.Set;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
 @Validated
 @RestController
 @RequestMapping("/api/cvs")
@@ -36,14 +36,14 @@ public class CvsController {
     private final CandidateSchoolDao candidateSchoolDao;
     private final CandidateSkillDao candidateSkillDao;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(cvService.getAll());
     }
 
-    @GetMapping("/getById")
-    public ResponseEntity<?> getById(@RequestParam int id) {
-        return Utils.getResponseEntity(cvService.getById(id));
+    @GetMapping("/get/byId")
+    public ResponseEntity<?> getById(@RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.getById(cvId));
     }
 
     @PostMapping(value = "/add")
@@ -51,61 +51,61 @@ public class CvsController {
         return Utils.getResponseEntity(cvService.add(cvAddDto));
     }
 
-    @DeleteMapping(value = "/deleteById")
-    public ResponseEntity<?> deleteById(@RequestParam int id) {
-        return Utils.getResponseEntity(cvService.deleteById(id));
+    @DeleteMapping(value = "/delete/byId")
+    public ResponseEntity<?> deleteById(@RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.deleteById(cvId));
     }
 
-    @PutMapping(value = "/updateTitle")
+    @PutMapping(value = "/update/title")
     public ResponseEntity<?> updateTitle(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
-                                         @Size(max = Utils.Const.MAX_CV_TITLE) String title, @RequestParam int id) {
-        return Utils.getResponseEntity(cvService.updateTitle(title, id));
+                                         @Size(max = Utils.Const.MAX_CV_TITLE) String title, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.updateTitle(title, cvId));
     }
 
-    @PutMapping(value = "/updateCoverLetter")
+    @PutMapping(value = "/update/coverLetter")
     public ResponseEntity<?> updateCoverLetter(@RequestParam(required = false)
-                                               @Size(max = Utils.Const.MAX_CV_COVER_LETTER) String coverLetter, @RequestParam int id) {
-        return Utils.getResponseEntity(cvService.updateCoverLetter(coverLetter, id));
+                                               @Size(max = Utils.Const.MAX_CV_COVER_LETTER) String coverLetter, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.updateCoverLetter(coverLetter, cvId));
     }
 
-    @PutMapping(value = "/addToCv/JobExps")
-    public ResponseEntity<?> addJobExpsToCv(@RequestParam List<@NotNull Integer> candidateJobExpIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candidateJobExpIds, candidateJobExpDao, Utils.CheckType.ALL, CandidateJobExperience.class));
+    @PutMapping(value = "/update/jobExps/add")
+    public ResponseEntity<?> addJobExpsToCv(@RequestParam Set<@NotNull Integer> candJobExpIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candJobExpIds, candidateJobExpDao, Utils.CheckType.ALL, CandidateJobExperience.class));
     }
 
-    @PutMapping(value = "/addToCv/Langs")
-    public ResponseEntity<?> addLangsToCv(@RequestParam List<@NotNull Integer> candidateLangIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candidateLangIds, candidateLangDao, Utils.CheckType.ALL, CandidateLanguage.class));
+    @PutMapping(value = "/update/langs/add")
+    public ResponseEntity<?> addLangsToCv(@RequestParam Set<@NotNull Integer> candLangIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candLangIds, candidateLangDao, Utils.CheckType.ALL, CandidateLanguage.class));
     }
 
-    @PutMapping(value = "/addToCv/Schools")
-    public ResponseEntity<?> addSchoolsToCv(@RequestParam List<@NotNull Integer> candidateSchoolIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candidateSchoolIds, candidateSchoolDao, Utils.CheckType.ALL, CandidateSchool.class));
+    @PutMapping(value = "/update/schools/add")
+    public ResponseEntity<?> addSchoolsToCv(@RequestParam Set<@NotNull Integer> candSchoolIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candSchoolIds, candidateSchoolDao, Utils.CheckType.ALL, CandidateSchool.class));
     }
 
-    @PutMapping(value = "/addToCv/Skills")
-    public ResponseEntity<?> addSkillsToCv(@RequestParam List<@NotNull Integer> candidateSkillIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candidateSkillIds, candidateSkillDao, Utils.CheckType.ALL, CandidateSkill.class));
+    @PutMapping(value = "/update/skills/add")
+    public ResponseEntity<?> addSkillsToCv(@RequestParam Set<@NotNull Integer> candSkillIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candSkillIds, candidateSkillDao, Utils.CheckType.ALL, CandidateSkill.class));
     }
 
-    @PutMapping(value = "/deleteFromCv/JobExps")
-    public ResponseEntity<?> deleteJobExpsFromCv(@RequestParam List<@NotNull Integer> candidateJobExpIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.deletePropsFromCv(cvId, candidateJobExpIds, Utils.CheckType.ALL, CandidateJobExperience.class));
+    @PutMapping(value = "/update/jobExps/remove")
+    public ResponseEntity<?> removeJobExpsFromCv(@RequestParam Set<@NotNull Integer> candJobExpIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.removePropsFromCv(cvId, candJobExpIds, Utils.CheckType.ALL, CandidateJobExperience.class));
     }
 
-    @PutMapping(value = "/deleteFromCv/Langs")
-    public ResponseEntity<?> deleteLangsFromCv(@RequestParam List<@NotNull Integer> candidateLangIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.deletePropsFromCv(cvId, candidateLangIds, Utils.CheckType.ALL, CandidateLanguage.class));
+    @PutMapping(value = "/update/langs/remove")
+    public ResponseEntity<?> removeLangsFromCv(@RequestParam Set<@NotNull Integer> candLangIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.removePropsFromCv(cvId, candLangIds, Utils.CheckType.ALL, CandidateLanguage.class));
     }
 
-    @PutMapping(value = "/deleteFromCv/Schools")
-    public ResponseEntity<?> deleteSchoolsFromCv(@RequestParam List<@NotNull Integer> candidateSchoolIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.deletePropsFromCv(cvId, candidateSchoolIds, Utils.CheckType.ALL, CandidateSchool.class));
+    @PutMapping(value = "/update/schools/remove")
+    public ResponseEntity<?> removeSchoolsFromCv(@RequestParam Set<@NotNull Integer> candSchoolIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.removePropsFromCv(cvId, candSchoolIds, Utils.CheckType.ALL, CandidateSchool.class));
     }
 
-    @PutMapping(value = "/deleteFromCv/Skills")
-    public ResponseEntity<?> deleteSkillsFromCv(@RequestParam List<@NotNull Integer> candidateSkillIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.deletePropsFromCv(cvId, candidateSkillIds, Utils.CheckType.ALL, CandidateSkill.class));
+    @PutMapping(value = "/update/skills/remove")
+    public ResponseEntity<?> removeSkillsFromCv(@RequestParam Set<@NotNull Integer> candSkillIds, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.removePropsFromCv(cvId, candSkillIds, Utils.CheckType.ALL, CandidateSkill.class));
     }
 
 }

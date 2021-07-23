@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
 @Validated
 @RestController
 @RequestMapping("/api/candidates")
@@ -20,22 +20,22 @@ public class CandidatesController {
 
     private final CandidateService candidateService;
 
-    @GetMapping("/existsByNatId")
+    @GetMapping("/exists/byNatId")
     public ResponseEntity<?> existsByNatId(@RequestParam String nationalityId) {
         return Utils.getResponseEntity(candidateService.existsByNatId(nationalityId));
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(candidateService.getAll());
     }
 
-    @GetMapping("/getById")
-    public ResponseEntity<?> getById(@RequestParam int id) {
-        return Utils.getResponseEntity(candidateService.getById(id));
+    @GetMapping("/get/byId")
+    public ResponseEntity<?> getById(@RequestParam int candId) {
+        return Utils.getResponseEntity(candidateService.getById(candId));
     }
 
-    @GetMapping("/getByEmailAndPW")
+    @GetMapping("/get/byEmailAndPW")
     public ResponseEntity<?> getByEmailAndPW(@RequestParam String email, @RequestParam String password) {
         return Utils.getResponseEntity(candidateService.getByEmailAndPW(email, password));
     }
@@ -45,27 +45,27 @@ public class CandidatesController {
         return Utils.getResponseEntity(candidateService.add(candidateAddDto));
     }
 
-    @PutMapping(value = "/updateGithubAccount")
+    @PutMapping(value = "/update/githubAccount")
     public ResponseEntity<?> updateGithubAccount(@RequestParam(required = false)
-                                                 @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String githubAccountLink,
-                                                 @RequestParam int id) {
-        return Utils.getResponseEntity(candidateService.updateGithubAccount(githubAccountLink, id));
+                                                 @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String githubAccount,
+                                                 @RequestParam int candId) {
+        return Utils.getResponseEntity(candidateService.updateGithubAccount(githubAccount, candId));
     }
 
-    @PutMapping(value = "/updateLinkedinAccount")
+    @PutMapping(value = "/update/linkedinAccount")
     public ResponseEntity<?> updateLinkedinAccount(@RequestParam(required = false)
-                                                   @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String linkedinAccountLink, @RequestParam int id) {
-        return Utils.getResponseEntity(candidateService.updateLinkedinAccount(linkedinAccountLink, id));
+                                                   @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String linkedinAccount, @RequestParam int candId) {
+        return Utils.getResponseEntity(candidateService.updateLinkedinAccount(linkedinAccount, candId));
     }
 
-    @PutMapping(value = "/addJobAdvToFavorites")
-    public ResponseEntity<?> addJobAdvToFavorites(@RequestParam int jobAdvId, @RequestParam int id) {
-        return Utils.getResponseEntity(candidateService.updateFavoriteJobAdverts(jobAdvId, id, Utils.UpdateType.ADD));
+    @PutMapping(value = "/update/favoriteJobAdvs/add")
+    public ResponseEntity<?> addJobAdvToFavorites(@RequestParam int jobAdvId, @RequestParam int candId) {
+        return Utils.getResponseEntity(candidateService.updateFavoriteJobAdverts(jobAdvId, candId, Utils.UpdateType.ADD));
     }
 
-    @PutMapping(value = "/deleteJobAdvFromFavorites")
-    public ResponseEntity<?> deleteJobAdvFromFavorites(@RequestParam int jobAdvId, @RequestParam int id) {
-        return Utils.getResponseEntity(candidateService.updateFavoriteJobAdverts(jobAdvId, id, Utils.UpdateType.DEL));
+    @PutMapping(value = "/update/favoriteJobAdvs/remove")
+    public ResponseEntity<?> removeJobAdvFromFavorites(@RequestParam int jobAdvId, @RequestParam int candId) {
+        return Utils.getResponseEntity(candidateService.updateFavoriteJobAdverts(jobAdvId, candId, Utils.UpdateType.DEL));
     }
 
 }

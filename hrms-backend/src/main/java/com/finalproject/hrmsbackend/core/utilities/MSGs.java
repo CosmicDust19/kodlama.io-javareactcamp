@@ -24,7 +24,7 @@ public enum MSGs {
     WRONG("wrong"),
     THE_SAME("the same as before"),
     ALREADY_CONTAINS("already contains this"),
-    DIFF_DOMAIN("different domain"),
+    DIFF_DOMAIN("have different domain"),
     EXTERNAL_INTERVENTION("can have been intervened externally"),
     EMPTY("Empty"),
     NO_ID_FOUND("No ids found, nothing executed"),

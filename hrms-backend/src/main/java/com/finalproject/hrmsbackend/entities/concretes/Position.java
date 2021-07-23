@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -25,7 +24,6 @@ public class Position implements BaseEntity<Short> {
     @Column(name = "id")
     private Short id;
 
-    @NotBlank(message = "Empty")
     @Column(name = "title", nullable = false, unique = true, length = 100)
     private String title;
 
@@ -37,4 +35,7 @@ public class Position implements BaseEntity<Short> {
         this.id = id;
     }
 
+    public Position(String title) {
+        this.title = title;
+    }
 }

@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.DepartmentService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.DepartmentDao;
@@ -24,10 +24,8 @@ public class DepartmentManager implements DepartmentService {
     }
 
     @Override
-    public Result add(Department department) {
-        if (department.getName() != null) department.setName(department.getName().trim());
-        if (check.invalidLength(department.getName(), 0, 100)) return new ErrorResult(MSGs.INVALID.get("departmentName"));
-        departmentDao.save(department);
+    public Result add(String departmentName) {
+        departmentDao.save(new Department(departmentName));
         return new SuccessResult(MSGs.SAVED.get());
     }
 }

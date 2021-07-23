@@ -30,7 +30,7 @@ export default function EmployerDetail() {
         const employerService = new EmployerService();
         const jobAdvertisementService = new JobAdvertisementService()
         employerService.getById(id).then((result) => setEmployer(result.data.data));
-        jobAdvertisementService.getEmployerJobs(employer.id).then(result => setJobAdvertisements(result.data.data))
+        jobAdvertisementService.getPublicByEmployerId(employer.id).then(result => setJobAdvertisements(result.data.data))
     }, [employer.id, id]);
 
     if (employer === {}){

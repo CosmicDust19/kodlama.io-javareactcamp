@@ -14,7 +14,7 @@ export default function SystemEmployeeList() {
     useEffect(() => {
         setLoading(true);
         let systemEmployeeService = new SystemEmployeeService();
-        systemEmployeeService.getSystemEmployees().then((result) => setSystemEmployees(result.data.data));
+        systemEmployeeService.getAll().then((result) => setSystemEmployees(result.data.data));
         setTimeout(() => {
             setLoading(false);
         }, 500)

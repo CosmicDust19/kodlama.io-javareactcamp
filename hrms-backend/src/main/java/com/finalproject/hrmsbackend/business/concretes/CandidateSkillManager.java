@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSkillService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
@@ -34,18 +34,18 @@ public class CandidateSkillManager implements CandidateSkillService {
     public Result add(CandidateSkillAddDto candidateSkillAddDto) {
         if (check.notExistsById(candidateDao, candidateSkillAddDto.getCandidateId()))
             return new ErrorResult(MSGs.NOT_EXIST.get("candidateId"));
-        if (check.notExistsById(skillDao, candidateSkillAddDto.getSkill().getId()))
-            return new ErrorResult(MSGs.NOT_EXIST.get("skill"));
+        if (check.notExistsById(skillDao, candidateSkillAddDto.getSkillId()))
+            return new ErrorResult(MSGs.NOT_EXIST.get("skill.id"));
 
         CandidateSkill candidateSkill = modelMapper.map(candidateSkillAddDto, CandidateSkill.class);
 
         CandidateSkill savedCandidateSkill = candidateSkillDao.save(candidateSkill);
-        return new SuccessResult(Integer.toString(savedCandidateSkill.getId()));
+        return new SuccessDataResult<>(MSGs.SAVED.getCustom("%s (data: new id)"), savedCandidateSkill.getId());
     }
 
     @Override
-    public Result deleteById(int id) {
-        candidateSkillDao.deleteById(id);
+    public Result deleteById(int candSkillId) {
+        candidateSkillDao.deleteById(candSkillId);
         return new SuccessDataResult<>(MSGs.DELETED.get());
     }
 

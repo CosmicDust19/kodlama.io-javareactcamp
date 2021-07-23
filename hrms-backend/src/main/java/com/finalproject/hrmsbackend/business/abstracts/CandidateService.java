@@ -13,16 +13,16 @@ public interface CandidateService {
 
     DataResult<Boolean> existsByNatId(String nationalityId);
 
-    DataResult<Candidate> getById(int id);
+    DataResult<Candidate> getById(int candId);
 
     DataResult<Candidate> getByEmailAndPW(String email, String password);
 
     Result add(CandidateAddDto candidateAddDto);
 
-    Result updateGithubAccount(String githubAccountLink, int id);
+    Result updateGithubAccount(String githubAccountLink, int candId);
 
-    Result updateLinkedinAccount(String linkedinAccountLink, int id);
+    Result updateLinkedinAccount(String linkedinAccountLink, int candId);
 
-    Result updateFavoriteJobAdverts(int jobAdvertisementId, int id, String type);
+    Result updateFavoriteJobAdverts(int jobAdvertisementId, int candId, String type);
 
 }

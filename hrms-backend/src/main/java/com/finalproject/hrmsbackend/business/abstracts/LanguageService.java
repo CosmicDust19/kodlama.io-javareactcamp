@@ -10,6 +10,6 @@ public interface LanguageService {
 
     DataResult<List<Language>> getAll();
 
-    Result add(Language language);
+    Result add(String languageName);
 
 }

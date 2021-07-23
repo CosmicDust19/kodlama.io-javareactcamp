@@ -12,29 +12,29 @@ public interface JobAdvertisementService {
 
     DataResult<List<JobAdvertisement>> getAll();
 
-    DataResult<List<JobAdvertisement>> getAllActiveVerified();
+    DataResult<List<JobAdvertisement>> getActiveVerified();
 
-    DataResult<List<JobAdvertisement>> getAllActiveVerifiedByDate(Short sortDirection);
+    DataResult<List<JobAdvertisement>> getActiveVerifiedByCreatedAt(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> getAllPublicByEmployer(int employerId);
+    DataResult<List<JobAdvertisement>> getPublicByEmployer(int employerId);
 
-    DataResult<List<JobAdvertisement>> getAllUnverified(Short sortDirection);
+    DataResult<List<JobAdvertisement>> getUnverified(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> getAllPublic(Short sortDirection);
+    DataResult<List<JobAdvertisement>> getPublic(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> getAllActiveVerifiedPast();
+    DataResult<List<JobAdvertisement>> getActiveVerifiedPast();
 
-    DataResult<JobAdvertisement> getById(int jobAdvertisementId);
+    DataResult<JobAdvertisement> getById(int jobAdvId);
 
     Result add(JobAdvertisementAddDto jobAdvertisementAddDto);
 
-    DataResult<Boolean> deleteById(int id);
+    DataResult<Boolean> deleteById(int jobAdvId);
 
-    Result updatePosition(short positionId, int id);
+    Result updatePosition(short positionId, int jobAdvId);
 
-    Result updateJobDesc(String jobDescription, int id);
+    Result updateJobDesc(String jobDescription, int jobAdvId);
 
-    Result updateCity(short cityId, int id);
+    Result updateCity(short cityId, int jobAdvId);
 
     Result updateMinSalary(Double minSalary, int id);
 
@@ -48,7 +48,7 @@ public interface JobAdvertisementService {
 
     Result updateDeadLine(LocalDate deadLine, int id);
 
-    Result applyUpdates(int jobAdvId);
+    Result applyChanges(int jobAdvId);
 
     Result updateActivation(boolean isActive, int id);
 

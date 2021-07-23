@@ -27,6 +27,8 @@ public class ModelMapperConfig {
     private final PropertyMap<JobAdvertisementAddDto, JobAdvertisement> jobAdvAddDtoJobAdvPropertyMap = new PropertyMap<JobAdvertisementAddDto, JobAdvertisement>() {
         protected void configure() {
             map(source.getEmployerId(), destination.getEmployer().getId());
+            map(source.getPositionId(), destination.getPosition().getId());
+            map(source.getCityId(), destination.getCity().getId());
         }
     };
 
@@ -39,24 +41,29 @@ public class ModelMapperConfig {
     private final PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience> candidateJobExpAddDtoCandidateJobExpPropertyMap = new PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
+            map(source.getPositionId(), destination.getPosition().getId());
         }
     };
 
     private final PropertyMap<CandidateLanguageAddDto, CandidateLanguage> candidateLangAddDtoCandidateLangPropertyMap = new PropertyMap<CandidateLanguageAddDto, CandidateLanguage>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
+            map(source.getLanguageId(), destination.getLanguage().getId());
         }
     };
 
     private final PropertyMap<CandidateSchoolAddDto, CandidateSchool> candidateSchoolAddDtoCandidateSchoolPropertyMap = new PropertyMap<CandidateSchoolAddDto, CandidateSchool>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
+            map(source.getSchoolId(), destination.getSchool().getId());
+            map(source.getDepartmentId(), destination.getDepartment().getId());
         }
     };
 
     private final PropertyMap<CandidateSkillAddDto, CandidateSkill> candidateSkillAddDtoCandidateSkillPropertyMap = new PropertyMap<CandidateSkillAddDto, CandidateSkill>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
+            map(source.getSkillId(), destination.getSkill().getId());
         }
     };
 

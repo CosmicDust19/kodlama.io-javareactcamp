@@ -1,15 +1,18 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.SchoolService;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.School;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
+@Validated
 @RestController
 @RequestMapping("/api/schools")
 @RequiredArgsConstructor
@@ -17,13 +20,14 @@ public class SchoolsController {
 
     private final SchoolService schoolService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(schoolService.getAll());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody School school) {
-        return Utils.getResponseEntity(schoolService.add(school));
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+                                 @Size(max = Utils.Const.MAX_SCHOOL_NAME) String schoolName) {
+        return Utils.getResponseEntity(schoolService.add(schoolName));
     }
 }

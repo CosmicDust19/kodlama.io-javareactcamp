@@ -1,9 +1,9 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
-import com.finalproject.hrmsbackend.business.abstracts.EmployerCheckService;
 import com.finalproject.hrmsbackend.business.abstracts.EmployerService;
-import com.finalproject.hrmsbackend.core.abstracts.EmailService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
+import com.finalproject.hrmsbackend.core.business.abstracts.UserCheckService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
@@ -18,9 +18,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +26,7 @@ public class EmployerManager implements EmployerService {
 
     private final EmployerDao employerDao;
     private final EmployerUpdateDao employerUpdateDao;
-    private final EmployerCheckService employerCheck;
+    private final UserCheckService userCheck;
     private final CheckService check;
     private final EmailService emailService;
     private final ModelMapper modelMapper;
@@ -50,18 +48,18 @@ public class EmployerManager implements EmployerService {
     }
 
     @Override
-    public DataResult<List<Employer>> getAllVerified() {
+    public DataResult<List<Employer>> getVerified() {
         return new SuccessDataResult<>(employerDao.getAllByVerifiedTrue());
     }
 
     @Override
-    public DataResult<List<Employer>> getAllUnverified() {
+    public DataResult<List<Employer>> getUnverified() {
         return new SuccessDataResult<>(employerDao.getAllByVerifiedFalse());
     }
 
     @Override
-    public DataResult<Employer> getById(int id) {
-        return new SuccessDataResult<>(employerDao.getById(id));
+    public DataResult<Employer> getById(int emplId) {
+        return new SuccessDataResult<>(employerDao.getById(emplId));
     }
 
     @Override
@@ -71,8 +69,8 @@ public class EmployerManager implements EmployerService {
 
     @Override
     public Result add(EmployerAddDto employerAddDto) {
-        if (employerCheck.emailWebsiteDiffDomain(employerAddDto.getEmail(), employerAddDto.getWebsite()))
-            return new ErrorResult(MSGs.DIFF_DOMAIN.get("email and website have"));
+        if (userCheck.emailWebsiteDiffDomain(employerAddDto.getEmail(), employerAddDto.getWebsite()))
+            return new ErrorResult(MSGs.DIFF_DOMAIN.get("email and website"));
 
         employerAddDto.setPhoneNumber(Utils.getEditedPhoneNumber(employerAddDto.getPhoneNumber()));
         Employer employer = modelMapper.map(employerAddDto, Employer.class);
@@ -83,29 +81,29 @@ public class EmployerManager implements EmployerService {
     }
 
     @Override
-    public Result updateCompanyName(String companyName, int id) {
-        if (check.notExistsById(employerDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result updateCompanyName(String companyName, int emplId) {
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
 
-        Employer employer = employerDao.getById(id);
+        Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
         if ((employerUpdate != null && employerUpdate.getCompanyName().equals(companyName)) ||
                 (employerUpdate == null && employer.getCompanyName().equals(companyName)))
             return new ErrorResult(MSGs.THE_SAME.get("companyName is"));
 
-        handleLastActions(employer);
+        handleLastUpdateActions(employer);
         employerUpdateDao.updateCompanyName(companyName, employer.getEmployerUpdate().getUpdateId());
         return getUpdateOutput(employer);
     }
 
     @Override
-    public Result updateEmailAndWebsite(String email, String website, int id) {
-        Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(employerDao, id)) errors.put("id", MSGs.NOT_EXIST.get());
-        if (employerCheck.emailWebsiteDiffDomain(email, website)) errors.put("email - website", MSGs.DIFF_DOMAIN.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+    public Result updateEmailAndWebsite(String email, String website, int emplId) {
+        if (check.notExistsById(employerDao, emplId))
+            return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
+        if (userCheck.emailWebsiteDiffDomain(email, website))
+            return new ErrorResult(MSGs.DIFF_DOMAIN.get("email and website"));
 
-        Employer employer = employerDao.getById(id);
+        Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
         boolean employerUpdateEmailSame = (employerUpdate != null && employerUpdate.getEmail().equals(email));
@@ -122,45 +120,45 @@ public class EmployerManager implements EmployerService {
         if (!employer.getWebsite().equals(website) && employerDao.existsByWebsite(website))
             return new ErrorResult(MSGs.IN_USE.get("website is"));
 
-        handleLastActions(employer);
+        handleLastUpdateActions(employer);
         employerUpdateDao.updateEmailAndWebsite(email, website, employer.getEmployerUpdate().getUpdateId());
         return getUpdateOutput(employer);
     }
 
     @Override
-    public Result updatePhoneNumber(String phoneNumber, int id) {
-        if (check.notExistsById(employerDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result updatePhoneNumber(String phoneNumber, int emplId) {
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
 
-        Employer employer = employerDao.getById(id);
+        Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
         if ((employerUpdate != null && employerUpdate.getPhoneNumber().equals(phoneNumber)) ||
                 (employerUpdate == null && employer.getPhoneNumber().equals(phoneNumber)))
             return new ErrorResult(MSGs.THE_SAME.get("phoneNumber is"));
 
-        handleLastActions(employer);
+        handleLastUpdateActions(employer);
         employerUpdateDao.updatePhoneNumber(Utils.getEditedPhoneNumber(phoneNumber), employer.getEmployerUpdate().getUpdateId());
         return getUpdateOutput(employer);
     }
 
     @Override
-    public Result applyUpdates(int empId) {
-        if (check.notExistsById(employerDao, empId)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result applyChanges(int emplId) {
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
 
-        Employer employer = employerDao.getById(empId);
+        Employer employer = employerDao.getById(emplId);
 
         if (employer.getEmployerUpdate() == null) return new ErrorResult(MSGs.NO_UPDATE.get());
-        employerDao.applyUpdates(employer.getEmployerUpdate(), empId);
-        employerDao.updateUpdateVerification(true, empId);
+        employerDao.applyUpdates(employer.getEmployerUpdate(), emplId);
+        employerDao.updateUpdateVerification(true, emplId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateVerification(boolean systemVerificationStatus, int id) {
-        if (check.notExistsById(employerDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result updateVerification(boolean verificationStatus, int emplId) {
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
 
-        employerDao.updateVerification(systemVerificationStatus, id);
-        employerDao.updateRejection(!systemVerificationStatus, id);
+        employerDao.updateVerification(verificationStatus, emplId);
+        employerDao.updateRejection(!verificationStatus, emplId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
@@ -171,7 +169,7 @@ public class EmployerManager implements EmployerService {
         return savedEmployerUpdate;
     }
 
-    private void handleLastActions(Employer employer) {
+    private void handleLastUpdateActions(Employer employer) {
         if (employer.getEmployerUpdate() == null) employer.setEmployerUpdate(createEmployerUpdate(employer));
         employerDao.updateUpdateVerification(false, employer.getId());
         userDao.updateLastModifiedAt(LocalDateTime.now(), employer.getId());

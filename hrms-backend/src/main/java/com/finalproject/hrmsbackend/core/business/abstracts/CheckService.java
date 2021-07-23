@@ -1,4 +1,4 @@
-package com.finalproject.hrmsbackend.core.business;
+package com.finalproject.hrmsbackend.core.business.abstracts;
 
 import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import org.springframework.data.repository.CrudRepository;
@@ -7,9 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 
 public interface CheckService {
-    boolean notExistsById(CrudRepository<?, Integer> dao, int id);
+    boolean notExistsById(CrudRepository<?, Integer> dao, Integer id);
 
-    boolean notExistsById(CrudRepository<?, Short> dao, short id);
+    boolean notExistsById(CrudRepository<?, Short> dao, Short id);
 
     boolean invalidLength(String value, int min, int max);
 

@@ -1,8 +1,8 @@
 import {
     Header, Grid, Menu, Input, Icon, Form, Button,
-    Item, Modal, Image, Placeholder,
+    Item, Modal,
 } from "semantic-ui-react";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
 import UserService from "../../services/userService";
@@ -24,14 +24,7 @@ export function CandidateManageAccount() {
     const [deletePopupOpen, setDeletePopupOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [activeItem, setActiveItem] = useState('email')
-    const [refresh, setRefresh] = useState(0);
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false)
-        }, 1000)
-    }, [])
+    const [refresh, setRefresh] = useState(true);
 
     const handleItemClick = (activeItem) => {
         setActiveItem(activeItem)
@@ -49,42 +42,40 @@ export function CandidateManageAccount() {
         return new Date().getFullYear() - user?.birthYear
     }
 
+    const refreshPage = () => {
+        if (refresh === true) setRefresh(false);
+        else setRefresh(true)
+    }
+
+    const handleCatch = (error) => {
+        toast.warning("An error has occurred")
+        console.log(error.response)
+        refreshPage()
+    }
+
     const handleEmailSubmit = () => {
         if (!formik.values.email) {
-            toast.warning("Please enter an email!")
+            toast.warning("Please enter an email")
             return;
         }
         formik.values.email = formik.values.email.trim()
         if (user.email === formik.values.email) {
-            toast.warning("You are already using this email!")
+            toast.warning("You are already using this email")
             return;
         } else if (formik.values.email < 4 || formik.values.email > 100 ||
             !/^\w+(\.\w+)*@[a-zA-Z]+(\.\w{2,6})+$/.test(formik.values.email)) {
-            toast.warning("Invalid email format!")
+            toast.warning("Invalid email format")
             return;
         }
         userService.existsByEmail(formik.values.email).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                if (!r.data.data) {
-                    candidateService.updateEmail(user.id, formik.values.email).then(r => {
-                        console.log(r)
-                        if (r.data.success) {
-                            dispatch(changeEmail(formik.values.email))
-                            if (refresh === 0) setRefresh(1);
-                            else setRefresh(0)
-                            toast("Saved")
-                        } else toast.warning("A problem has occurred")
-                    }).catch(reason => {
-                        console.log(reason)
-                        toast.warning("A problem has occurred while updating email")
-                    })
-                } else toast.warning("This email in use")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+            if (!r.data.data) {
+                userService.updateEmail(user.id, formik.values.email).then(() => {
+                    dispatch(changeEmail(formik.values.email))
+                    refreshPage()
+                    toast("Saved")
+                }).catch(handleCatch)
+            } else toast.warning("This email in use")
+        }).catch(handleCatch)
     }
 
     const handleCurrentPasswordSubmit = () => {
@@ -96,18 +87,12 @@ export function CandidateManageAccount() {
             toast.warning("Wrong password!")
             return;
         }
-        candidateService.existsByEmailAndPassword(user?.email, formik.values.currentPassword).then((r) => {
-            console.log(r)
-            if (r.data.success) {
-                if (r.data.data) {
-                    setIsAuthenticated(true)
-                    toast("Authentication Successful")
-                } else toast.warning("Wrong password!")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        userService.existsByEmailAndPW(user?.email, formik.values.currentPassword).then((r) => {
+            if (r.data.data) {
+                setIsAuthenticated(true)
+                toast("Authentication Successful")
+            } else toast.warning("Wrong password!")
+        }).catch(handleCatch)
     }
 
     const handlePasswordSubmit = () => {
@@ -128,17 +113,10 @@ export function CandidateManageAccount() {
             toast.warning("You are already using this password")
             return;
         }
-        candidateService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                toast("Saved")
-                formik.values.currentPassword = formik.values.password
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
-
+        userService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(() => {
+            toast("Saved")
+            formik.values.currentPassword = formik.values.password
+        }).catch(handleCatch)
     }
 
     const handleGithubLinkSubmit = () => {
@@ -155,18 +133,13 @@ export function CandidateManageAccount() {
             toast.warning("You are already using this link")
             return;
         }
-        candidateService.updateGithubAccountLink(user.id, formik.values.githubAccountLink).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeGithub(formik.values.githubAccountLink))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Saved")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        console.log(formik.values.githubAccountLink)
+        candidateService.updateGithubAccount(user.id, formik.values.githubAccountLink).then(() => {
+            console.log(formik.values.githubAccountLink)
+            dispatch(changeGithub(formik.values.githubAccountLink))
+            refreshPage()
+            toast("Saved")
+        }).catch(handleCatch)
     }
 
     const handleLinkedinLinkSubmit = () => {
@@ -183,56 +156,35 @@ export function CandidateManageAccount() {
             toast.warning("You are already using this link")
             return;
         }
-        candidateService.updateLinkedinAccount(user.id, formik.values.linkedinAccountLink).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeLinkedin(formik.values.linkedinAccountLink))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Saved")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        candidateService.updateLinkedinAccount(user.id, formik.values.linkedinAccountLink).then(() => {
+            dispatch(changeLinkedin(formik.values.linkedinAccountLink))
+            refreshPage()
+            toast("Saved")
+        }).catch(handleCatch)
     }
 
     const handleGithubLinkRemove = () => {
-        if (user.githubAccountLink == null) {
+        if (user.githubAccount == null) {
             toast.warning("Already you do not have a github link")
             return;
         }
-        candidateService.updateGithubAccountLink(user.id, null).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeGithub(null))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Removed")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        candidateService.updateGithubAccount(user.id, undefined).then(() => {
+            dispatch(changeGithub(null))
+            refreshPage()
+            toast("Removed")
+        }).catch(handleCatch)
     }
 
     const handleLinkedinLinkRemove = () => {
-        if (user.linkedinAccountLink == null) {
+        if (user.linkedinAccount == null) {
             toast.warning("Already you do not have a linkedin link")
             return;
         }
-        candidateService.updateLinkedinAccount(user.id, null).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                dispatch(changeLinkedin(null))
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-                toast("Removed")
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+        candidateService.updateLinkedinAccount(user.id, undefined).then(() => {
+            dispatch(changeLinkedin(null))
+            refreshPage()
+            toast("Removed")
+        }).catch(handleCatch)
     }
 
     const handleDeleteAccount = () => {
@@ -248,12 +200,11 @@ export function CandidateManageAccount() {
                 </Header>
                 <Modal.Actions>
                     <Button color='red' inverted size='large' onClick={() => {
-                        candidateService.deleteAccount(user.id).then(r => {
-                            console.log(r)
+                        userService.deleteById(user.id).then(() => {
                             dispatch(signOut())
                             history.push("/")
                             toast("Good Bye 👋")
-                        }).finally(() => {
+                        }).catch(handleCatch).finally(() => {
                             setDeletePopupOpen(false)
                         })
                     }}>
@@ -281,25 +232,24 @@ export function CandidateManageAccount() {
             case "password":
                 return (
                     isAuthenticated ?
-                        <Form>
-                            <Grid>
-                                <Grid.Row>
-                                    <Input icon="lock" iconPosition="left" placeholder="New Password"
-                                           type="password" value={formik.values.password}
-                                           onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                           name="password"/>
-                                </Grid.Row>
-                                <Grid.Row>
-                                    <Input icon="lock" iconPosition="left" placeholder="New Password Repeat"
-                                           type="password" value={formik.values.passwordRepeat}
-                                           onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                           name="passwordRepeat"/>
-                                </Grid.Row>
-                                <Button color="blue" style={{marginLeft: 10}}
-                                        onClick={handlePasswordSubmit} content={"Save"}>
-                                </Button>
-                            </Grid>
-                        </Form> :
+                        <div>
+                            <Form>
+                                <Input icon="lock" iconPosition="left" placeholder="New Password"
+                                       type="password" value={formik.values.password}
+                                       onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                       name="password"/>
+                            </Form>
+                            <Form style={{marginTop: 10}}>
+                                <Input icon="lock" iconPosition="left" placeholder="New Password Repeat"
+                                       type="password" value={formik.values.passwordRepeat}
+                                       onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                       name="passwordRepeat"/>
+                            </Form>
+                            <Button color="blue" style={{marginTop: 10}}
+                                    onClick={handlePasswordSubmit} content={"Save"}>
+                            </Button>
+                        </div>
+                        :
                         <Form>
                             <Input icon="lock" iconPosition="left" placeholder="Current Password"
                                    type="password" value={formik.values.currentPassword}
@@ -367,16 +317,7 @@ export function CandidateManageAccount() {
                 <Grid.Column width={8}>
                     <Item.Group unstackable>
                         <Item>
-                            {loading ?
-                                <Item.Image>
-                                    <Image circular>
-                                        <Placeholder style={{height: 175, width: 175}}>
-                                            <Placeholder.Image/>
-                                        </Placeholder>
-                                    </Image>
-                                </Item.Image> :
-                                <Item.Image src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
-                            }
+                            <Item.Image src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
                             <Item.Content verticalAlign={"middle"}>
                                 <Item.Header as='a'>
                                     <Header>
@@ -387,14 +328,14 @@ export function CandidateManageAccount() {
                                 <Item.Description>
                                     <Icon name={"envelope"}/>{"  " + user?.email}
                                 </Item.Description>
-                                {user?.linkedinAccountLink || user?.githubAccountLink ?
+                                {user?.linkedinAccount || user?.githubAccount ?
                                     <Item.Extra>
-                                        {user?.githubAccountLink ?
-                                            <a href={user.githubAccountLink}>
+                                        {user?.githubAccount ?
+                                            <a href={user.githubAccount}>
                                                 <Icon name={"github"} size="big" color={"black"}/>
                                             </a> : null}
-                                        {user?.linkedinAccountLink ?
-                                            <a href={user.linkedinAccountLink}>
+                                        {user?.linkedinAccount ?
+                                            <a href={user.linkedinAccount}>
                                                 <Icon name={"linkedin"} size="big"/>
                                             </a> : null}
                                     </Item.Extra>
@@ -454,7 +395,6 @@ export function CandidateManageAccount() {
                     </Grid>
                 </Grid.Column>
             </Grid>
-            {loading ? <Image src={"https://freesvg.org/img/abstract-user-flat-1.png"} style={{opacity: 0}}/> : null}
         </div>
     )
 }

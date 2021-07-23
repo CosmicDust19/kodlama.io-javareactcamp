@@ -1,15 +1,18 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.SkillService;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.Skill;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
+@Validated
 @RestController
 @RequestMapping("/api/skills")
 @RequiredArgsConstructor
@@ -17,14 +20,15 @@ public class SkillsController {
 
     private final SkillService skillService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(skillService.getAll());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody Skill skill) {
-        return Utils.getResponseEntity(skillService.add(skill));
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+                                 @Size(max = Utils.Const.MAX_SKILL_NAME) String skillName) {
+        return Utils.getResponseEntity(skillService.add(skillName));
     }
 
 }

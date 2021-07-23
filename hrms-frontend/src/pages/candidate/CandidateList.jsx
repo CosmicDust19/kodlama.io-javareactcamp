@@ -13,7 +13,7 @@ export default function CandidateList() {
     useEffect(() => {
         setLoading(true)
         let candidateService = new CandidateService();
-        candidateService.getCandidates().then((result) => setCandidates(result.data.data));
+        candidateService.getAll().then((result) => setCandidates(result.data.data));
         setTimeout(() => {
             setLoading(false)
         }, 1500)

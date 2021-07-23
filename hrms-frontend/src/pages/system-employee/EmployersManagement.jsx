@@ -24,11 +24,11 @@ export default function EmployersManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const [employersPerPage, setEmployersPerPage] = useState(20);
     const [employers, setEmployers] = useState([]);
-    const [refresh, setRefresh] = useState(0);
+    const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
         let employerService = new EmployerService();
-        employerService.getAllEmployers().then((result) => setEmployers(result.data.data));
+        employerService.getAll().then((result) => setEmployers(result.data.data));
     }, []);
 
     const indexOfLastEmployer = currentPage * employersPerPage
@@ -37,7 +37,7 @@ export default function EmployersManagement() {
 
     let counter = 0
     let employerOption
-    let employerCompanyNameOption = employers.map((employer) => ({
+    const employerCompanyNameOption = employers.map((employer) => ({
         key: counter++,
         text: employer.companyName,
         value: employer.id,
@@ -71,31 +71,34 @@ export default function EmployersManagement() {
         }
     });
 
+    const refreshPage = () => {
+        if (refresh === true) setRefresh(false);
+        else setRefresh(true)
+    }
+
+    const handleCatch = (error) => {
+        toast.warning("A problem has occurred")
+        console.log(error.response)
+        refreshPage()
+    }
+
     const getRowColor = (employer) => {
-        if ((employer.systemRejectionStatus === null && employer.systemVerificationStatus === false)) return "rgba(0,94,255,0.07)"
-        else if (employer.systemRejectionStatus) return "rgba(255,0,0,0.07)"
-        else if (employer.systemVerificationStatus) return "rgba(27,252,3,0.05)"
+        if ((employer.rejected === null && employer.verified === false)) return "rgba(0,94,255,0.07)"
+        else if (employer.rejected) return "rgba(255,0,0,0.07)"
+        else if (employer.verified) return "rgba(27,252,3,0.05)"
         else return "rgba(255,255,255,0.1)"
     }
 
-    const handleChangeSystemVerificationStatus = (employer, status) => {
-        employerService.updateSystemVerificationStatus(employer.id, status).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                employer.systemVerificationStatus = status
-                employer.systemRejectionStatus = !status
-                let index = filteredEmployers.findIndex((filteredEmployer) =>
-                    filteredEmployer.id === employer.id)
-                filteredEmployers[index] = employer
-                dispatch(changeFilteredEmployers(filteredEmployers))
-                toast("Success")
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+    const handleChangeVerification = (employer, status) => {
+        employerService.updateVerification(employer.id, status).then(() => {
+            employer.verified = status
+            employer.rejected = !status
+            const index = filteredEmployers.findIndex((filteredEmployer) => filteredEmployer.id === employer.id)
+            filteredEmployers[index] = employer
+            dispatch(changeFilteredEmployers(filteredEmployers))
+            toast("Successful")
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const handleEmployerInfoClick = id => {
@@ -329,19 +332,19 @@ export default function EmployersManagement() {
                                 {employer.website}
                             </Table.Cell>
                             <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
-                                {!employer.systemVerificationStatus && employer.systemRejectionStatus === null ?
+                                {!employer.verified && employer.rejected === null ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
                                         <Icon name="add user" color="blue"/>Sign Up Approval
                                     </Label> : null}
-                                {employer.updateVerificationStatus === undefined ? null :
+                                {employer.updateVerified === null || !!employer.updateVerified ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(255,113,0,0.1)"}}>
                                         <Icon name="redo alternate" color="orange"/>Update Approval
                                     </Label>}
-                                {!employer.systemVerificationStatus ? null :
+                                {!employer.verified ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(58,255,0,0.1)"}}>
                                         <Icon name="check circle outline" color="green"/>Verified
                                     </Label>}
-                                {(employer.systemVerificationStatus || !employer.systemRejectionStatus) ? null :
+                                {(employer.verified || !employer.rejected) ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
                                         <Icon name="ban" color="red"/>Rejected
                                     </Label>}
@@ -356,24 +359,24 @@ export default function EmployersManagement() {
                                             backgroundColor: "rgba(250,250,250, 0.7)",
                                             borderRadius: 10
                                         }}>
-                                        {(!employer.systemVerificationStatus && employer.systemRejectionStatus === null) ?
+                                        {(!employer.verified && employer.rejected === null) ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(employer, true)}>
+                                                onClick={() => handleChangeVerification(employer, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
                                             </Dropdown.Item> : null}
-                                        {(!employer.systemVerificationStatus && employer.systemRejectionStatus === null) ?
+                                        {(!employer.verified && employer.rejected === null) ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(employer, false)}>
+                                                onClick={() => handleChangeVerification(employer, false)}>
                                                 <Icon name="ban" color="red"/>Reject
                                             </Dropdown.Item> : null}
-                                        {!employer.systemVerificationStatus ? null :
+                                        {!employer.verified ? null :
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(employer, false)}>
+                                                onClick={() => handleChangeVerification(employer, false)}>
                                                 <Icon name="ban" color="red"/>Cancel Verification
                                             </Dropdown.Item>}
-                                        {!employer.systemRejectionStatus ? null :
+                                        {!employer.rejected ? null :
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(employer, true)}>
+                                                onClick={() => handleChangeVerification(employer, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
                                             </Dropdown.Item>}
                                         <Dropdown.Item

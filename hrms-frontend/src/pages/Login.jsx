@@ -75,24 +75,24 @@ export default function Login() {
             if (candidate && candidate !== {}) {
                 handleLogin(candidate, "candidate")
                 let jobAdvertisementService = new JobAdvertisementService();
-                jobAdvertisementService.getJobAdvertisements().then((result) => {
+                jobAdvertisementService.getPublic().then((result) => {
                     dispatch(changeFilteredJobAdverts(result.data.data))
                 })
                 history.push("/")
             } else if (employer && employer !== {}) {
                 handleLogin(employer, "employer")
                 let jobAdvertisementService = new JobAdvertisementService();
-                jobAdvertisementService.getJobAdvertisements().then((result) => {
+                jobAdvertisementService.getPublic().then((result) => {
                     dispatch(changeFilteredJobAdverts(result.data.data))
                 })
                 history.push("/")
             } else if (systemEmployee && systemEmployee !== {}) {
                 handleLogin(systemEmployee, "systemEmployee")
                 let jobAdvertisementService = new JobAdvertisementService();
-                jobAdvertisementService.getAllJobAdvertisements().then((result) =>
+                jobAdvertisementService.getAll().then((result) =>
                     dispatch(changeFilteredJobAdverts(result.data.data)))
                 let employerService = new EmployerService()
-                employerService.getAllEmployers().then(result =>
+                employerService.getAll().then(result =>
                     dispatch(changeFilteredEmployers(result.data.data)))
                 history.push("/")
             } else {

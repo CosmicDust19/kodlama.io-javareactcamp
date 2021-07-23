@@ -1,9 +1,9 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateService;
-import com.finalproject.hrmsbackend.core.abstracts.EmailService;
+import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
 import com.finalproject.hrmsbackend.core.adapters.MernisServiceAdapter;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
@@ -17,9 +17,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -44,8 +42,8 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public DataResult<Candidate> getById(int id) {
-        return new SuccessDataResult<>(candidateDao.getById(id));
+    public DataResult<Candidate> getById(int candId) {
+        return new SuccessDataResult<>(candidateDao.getById(candId));
     }
 
     @Override
@@ -65,30 +63,30 @@ public class CandidateManager implements CandidateService {
     }
 
     @Override
-    public Result updateGithubAccount(String githubAccount, int id) {
-        if (check.notExistsById(candidateDao, id)) return new ErrorResult(MSGs.FAILED.get("id"));
-        candidateDao.updateGithubAccount(githubAccount, id);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), id);
+    public Result updateGithubAccount(String githubAccount, int candId) {
+        if (check.notExistsById(candidateDao, candId)) return new ErrorResult(MSGs.NOT_EXIST.get("candId"));
+        candidateDao.updateGithubAccount(githubAccount, candId);
+        userDao.updateLastModifiedAt(LocalDateTime.now(), candId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateLinkedinAccount(String linkedinAccount, int id) {
-        if (check.notExistsById(candidateDao, id)) return new ErrorResult(MSGs.FAILED.get("id"));
-        candidateDao.updateLinkedinAccount(linkedinAccount, id);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), id);
+    public Result updateLinkedinAccount(String linkedinAccount, int candId) {
+        if (check.notExistsById(candidateDao, candId)) return new ErrorResult(MSGs.NOT_EXIST.get("candId"));
+        candidateDao.updateLinkedinAccount(linkedinAccount, candId);
+        userDao.updateLastModifiedAt(LocalDateTime.now(), candId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateFavoriteJobAdverts(int jobAdvertisementId, int id, String updateType) {
-        Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(candidateDao, id)) errors.put("id", MSGs.NOT_EXIST.get());
-        if (check.notExistsById(jobAdvertisementDao, id)) errors.put("jobAdvertisementId", MSGs.NOT_EXIST.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+    public Result updateFavoriteJobAdverts(int jobAdvertisementId, int candId, String updateType) {
+        if (check.notExistsById(candidateDao, candId))
+            return new ErrorResult(MSGs.NOT_EXIST.get("candId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvertisementId))
+            return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvertisementId"));
 
-        if (updateType.equals(Utils.UpdateType.DEL)) candidateDao.deleteJobAdvFromFavorites(jobAdvertisementId, id);
-        else candidateDao.addJobAdvToFavorites(jobAdvertisementId, id);
+        if (updateType.equals(Utils.UpdateType.DEL)) candidateDao.deleteJobAdvFromFavorites(jobAdvertisementId, candId);
+        else candidateDao.addJobAdvToFavorites(jobAdvertisementId, candId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 

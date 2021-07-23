@@ -1,4 +1,4 @@
-package com.finalproject.hrmsbackend.core.business;
+package com.finalproject.hrmsbackend.core.business.abstracts;
 
 public interface UserCheckService {
 
@@ -8,4 +8,5 @@ public interface UserCheckService {
 
     boolean invalidPhone(String phone);
 
+    boolean emailWebsiteDiffDomain(String email, String website);
 }

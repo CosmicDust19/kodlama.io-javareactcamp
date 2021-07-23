@@ -39,6 +39,13 @@ public class Utils {
         public static final int THIS_YEAR = 2021;
         public static final int MAX_JOB_ADV_WORK_MODEL = 20;
         public static final int MAX_JOB_ADV_WORK_TIME = 20;
+        public static final int MAX_CITY_NAME = 50;
+        public static final int MAX_POSITION_TITLE = 100;
+        public static final int MAX_LANGUAGE_NAME = 50;
+        public static final int MAX_SCHOOL_NAME = 100;
+        public static final int MAX_DEPARTMENT_NAME = 100;
+        public static final int MAX_SKILL_NAME = 100;
+
 
         public static final String NAT_ID_REGEXP = "\\d{11}";
         public static final String LANG_LVL_REGEXP = "[ABC][12]";
@@ -46,6 +53,9 @@ public class Utils {
         public static final String WEBSITE_REGEXP = "^(w{3}\\.)?[^.]+(\\.\\p{javaLowerCase}{2,12})+$";
         public static final String PHONE_NUM_REGEXP = "^((\\+?\\d{1,3})?0?[\\s-]?)?\\(?0?\\d{3}\\)?[\\s-]?\\d{3}[\\s-]?\\d{2}[\\s-]?\\d{2}$";
         public static final String DATE_REGEXP = "^\\d{4}-\\d{2}-\\d{2}$";
+
+        public static final String LOCALHOST_3000 = "http://localhost:3000";
+        public static final String HEROKU_APP = "https://javareactcamp-hrms-frontend.herokuapp.com";
 
     }
 

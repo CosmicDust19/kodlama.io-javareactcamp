@@ -1,4 +1,3 @@
--- WARNING!!! : SCHEMA WILL BE RESET.
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
@@ -270,6 +269,7 @@ CREATE TABLE public.candidates_cvs_schools
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_schools_candidate_school_id FOREIGN KEY (candidate_school_id)
         REFERENCES public.candidates_schools (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE public.candidates_cvs_languages
@@ -282,6 +282,7 @@ CREATE TABLE public.candidates_cvs_languages
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_languages_candidate_language_id FOREIGN KEY (candidate_language_id)
         REFERENCES public.candidates_languages (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE public.candidates_cvs_job_experiences
@@ -294,6 +295,7 @@ CREATE TABLE public.candidates_cvs_job_experiences
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_job_experiences_candidate_job_exp_id FOREIGN KEY (candidate_job_exp_id)
         REFERENCES public.candidates_job_experiences (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE public.candidates_cvs_skills
@@ -306,6 +308,7 @@ CREATE TABLE public.candidates_cvs_skills
         ON DELETE CASCADE,
     CONSTRAINT fk_candidates_cvs_skills_candidates_sk_id FOREIGN KEY (candidate_skill_id)
         REFERENCES public.candidates_skills (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE public.candidates_favorite_job_advertisements

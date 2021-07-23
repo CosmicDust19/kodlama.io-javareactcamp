@@ -1,5 +1,7 @@
-package com.finalproject.hrmsbackend.core.business;
+package com.finalproject.hrmsbackend.core.business.concretes;
 
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.UserService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -26,24 +28,25 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public Result deleteById(int id){
-        userDao.deleteById(id);
+    public Result deleteById(int userId) {
+        userDao.deleteById(userId);
         return new SuccessResult(MSGs.DELETED.get());
     }
 
     @Override
-    public Result updateEmail(String email, int id) {
-        if (check.notExistsById(userDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result updateEmail(String email, int userId) {
+        if (check.notExistsById(userDao, userId)) return new ErrorResult(MSGs.NOT_EXIST.get("userId"));
         if (userDao.existsByEmail(email)) return new ErrorResult(MSGs.IN_USE.get("email is"));
 
-        userDao.updateEmail(email, id);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), id);
+        userDao.updateEmail(email, userId);
+        userDao.updateLastModifiedAt(LocalDateTime.now(), userId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
     public Result updatePW(String password, String oldPassword, int id) {
         if (!userDao.existsByIdAndPassword(id, oldPassword)) return new ErrorResult(MSGs.WRONG.getCustom("%s oldPassword"));
+
         userDao.updatePassword(password, id);
         userDao.updateLastModifiedAt(LocalDateTime.now(), id);
         return new SuccessResult(MSGs.UPDATED.get());

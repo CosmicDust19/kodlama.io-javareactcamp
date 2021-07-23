@@ -7,6 +7,7 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CvAddDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Set;
 
 public interface CvService {
 
@@ -14,18 +15,18 @@ public interface CvService {
 
     DataResult<List<Cv>> getAll();
 
-    DataResult<Cv> getById(int id);
+    DataResult<Cv> getById(int cvId);
 
     Result add(CvAddDto cvAddDto);
 
-    Result deleteById(int id);
+    Result deleteById(int cvId);
 
-    Result updateTitle(String title, int id);
+    Result updateTitle(String title, int cvId);
 
-    Result updateCoverLetter(String coverLetter, int id);
+    Result updateCoverLetter(String coverLetter, int cvId);
 
-    Result addPropsToCv(int cvId, List<Integer> cvPropIds, JpaRepository<?, Integer> cvPropDao, String checkType, Class<?> propType);
+    Result addPropsToCv(int cvId, Set<Integer> cvPropIds, JpaRepository<?, Integer> cvPropDao, String checkType, Class<?> propType);
 
-    Result deletePropsFromCv(int cvId, List<Integer> cvPropIds, String checkType, Class<?> propType);
+    Result removePropsFromCv(int cvId, Set<Integer> cvPropIds, String checkType, Class<?> propType);
 
 }

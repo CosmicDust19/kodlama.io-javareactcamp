@@ -39,6 +39,11 @@ export default function JobAdvertisementAdd() {
             percent: prevState.percent + 11 >= 100 ? 100 : prevState.percent + 11,
         }))
 
+    const finish = () =>
+        setProgressBarState(() => ({
+            percent: 100
+        }))
+
     let jobAdvertisementService = new JobAdvertisementService();
     const JobAdvertisementAddSchema = Yup.object().shape({
         positionId: Yup.string().required("This field cannot be empty"),
@@ -47,38 +52,33 @@ export default function JobAdvertisementAdd() {
         workTime: Yup.string().required("This field cannot be empty"),
         minSalary: Yup.number().nullable().min(0, "Cannot be less than 0"),
         maxSalary: Yup.number().nullable().min(0, "Cannot be less than 0"),
-        numberOfPeopleToBeHired: Yup.string().required("This field cannot be empty").min(1, "This field cannot be less than 1"),
-        applicationDeadline: Yup.date().required("This field cannot be empty"),
+        openPositions: Yup.string().required("This field cannot be empty").min(1, "This field cannot be less than 1"),
+        deadline: Yup.date().required("This field cannot be empty"),
         jobDescription: Yup.string().required("This field cannot be empty")
     });
 
     const formik = useFormik({
         initialValues: {
-            jobDescription: "", positionId: "", workTime: "",
-            workModel: "", numberOfPeopleToBeHired: "", cityId: "",
-            minSalary: "", maxSalary: "", applicationDeadline: "",
+            employerId: userProps.user?.id, jobDescription: "", positionId: "", workTime: "",
+            workModel: "", openPositions: "", cityId: "",
+            minSalary: "", maxSalary: "", deadline: "",
         },
         validationSchema: JobAdvertisementAddSchema,
         onSubmit: (values) => {
             let counter = 0
-            values.employerId = userProps.user?.id;
-            formik.values.position = {id: formik.values.positionId}
-            formik.values.city = {id: formik.values.cityId}
             if (values.minSalary && values.maxSalary && Number(values.minSalary) > Number(values.maxSalary)) {
                 toast.warning("Minimum salary cannot be bigger than maximum salary")
                 counter++
             }
-            if (new Date(values.applicationDeadline).getTime() < new Date().getTime()) {
-                toast.warning("Application deadline should be a date in the future")
+            if (new Date(values.deadline).getTime() < new Date().getTime()) {
+                toast.warning("Deadline should be a date in the future")
                 counter++
             }
             if (counter === 0) {
                 jobAdvertisementService.add(values).then((result) => {
                     console.log(result)
                     toast("Your advertisement received, it will be published after confirmation")
-                    increment()
-                    increment()
-                    increment()
+                    finish()
                 }).catch(reason => {
                     console.log(reason)
                     toast.warning("A problem has occurred", {
@@ -89,7 +89,7 @@ export default function JobAdvertisementAdd() {
                     })
                 })
             }
-        },
+        }
     });
 
     useEffect(() => {
@@ -106,10 +106,10 @@ export default function JobAdvertisementAdd() {
         value: workTime,
     }));
 
-    const workModalOption = workModels.map((workModal, index) => ({
+    const workModelOption = workModels.map((workModel, index) => ({
         key: index,
-        text: workModal,
-        value: workModal,
+        text: workModel,
+        value: workModel,
     }));
 
     const cityOption = cities.map((city, index) => ({
@@ -150,7 +150,7 @@ export default function JobAdvertisementAdd() {
                     setIs1stTimeWorkTime(false)
                 }
                 break;
-            case "numberOfPeopleToBeHired":
+            case "openPositions":
                 if (is1stTimeHired) {
                     increment()
                     setIs1stTimeHired(false)
@@ -174,7 +174,7 @@ export default function JobAdvertisementAdd() {
                     setIs1stJobDesc(false)
                 }
                 break;
-            case "applicationDeadline":
+            case "deadline":
                 if (is1stTimeDeadline) {
                     increment()
                     setIs1stDeadline(false)
@@ -210,7 +210,6 @@ export default function JobAdvertisementAdd() {
                                               onChange={(event, data) => {
                                                   handleChange("positionId", data.value)
                                               }}
-                                              onBlur={formik.handleBlur} id="id"
                                               value={formik.values.positionId} options={positionOption}
                                     />
                                     {formik.errors.positionId && formik.touched.positionId && (
@@ -223,9 +222,7 @@ export default function JobAdvertisementAdd() {
                                     <Dropdown clearable item placeholder="Select a city" search selection
                                               onChange={(event, data) => {
                                                   handleChange("cityId", data.value)
-                                              }}
-                                              onBlur={formik.handleBlur} id="id" value={formik.values.cityId}
-                                              options={cityOption}
+                                              }} value={formik.values.cityId} options={cityOption}
                                     />
                                     {formik.errors.cityId && formik.touched.cityId && (
                                         <div className={"ui pointing red basic label"}>
@@ -237,9 +234,7 @@ export default function JobAdvertisementAdd() {
                                     <Dropdown clearable item placeholder="Enter Work Model" search selection
                                               onChange={(event, data) => {
                                                   handleChange("workModel", data.value)
-                                              }}
-                                              onBlur={formik.handleBlur} id="workModel"
-                                              value={formik.values.workModel} options={workModalOption}
+                                              }} value={formik.values.workModel} options={workModelOption}
                                     />
                                     {formik.errors.workModel && formik.touched.workModel && (
                                         <div className={"ui pointing red basic label"}>
@@ -248,8 +243,7 @@ export default function JobAdvertisementAdd() {
                                     )}
                                 </GridColumn>
                                 <GridColumn width={4}>
-                                    <Dropdown clearable item placeholder="Enter Work Time" search selection
-                                              onBlur={formik.handleBlur} id="workTime" openOnFocus
+                                    <Dropdown clearable item placeholder="Enter Work Time" search selection openOnFocus
                                               value={formik.values.workTime} options={workTimeOption}
                                               onChange={(event, data) => {
                                                   handleChange("workTime", data.value)
@@ -264,33 +258,25 @@ export default function JobAdvertisementAdd() {
                         <Form.Field>
                             <Grid stackable>
                                 <Grid.Column width={8}>
-                                    <Input style={{width: "89%"}}
-                                           id="numberOfPeopleToBeHired" name="numberOfPeopleToBeHired"
-                                           error={Boolean(formik.errors.numberOfPeopleToBeHired)}
+                                    <Input style={{width: "89%"}} name="openPositions"
                                            onChange={(event, data) => {
-                                               handleChange("numberOfPeopleToBeHired", data.value)
-                                           }} value={formik.values.numberOfPeopleToBeHired}
-                                           onBlur={formik.handleBlur} type="number"
-                                           placeholder="Enter the number of people to be hired"
+                                               handleChange("openPositions", data.value)
+                                           }} value={formik.values.openPositions} type="number"
+                                           placeholder="Enter Open Positions"
                                     />
-                                    {formik.errors.numberOfPeopleToBeHired && formik.touched.numberOfPeopleToBeHired && (
+                                    {formik.errors.openPositions && formik.touched.openPositions && (
                                         <div className={"ui pointing red basic label"}>
-                                            {formik.errors.numberOfPeopleToBeHired}
+                                            {formik.errors.openPositions}
                                         </div>
                                     )}
                                 </Grid.Column>
                                 <Grid.Column width={4}>
                                     <Input
-                                        style={{width: "78%"}}
-                                        type="number"
-                                        placeholder="Enter Minimum Salary"
-                                        value={formik.values.minSalary}
-                                        error={Boolean(formik.errors.minSalary)}
-                                        name="minSalary"
+                                        style={{width: "78%"}} type="number" placeholder="Enter Minimum Salary"
+                                        value={formik.values.minSalary} error={Boolean(formik.errors.minSalary)} name="minSalary"
                                         onChange={(event, data) => {
                                             handleChange("minSalary", data.value)
                                         }}
-                                        onBlur={formik.handleBlur}
                                     />
                                     {formik.errors.minSalary && formik.touched.minSalary && (
                                         <div className={"ui pointing red basic label"}>
@@ -300,16 +286,11 @@ export default function JobAdvertisementAdd() {
                                 </Grid.Column>
                                 <Grid.Column width={4}>
                                     <Input
-                                        style={{width: "78%"}}
-                                        type="number"
-                                        placeholder="Enter Maximum Salary"
-                                        value={formik.values.maxSalary}
-                                        error={Boolean(formik.errors.maxSalary)}
-                                        name="maxSalary"
+                                        style={{width: "78%"}} type="number" placeholder="Enter Maximum Salary"
+                                        value={formik.values.maxSalary} error={Boolean(formik.errors.maxSalary)} name="maxSalary"
                                         onChange={(event, data) => {
                                             handleChange("maxSalary", data.value)
                                         }}
-                                        onBlur={formik.handleBlur}
                                     />
                                     {formik.errors.maxSalary && formik.touched.maxSalary && (
                                         <div className={"ui pointing red basic label"}>
@@ -324,14 +305,11 @@ export default function JobAdvertisementAdd() {
                                 <Grid.Column width={12}>
                                     <label style={{fontWeight: "bold"}}>Job Description</label>
                                     <TextArea
-                                        placeholder="Enter Job Description"
-                                        style={{minHeight: 300, maxWidth: 762}}
-                                        value={formik.values.jobDescription}
-                                        name="jobDescription"
+                                        placeholder="Enter Job Description" style={{minHeight: 300, maxWidth: 762}}
+                                        value={formik.values.jobDescription} name="jobDescription"
                                         onChange={(event, data) => {
                                             handleChange("jobDescription", data.value)
                                         }}
-                                        onBlur={formik.handleBlur}
                                     />
                                     {formik.errors.jobDescription && formik.touched.jobDescription && (
                                         <div className={"ui pointing red basic label"}>
@@ -340,25 +318,22 @@ export default function JobAdvertisementAdd() {
                                     )}
                                 </Grid.Column>
                                 <Grid.Column width={4}>
-                                    <label style={{fontWeight: "bold"}}>Application Deadline</label>
+                                    <label style={{fontWeight: "bold"}}>Deadline</label>
                                     <Input
-                                        style={{width: "78%"}} type="date"
-                                        error={Boolean(formik.errors.applicationDeadline)}
+                                        style={{width: "78%"}} type="date" error={Boolean(formik.errors.deadline)}
                                         onChange={(event, data) =>
-                                            handleChange("applicationDeadline", data.value)
-                                        }
-                                        value={formik.values.applicationDeadline} onBlur={formik.handleBlur}
-                                        name="applicationDeadline"
+                                            handleChange("deadline", data.value)
+                                        } value={formik.values.deadline} name="deadline"
                                     />
-                                    {formik.errors.applicationDeadline && formik.touched.applicationDeadline && (
+                                    {formik.errors.deadline && formik.touched.deadline && (
                                         <div className={"ui pointing red basic label"}>
-                                            {formik.errors.applicationDeadline}
+                                            {formik.errors.deadline}
                                         </div>
                                     )}
                                 </Grid.Column>
                             </Grid>
                         </Form.Field>
-                        <Button animated="fade" positive type="submit" size="large">
+                        <Button animated="fade" positive type="submit" size="large" onClick={() => {console.log(formik.values)}}>
                             <Button.Content hidden><Icon name='checkmark'/></Button.Content>
                             <Button.Content visible>Post</Button.Content>
                         </Button>

@@ -56,10 +56,10 @@ export default function JobAdvertisementDetail() {
         return `between ${jobAdvertisement.minSalary} ~ ${jobAdvertisement.maxSalary}$`;
     }
 
-    let remainedDays = Math.round((new Date(jobAdvertisement.applicationDeadline).getTime() - new Date().getTime()) / 86400000)
+    let remainedDays = Math.round((new Date(jobAdvertisement.deadline).getTime() - new Date().getTime()) / 86400000)
 
     const handleAddToFavorites = () => {
-        candidateService.addJobAdvertisementToFavorites(user.id, jobAdvertisement.id).then(r => {
+        candidateService.addJobAdvToFavorites(user.id, jobAdvertisement.id).then(r => {
             console.log(r)
             if (r.data.success) {
                 user.favoriteJobAdvertisements.push(jobAdvertisement)
@@ -75,7 +75,7 @@ export default function JobAdvertisementDetail() {
     }
 
     const handleDeleteFromFavorites = () => {
-        candidateService.deleteJobAdvertisementToFavorites(user.id, jobAdvertisement.id).then(r => {
+        candidateService.removeJobAdvFromFavorites(user.id, jobAdvertisement.id).then(r => {
             console.log(r)
             if (r.data.success) {
                 let index = user.favoriteJobAdvertisements.findIndex((jobAdvertisement2) => {
@@ -120,27 +120,27 @@ export default function JobAdvertisementDetail() {
                                     }}/>) : null}
                             {String(userProps.userType) === "systemEmployee" ?
                                 <div>
-                                    {!jobAdvertisement.systemVerificationStatus && jobAdvertisement.systemRejectionStatus === null ?
+                                    {!jobAdvertisement.verified && jobAdvertisement.rejected === null ?
                                         <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
                                             <Icon name="bullhorn" color="blue"/>Release Approval
                                         </Label> : null}
-                                    {jobAdvertisement.updateVerificationStatus === undefined ? null :
+                                    {jobAdvertisement.updateVerified === undefined ? null :
                                         <Label style={{marginTop: 10, backgroundColor: "rgba(255,113,0,0.1)"}}>
                                             <Icon name="redo alternate" color="orange"/>Update Approval
                                         </Label>}
-                                    {!jobAdvertisement.systemVerificationStatus ? null :
+                                    {!jobAdvertisement.verified ? null :
                                         <Label style={{marginTop: 10, backgroundColor: "rgba(58,255,0,0.1)"}}>
                                             <Icon name="check circle outline" color="green"/>Verified
                                         </Label>}
-                                    {(jobAdvertisement.systemVerificationStatus || !jobAdvertisement.systemRejectionStatus) ? null :
+                                    {(jobAdvertisement.verified || !jobAdvertisement.rejected) ? null :
                                         <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
                                             <Icon name="ban" color="red"/>Rejected
                                         </Label>}
-                                    {!jobAdvertisement.activationStatus ? null :
+                                    {!jobAdvertisement.active ? null :
                                         <Label style={{marginTop: 10, backgroundColor: "rgba(57,255,0,0.1)"}}>
                                             <Icon name="checkmark" color="green"/>Active
                                         </Label>}
-                                    {jobAdvertisement.activationStatus ? null :
+                                    {jobAdvertisement.active ? null :
                                         <Label style={{marginTop: 10, backgroundColor: "rgba(76,16,11,0.1)"}}>
                                             <Icon name="minus circle" color="brown"/>Inactive
                                         </Label>}
@@ -164,16 +164,16 @@ export default function JobAdvertisementDetail() {
                     </Card.Content> : null}
 
                 <Card.Content>Application deadline
-                    | {" " + new Date(jobAdvertisement.applicationDeadline).getDate() + " " +
-                    months[new Date(jobAdvertisement.applicationDeadline).getMonth()] + " " +
-                    new Date(jobAdvertisement.applicationDeadline).getFullYear()} |
+                    | {" " + new Date(jobAdvertisement.deadline).getDate() + " " +
+                    months[new Date(jobAdvertisement.deadline).getMonth()] + " " +
+                    new Date(jobAdvertisement.deadline).getFullYear()} |
                     Remained {remainedDays} {(remainedDays > 1) ? "days" : "day"}
                 </Card.Content>
 
                 <Card.Content>
                     <Grid>
                         <Grid.Column width={8}>
-                            Number of candidates to be hired |{" " + jobAdvertisement.numberOfPeopleToBeHired}
+                            Open Positions |{" " + jobAdvertisement.openPositions}
                         </Grid.Column>
                         <Grid.Column width={8} textAlign={"right"}>Created at
                             {" " + new Date(jobAdvertisement.createdAt).getDate() + " " +
@@ -206,7 +206,7 @@ export default function JobAdvertisementDetail() {
                     <Table compact celled>
 
                         <Table.Header>
-                            {(jobAdvertisement.employer?.systemVerificationStatus || !jobAdvertisement.employer?.systemRejectionStatus) ? null :
+                            {(jobAdvertisement.employer?.verified || !jobAdvertisement.employer?.rejected) ? null :
                                 <Label style={{marginRight: -90, marginTop: -7,backgroundColor: "rgba(226,14,14,0.22)"}} attached={"top right"} ribbon={"right"}>
                                     <Icon name="ban" color="red"/>Rejected
                                 </Label>}

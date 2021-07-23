@@ -13,26 +13,26 @@ public interface EmployerService {
 
     DataResult<Boolean> existsByWebsite(String website);
 
-    DataResult<Employer> getById(int id);
+    DataResult<Employer> getById(int emplId);
 
     DataResult<Employer> getByEmailAndPW(String email, String password);
 
     DataResult<List<Employer>> getAll();
 
-    DataResult<List<Employer>> getAllVerified();
+    DataResult<List<Employer>> getVerified();
 
-    DataResult<List<Employer>> getAllUnverified();
+    DataResult<List<Employer>> getUnverified();
 
     Result add(EmployerAddDto employerAddDto);
 
-    Result updateCompanyName(String companyName, int id);
+    Result updateCompanyName(String companyName, int emplId);
 
-    Result updateEmailAndWebsite(String website, String email, int id);
+    Result updateEmailAndWebsite(String website, String email, int emplId);
 
-    Result updatePhoneNumber(String phoneNumber, int id);
+    Result updatePhoneNumber(String phoneNumber, int emplId);
 
-    Result applyUpdates(int empId);
+    Result applyChanges(int emplId);
 
-    Result updateVerification(boolean systemVerificationStatus, int id);
+    Result updateVerification(boolean systemVerificationStatus, int emplId);
 
 }

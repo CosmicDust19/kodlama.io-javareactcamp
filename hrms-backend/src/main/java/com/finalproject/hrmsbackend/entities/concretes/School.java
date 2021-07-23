@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +21,6 @@ public class School implements BaseEntity<Integer> {
     @Column(name = "id")
     private Integer id;
 
-    @NotBlank(message = "Empty")
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
@@ -30,4 +28,7 @@ public class School implements BaseEntity<Integer> {
         this.id = id;
     }
 
+    public School(String name) {
+        this.name = name;
+    }
 }

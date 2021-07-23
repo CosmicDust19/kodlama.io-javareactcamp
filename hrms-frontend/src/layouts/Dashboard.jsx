@@ -16,14 +16,15 @@ import {useSelector} from "react-redux";
 import EmployerList from "../pages/employer/EmployerList";
 import {CandidateManageAccount} from "../pages/candidate/CandidateManageAccount"
 import {CandidateManageCvs} from "../pages/candidate/CandidateManageCVs"
-import {EmployerAccount, EmployerAdverts} from "../pages/employer/EmployerOperations";
 import {SignUpCandidate} from "../pages/SignUpCandidate";
 import {SignUpEmployer} from "../pages/SignUpEmployer";
 import {SignUpSystemEmployee} from "../pages/SignUpSystemEmployee";
-import {CandidateManageMe} from "../pages/candidate/CandidateManageMe";
+import {CandidateManageProfile} from "../pages/candidate/CandidateManageProfile";
 import {SystemEmployeeManageAccount} from "../pages/system-employee/SystemEmployeeManageAccount";
 import JobAdvertisementsManagement from "../pages/system-employee/JobAdvertisementsManagement";
 import EmployersManagement from "../pages/system-employee/EmployersManagement";
+import {EmployerManageAccount} from "../pages/employer/EmployerManageAccount";
+import {EmployerAdverts} from "../pages/employer/EmployerManageAdverts";
 
 export default function Dashboard() {
 
@@ -52,11 +53,11 @@ export default function Dashboard() {
                     <Route exact path="/signUpCandidate" component={SignUpCandidate}/>
                     <Route exact path="/candidateManageAccount" component={CandidateManageAccount}/>
                     <Route exact path="/candidateManageCVs" component={CandidateManageCvs}/>
-                    <Route exact path="/candidateManageMe" component={CandidateManageMe}/>
+                    <Route exact path="/candidateManageProfile" component={CandidateManageProfile}/>
                     <Route exact path="/employers" component={EmployerList}/>
                     <Route path="/employers/:id" component={EmployerDetail}/>
                     <Route exact path="/signUpEmployer" component={SignUpEmployer}/>
-                    <Route exact path="/employerAccount" component={EmployerAccount}/>
+                    <Route exact path="/employerManageAccount" component={EmployerManageAccount}/>
                     <Route exact path="/employerJobAdverts" component={EmployerAdverts}/>
                     <Route exact path="/employersManagement" component={EmployersManagement}/>
                     <Route exact path="/jobAdvertisements" component={JobAdvertisementsList}/>

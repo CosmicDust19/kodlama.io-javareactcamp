@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
 @Validated
 @RestController
 @RequestMapping("/api/candidateSchools")
@@ -21,14 +21,14 @@ public class CandidateSchoolsController {
 
     private final CandidateSchoolService candidateSchoolService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(candidateSchoolService.getAll());
     }
 
-    @GetMapping("/getAllByGradYear")
-    public ResponseEntity<?> getAllByGradYear(Short sortDirection) {
-        return Utils.getResponseEntity(candidateSchoolService.getAllByGradYear(sortDirection));
+    @GetMapping("/get/byGradYear")
+    public ResponseEntity<?> getByGradYear(@RequestParam(required = false) Short sortDirection) {
+        return Utils.getResponseEntity(candidateSchoolService.getByGradYear(sortDirection));
     }
 
     @PostMapping("/add")
@@ -36,33 +36,33 @@ public class CandidateSchoolsController {
         return Utils.getResponseEntity(candidateSchoolService.add(candidateSchoolAddDto));
     }
 
-    @DeleteMapping(value = "/deleteById")
-    public ResponseEntity<?> deleteById(@RequestParam int id) {
-        return Utils.getResponseEntity(candidateSchoolService.deleteById(id));
+    @DeleteMapping(value = "/delete/byId")
+    public ResponseEntity<?> deleteById(@RequestParam int candSchId) {
+        return Utils.getResponseEntity(candidateSchoolService.deleteById(candSchId));
     }
 
-    @PutMapping(value = "/updateSchool")
-    public ResponseEntity<?> updateSchool(@RequestParam int schoolId, @RequestParam int id) {
-        return Utils.getResponseEntity(candidateSchoolService.updateSchool(schoolId, id));
+    @PutMapping(value = "/update/school")
+    public ResponseEntity<?> updateSchool(@RequestParam int schoolId, @RequestParam int candSchId) {
+        return Utils.getResponseEntity(candidateSchoolService.updateSchool(schoolId, candSchId));
     }
 
-    @PutMapping(value = "/updateDepartment")
-    public ResponseEntity<?> updateDepartment(@RequestParam short departmentId, @RequestParam int id) {
-        return Utils.getResponseEntity(candidateSchoolService.updateDepartment(departmentId, id));
+    @PutMapping(value = "/update/department")
+    public ResponseEntity<?> updateDepartment(@RequestParam short departmentId, @RequestParam int candSchId) {
+        return Utils.getResponseEntity(candidateSchoolService.updateDepartment(departmentId, candSchId));
     }
 
-    @PutMapping(value = "/updateStartYear")
+    @PutMapping(value = "/update/startYear")
     public ResponseEntity<?> updateStartYear(@RequestParam @Min(value = Utils.Const.MIN_YEAR)
                                              @Max(value = Utils.Const.THIS_YEAR) short startYear,
-                                             @RequestParam int id) {
-        return Utils.getResponseEntity(candidateSchoolService.updateStartYear(startYear, id));
+                                             @RequestParam int candSchId) {
+        return Utils.getResponseEntity(candidateSchoolService.updateStartYear(startYear, candSchId));
     }
 
-    @PutMapping(value = "/updateGradYear")
+    @PutMapping(value = "/update/gradYear")
     public ResponseEntity<?> updateGradYear(@RequestParam(required = false) @Min(value = Utils.Const.MIN_YEAR)
                                             @Max(value = Utils.Const.THIS_YEAR) Short graduationYear,
-                                            @RequestParam int id) {
-        return Utils.getResponseEntity(candidateSchoolService.updateGradYear(graduationYear, id));
+                                            @RequestParam int candSchId) {
+        return Utils.getResponseEntity(candidateSchoolService.updateGradYear(graduationYear, candSchId));
     }
 
 }

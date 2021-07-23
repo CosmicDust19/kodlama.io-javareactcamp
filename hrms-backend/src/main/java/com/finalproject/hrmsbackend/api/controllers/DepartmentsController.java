@@ -1,15 +1,18 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.DepartmentService;
+import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.Department;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
+@Validated
 @RestController
 @RequestMapping("/api/departments")
 @RequiredArgsConstructor
@@ -17,14 +20,15 @@ public class DepartmentsController {
 
     private final DepartmentService departmentService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(departmentService.getAll());
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody Department department) {
-        return Utils.getResponseEntity(departmentService.add(department));
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+                                 @Size(max = Utils.Const.MAX_DEPARTMENT_NAME) String departmentName) {
+        return Utils.getResponseEntity(departmentService.add(departmentName));
     }
 
 }

@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.SystemEmployeeService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -30,8 +30,8 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     }
 
     @Override
-    public DataResult<SystemEmployee> getById(int id) {
-        return new SuccessDataResult<>(systemEmployeeDao.getById(id));
+    public DataResult<SystemEmployee> getById(int sysEmplId) {
+        return new SuccessDataResult<>(systemEmployeeDao.getById(sysEmplId));
     }
 
     @Override
@@ -47,20 +47,20 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     }
 
     @Override
-    public Result updateFirstName(String firstName, int id) {
-        if (check.notExistsById(systemEmployeeDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result updateFirstName(String firstName, int sysEmplId) {
+        if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(MSGs.NOT_EXIST.get("sysEmplId"));
 
-        systemEmployeeDao.updateFirstName(firstName, id);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), id);
+        systemEmployeeDao.updateFirstName(firstName, sysEmplId);
+        userDao.updateLastModifiedAt(LocalDateTime.now(), sysEmplId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateLastName(String lastName, int id) {
-        if (check.notExistsById(systemEmployeeDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
+    public Result updateLastName(String lastName, int sysEmplId) {
+        if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(MSGs.NOT_EXIST.get("sysEmplId"));
 
-        systemEmployeeDao.updateLastName(lastName, id);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), id);
+        systemEmployeeDao.updateLastName(lastName, sysEmplId);
+        userDao.updateLastModifiedAt(LocalDateTime.now(), sysEmplId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 

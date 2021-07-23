@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CityService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CityDao;
@@ -24,10 +24,9 @@ public class CityManager implements CityService {
     }
 
     @Override
-    public Result add(City city) {
-        if (city.getName() != null) city.setName(city.getName().trim());
-        if (check.invalidLength(city.getName(), 0, 50)) return new ErrorResult(MSGs.INVALID.get("cityName"));
-        cityDao.save(city);
+    public Result add(String cityName) {
+        cityDao.save(new City(cityName));
         return new SuccessResult(MSGs.SAVED.get());
     }
+
 }

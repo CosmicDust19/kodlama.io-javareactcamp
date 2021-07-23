@@ -31,4 +31,13 @@ public class ApiError {
         this.errors = errors;
         this.details = details;
     }
+
+    public ApiError(HttpStatus httpStatus, String message, Map<?, ?> errors, Set<?> details) {
+        this.timestamp = LocalDateTime.now();
+        this.status = httpStatus;
+        this.message = message;
+        this.errors = errors;
+        this.details = details;
+    }
+
 }

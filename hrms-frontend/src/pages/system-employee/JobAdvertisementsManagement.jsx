@@ -32,7 +32,7 @@ export default function JobAdvertisementsManagement() {
     const [workTimes] = useState(["Part Time", "Full Time"]);
     const [workModels] = useState(["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]);
     const [jobAdvertisements, setJobAdvertisements] = useState([]);
-    const [refresh, setRefresh] = useState(0);
+    const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
         let cityService = new CityService();
@@ -40,8 +40,8 @@ export default function JobAdvertisementsManagement() {
         let employerService = new EmployerService();
         cityService.getCities().then((result) => setCities(result.data.data));
         positionService.getPositions().then((result) => setPositions(result.data.data));
-        employerService.getAllEmployers().then((result) => setEmployers(result.data.data));
-        jobAdvertisementService.getAllJobAdvertisements().then((result) => {
+        employerService.getAll().then((result) => setEmployers(result.data.data));
+        jobAdvertisementService.getAll().then((result) => {
             setJobAdvertisements(result.data.data)
         });
     }, []);
@@ -101,8 +101,19 @@ export default function JobAdvertisementsManagement() {
         }
     });
 
+    const refreshPage = () => {
+        if (refresh === true) setRefresh(false);
+        else setRefresh(true)
+    }
+
+    const handleCatch = (error) => {
+        toast.warning("A problem has occurred")
+        console.log(error.response)
+        refreshPage()
+    }
+
     const getRemainedDays = (jobAdvertisement) => {
-        let remainedDays = Math.floor((new Date(jobAdvertisement.applicationDeadline).getTime() - new Date().getTime()) / 86400000) + 1
+        let remainedDays = Math.floor((new Date(jobAdvertisement.deadline).getTime() - new Date().getTime()) / 86400000) + 1
         if (remainedDays <= 0)
             return <font style={{color: "rgba(123,12,219,0.96)"}}>Expired</font>
         else if (remainedDays === 1)
@@ -113,32 +124,24 @@ export default function JobAdvertisementsManagement() {
     }
 
     const getRowColor = (jobAdvertisement) => {
-        if ((jobAdvertisement.systemRejectionStatus === null && jobAdvertisement.systemVerificationStatus === false)) return "rgba(0,94,255,0.07)"
-        else if (jobAdvertisement.systemRejectionStatus) return "rgba(255,0,0,0.07)"
-        else if (Math.floor((new Date(jobAdvertisement.applicationDeadline).getTime() - new Date().getTime()) / 86400000) + 1 <= 0) return "rgba(200,0,255,0.05)"
-        else if (!jobAdvertisement.activationStatus) return "rgba(80,39,39,0.07)"
-        else if (jobAdvertisement.systemVerificationStatus) return "rgba(27,252,3,0.05)"
+        if ((jobAdvertisement.rejected === null && jobAdvertisement.verified === false)) return "rgba(0,94,255,0.07)"
+        else if (jobAdvertisement.rejected) return "rgba(255,0,0,0.07)"
+        else if (Math.floor((new Date(jobAdvertisement.deadline).getTime() - new Date().getTime()) / 86400000) + 1 <= 0) return "rgba(200,0,255,0.05)"
+        else if (!jobAdvertisement.active) return "rgba(80,39,39,0.07)"
+        else if (jobAdvertisement.verified) return "rgba(27,252,3,0.05)"
         else return "rgba(255,255,255,0.1)"
     }
 
-    const handleChangeSystemVerificationStatus = (jobAdvertisement, status) => {
-        jobAdvertisementService.updateSystemVerificationStatus(jobAdvertisement.id, status).then(r => {
-            console.log(r)
-            if (r.data.success) {
-                jobAdvertisement.systemVerificationStatus = status
-                jobAdvertisement.systemRejectionStatus = !status
-                let index = filteredJobAdvertisements.findIndex((filteredJobAdvertisement) =>
-                    filteredJobAdvertisement.id === jobAdvertisement.id)
-                filteredJobAdvertisements[index] = jobAdvertisement
-                dispatch(changeFilteredJobAdverts(filteredJobAdvertisements))
-                toast("Success")
-                if (refresh === 0) setRefresh(1);
-                else setRefresh(0)
-            } else toast.warning("A problem has occurred")
-        }).catch(reason => {
-            console.log(reason)
-            toast.warning("A problem has occurred")
-        })
+    const handleChangeVerification = (jobAdvertisement, status) => {
+        jobAdvertisementService.updateVerification(jobAdvertisement.id, status).then(() => {
+            jobAdvertisement.verified = status
+            jobAdvertisement.rejected = !status
+            const index = filteredJobAdvertisements.findIndex((filteredJobAdv) => filteredJobAdv.id === jobAdvertisement.id)
+            filteredJobAdvertisements[index] = jobAdvertisement
+            dispatch(changeFilteredJobAdverts(filteredJobAdvertisements))
+            toast("Successful")
+            refreshPage()
+        }).catch(handleCatch)
     }
 
     const handleAdvertisementInfoClick = id => {
@@ -516,6 +519,7 @@ export default function JobAdvertisementsManagement() {
             )
         }
 
+
         return (
             <Table>
                 <Table.Body>
@@ -534,35 +538,35 @@ export default function JobAdvertisementsManagement() {
                                 {getRemainedDays(jobAdvertisement)}
                             </Table.Cell>
                             <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
-                                {!jobAdvertisement.systemVerificationStatus && jobAdvertisement.systemRejectionStatus === null ?
+                                {!jobAdvertisement.verified && jobAdvertisement.rejected === null ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
                                         <Icon name="bullhorn" color="blue"/>Release Approval
                                     </Label> : null}
-                                {jobAdvertisement.updateVerificationStatus === undefined ? null :
+                                {jobAdvertisement.updateVerified === null || !!jobAdvertisement.updateVerified ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(255,113,0,0.1)"}}>
                                         <Icon name="redo alternate" color="orange"/>Update Approval
                                     </Label>}
-                                {!jobAdvertisement.systemVerificationStatus ? null :
+                                {!jobAdvertisement.verified ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(58,255,0,0.1)"}}>
                                         <Icon name="check circle outline" color="green"/>Verified
                                     </Label>}
-                                {(jobAdvertisement.systemVerificationStatus || !jobAdvertisement.systemRejectionStatus) ? null :
+                                {(jobAdvertisement.verified || !jobAdvertisement.rejected) ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
                                         <Icon name="ban" color="red"/>Rejected
                                     </Label>}
-                                {!jobAdvertisement.activationStatus ? null :
+                                {!jobAdvertisement.active ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(57,255,0,0.1)"}}>
                                         <Icon name="checkmark" color="green"/>Active
                                     </Label>}
-                                {jobAdvertisement.activationStatus ? null :
+                                {!!jobAdvertisement.active ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(76,16,11,0.1)"}}>
                                         <Icon name="minus circle" color="brown"/>Inactive
                                     </Label>}
-                                {!jobAdvertisement.employer?.systemVerificationStatus && jobAdvertisement.employer?.systemRejectionStatus === null ?
+                                {!jobAdvertisement.employer?.verified && jobAdvertisement.employer?.verified === null ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
                                         <Icon name="user plus" color="blue"/>Sign Up Approval
                                     </Label> : null}
-                                {(jobAdvertisement.employer?.systemVerificationStatus || !jobAdvertisement.employer?.systemRejectionStatus) ? null :
+                                {(jobAdvertisement.employer?.verified || !jobAdvertisement.employer?.verified) ? null :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
                                         <Icon name="ban" color="red"/> Employer Rejected
                                     </Label>}
@@ -577,24 +581,24 @@ export default function JobAdvertisementsManagement() {
                                             backgroundColor: "rgba(250,250,250, 0.7)",
                                             borderRadius: 10
                                         }}>
-                                        {(!jobAdvertisement.systemVerificationStatus && jobAdvertisement.systemRejectionStatus === null) ?
+                                        {(!jobAdvertisement.verified && jobAdvertisement.rejected === null) ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(jobAdvertisement, true)}>
+                                                onClick={() => handleChangeVerification(jobAdvertisement, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
                                             </Dropdown.Item> : null}
-                                        {(!jobAdvertisement.systemVerificationStatus && jobAdvertisement.systemRejectionStatus === null) ?
+                                        {(!jobAdvertisement.verified && jobAdvertisement.rejected === null) ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(jobAdvertisement, false)}>
+                                                onClick={() => handleChangeVerification(jobAdvertisement, false)}>
                                                 <Icon name="ban" color="red"/>Reject
                                             </Dropdown.Item> : null}
-                                        {!jobAdvertisement.systemVerificationStatus ? null :
+                                        {!jobAdvertisement.verified ? null :
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(jobAdvertisement, false)}>
+                                                onClick={() => handleChangeVerification(jobAdvertisement, false)}>
                                                 <Icon name="ban" color="red"/>Cancel Verification
                                             </Dropdown.Item>}
-                                        {!jobAdvertisement.systemRejectionStatus ? null :
+                                        {jobAdvertisement.verified ? null :
                                             <Dropdown.Item
-                                                onClick={() => handleChangeSystemVerificationStatus(jobAdvertisement, true)}>
+                                                onClick={() => handleChangeVerification(jobAdvertisement, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
                                             </Dropdown.Item>}
                                         <Dropdown.Item

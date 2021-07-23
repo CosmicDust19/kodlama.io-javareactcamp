@@ -1,5 +1,6 @@
-package com.finalproject.hrmsbackend.core.business;
+package com.finalproject.hrmsbackend.core.business.concretes;
 
+import com.finalproject.hrmsbackend.core.business.abstracts.UserCheckService;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,13 @@ public class UserCheckManager implements UserCheckService {
     @Override
     public boolean invalidPhone(String phone) {
         return phone == null || phone.length() <= 9 || phone.length() >= 23 || !Pattern.matches(Utils.Const.PHONE_NUM_REGEXP, phone);
+    }
+
+    @Override
+    public boolean emailWebsiteDiffDomain(String email, String website) {
+        if (email == null || website == null) return true;
+        String emailDomain = email.substring(email.indexOf("@") + 1);
+        return !website.contains(emailDomain);
     }
 
 }

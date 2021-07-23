@@ -18,6 +18,10 @@ export const CHANGE_CV_SCHOOL  = "CHANGE_CV_SCHOOL"
 export const CHANGE_CV_SKILL  = "CHANGE_CV_SKILL"
 export const ADD_CV  = "ADD_CV"
 export const DELETE_CV  = "DELETE_CV"
+export const CHANGE_WEBSITE = "CHANGE_WEBSITE"
+export const CHANGE_COMP_NAME = "CHANGE_COMP_NAME"
+export const CHANGE_PHONE = "CHANGE_PHONE"
+export const CHANGE_EMPLOYER_UPDATE = "CHANGE_EMPLOYER_UPDATE"
 
 export function login(user, userType) {
     return {
@@ -141,6 +145,34 @@ export function changeCvSkill(cvId, cvSkills) {
     return {
         type: CHANGE_CV_SKILL,
         payload: {cvId, cvSkills}
+    }
+}
+
+export function changeEmployerUpdate (employerUpdate){
+    return {
+        type: CHANGE_EMPLOYER_UPDATE,
+        payload: {employerUpdate}
+    }
+}
+
+export function changeWebsite(website) {
+    return {
+        type: CHANGE_WEBSITE,
+        payload: {website}
+    }
+}
+
+export function changeCompName(companyName) {
+    return {
+        type: CHANGE_COMP_NAME,
+        payload: {companyName}
+    }
+}
+
+export function changePhone(phone) {
+    return {
+        type: CHANGE_PHONE,
+        payload: {phone}
     }
 }
 

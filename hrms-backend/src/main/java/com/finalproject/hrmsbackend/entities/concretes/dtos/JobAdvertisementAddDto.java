@@ -2,8 +2,6 @@ package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.City;
-import com.finalproject.hrmsbackend.entities.concretes.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,13 +18,13 @@ public class JobAdvertisementAddDto {
     private Integer employerId;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
-    private Position position;
+    private Short positionId;
 
     @NotBlank(message = MSGs.ForAnnotation.EMPTY)
     private String jobDescription;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
-    private City city;
+    private Short cityId;
 
     @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
     private Double minSalary;

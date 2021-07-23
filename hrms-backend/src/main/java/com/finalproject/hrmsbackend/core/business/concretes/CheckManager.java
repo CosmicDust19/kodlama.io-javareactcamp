@@ -1,5 +1,6 @@
-package com.finalproject.hrmsbackend.core.business;
+package com.finalproject.hrmsbackend.core.business.concretes;
 
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorResult;
@@ -19,13 +20,13 @@ import java.util.regex.Pattern;
 public class CheckManager implements CheckService {
 
     @Override
-    public boolean notExistsById(CrudRepository<?, Integer> dao, int id) {
-        return id <= 0 || !dao.existsById(id);
+    public boolean notExistsById(CrudRepository<?, Integer> dao, Integer id) {
+        return id == null || id <= 0 || !dao.existsById(id);
     }
 
     @Override
-    public boolean notExistsById(CrudRepository<?, Short> dao, short id) {
-        return id <= 0 || !dao.existsById(id);
+    public boolean notExistsById(CrudRepository<?, Short> dao, Short id) {
+        return id == null || id <= 0 || !dao.existsById(id);
     }
 
     @Override

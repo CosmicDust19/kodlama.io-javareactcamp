@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.PositionService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.PositionDao;
@@ -24,10 +24,8 @@ public class PositionManager implements PositionService {
     }
 
     @Override
-    public Result add(Position position) {
-        if (position.getTitle() != null) position.setTitle(position.getTitle().trim());
-        if (check.invalidLength(position.getTitle(), 0, 100)) return new ErrorResult(MSGs.INVALID.get("positionTitle"));
-        positionDao.save(position);
+    public Result add(String positionTitle) {
+        positionDao.save(new Position(positionTitle));
         return new SuccessResult(MSGs.SAVED.get());
     }
 }

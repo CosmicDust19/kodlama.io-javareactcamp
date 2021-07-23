@@ -2,8 +2,6 @@ package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.Department;
-import com.finalproject.hrmsbackend.entities.concretes.School;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,16 +15,14 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class CandidateSchoolAddDto {
 
-    private Integer id;
-
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private Integer candidateId;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
-    private School school;
+    private Integer schoolId;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
-    private Department department;
+    private Short departmentId;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     @Min(value = Utils.Const.MIN_YEAR)

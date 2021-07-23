@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
@@ -22,7 +21,6 @@ public class Language implements BaseEntity<Short> {
     @Column(name = "id")
     private Short id;
 
-    @NotBlank(message = "Empty")
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
@@ -30,4 +28,7 @@ public class Language implements BaseEntity<Short> {
         this.id = id;
     }
 
+    public Language(String name) {
+        this.name = name;
+    }
 }

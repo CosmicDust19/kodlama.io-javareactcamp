@@ -13,6 +13,6 @@ public interface CandidateSkillService {
 
     Result add(CandidateSkillAddDto candidateSkillAddDto);
 
-    Result deleteById(int id);
+    Result deleteById(int candSkillId);
 
 }

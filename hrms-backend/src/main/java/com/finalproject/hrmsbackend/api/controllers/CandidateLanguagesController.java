@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
 @Validated
 @RestController
-@RequestMapping("/api/cvsLanguages")
+@RequestMapping("/api/candidateLanguages")
 @RequiredArgsConstructor
 public class CandidateLanguagesController {
 
     private final CandidateLanguageService candidateLanguageService;
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(candidateLanguageService.getAll());
     }
@@ -31,21 +31,21 @@ public class CandidateLanguagesController {
         return Utils.getResponseEntity(candidateLanguageService.add(candidateLanguageAddDto));
     }
 
-    @DeleteMapping(value = "/deleteById")
-    public ResponseEntity<?> deleteById(@RequestParam int id) {
-        return Utils.getResponseEntity(candidateLanguageService.deleteById(id));
+    @DeleteMapping(value = "/delete/byId")
+    public ResponseEntity<?> deleteById(@RequestParam int CandLangId) {
+        return Utils.getResponseEntity(candidateLanguageService.deleteById(CandLangId));
     }
 
-    @PutMapping(value = "/updateLanguage")
-    public ResponseEntity<?> updateLanguage(@RequestParam short languageId, @RequestParam int id) {
-        return Utils.getResponseEntity(candidateLanguageService.updateLanguage(languageId, id));
+    @PutMapping(value = "/update/language")
+    public ResponseEntity<?> updateLanguage(@RequestParam short languageId, @RequestParam int CandLangId) {
+        return Utils.getResponseEntity(candidateLanguageService.updateLanguage(languageId, CandLangId));
     }
 
-    @PutMapping(value = "/updateLangLevel")
+    @PutMapping(value = "/update/langLevel")
     public ResponseEntity<?> updateLangLevel(@RequestParam
                                              @Pattern(regexp = Utils.Const.LANG_LVL_REGEXP, message = MSGs.ForAnnotation.INVALID_LANG_LVL) String languageLevel,
-                                             @RequestParam int id) {
-        return Utils.getResponseEntity(candidateLanguageService.updateLangLevel(languageLevel, id));
+                                             @RequestParam int CandLangId) {
+        return Utils.getResponseEntity(candidateLanguageService.updateLangLevel(languageLevel, CandLangId));
     }
 
 }

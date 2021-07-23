@@ -14,7 +14,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-@CrossOrigin
+@CrossOrigin(origins = {Utils.Const.LOCALHOST_3000, Utils.Const.HEROKU_APP})
 @Validated
 @RestController
 @RequestMapping("/api/employers")
@@ -23,37 +23,37 @@ public class EmployersController {
 
     private final EmployerService employerService;
 
-    @GetMapping("/existsByCompanyName")
+    @GetMapping("/exists/byCompanyName")
     public ResponseEntity<?> existsByCompanyName(@RequestParam String companyName) {
         return Utils.getResponseEntity(employerService.existsByCompanyName(companyName));
     }
 
-    @GetMapping("/existsByWebsite")
+    @GetMapping("/exists/byWebsite")
     public ResponseEntity<?> existsByWebsite(@RequestParam String website) {
         return Utils.getResponseEntity(employerService.existsByWebsite(website));
     }
 
-    @GetMapping("/getAll")
+    @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(employerService.getAll());
     }
 
-    @GetMapping("/getPublicEmployers")
-    public ResponseEntity<?> getPublicEmployers() {
-        return Utils.getResponseEntity(employerService.getAllVerified());
+    @GetMapping("/get/public")
+    public ResponseEntity<?> getPublic() {
+        return Utils.getResponseEntity(employerService.getVerified());
     }
 
-    @GetMapping("/getUnverified")
+    @GetMapping("/get/unverified")
     public ResponseEntity<?> getUnverified() {
-        return Utils.getResponseEntity(employerService.getAllUnverified());
+        return Utils.getResponseEntity(employerService.getUnverified());
     }
 
-    @GetMapping("/getById")
-    public ResponseEntity<?> getById(@RequestParam int id) {
-        return Utils.getResponseEntity(employerService.getById(id));
+    @GetMapping("/get/byId")
+    public ResponseEntity<?> getById(@RequestParam int emplId) {
+        return Utils.getResponseEntity(employerService.getById(emplId));
     }
 
-    @GetMapping("/getByEmailAndPW")
+    @GetMapping("/get/byEmailAndPW")
     public ResponseEntity<?> getByEmailAndPW(@RequestParam String email, @RequestParam String password) {
         return Utils.getResponseEntity(employerService.getByEmailAndPW(email, password));
     }
@@ -63,37 +63,37 @@ public class EmployersController {
         return Utils.getResponseEntity(employerService.add(employerAddDto));
     }
 
-    @PutMapping(value = "/updateEmailAndWebsite")
+    @PutMapping(value = "/update/emailAndWebsite")
     public ResponseEntity<?> updateEmailAndWebsite(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
                                                    @Pattern(regexp = Utils.Const.EMAIL_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT) String email,
                                                    @RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
                                                    @Pattern(regexp = Utils.Const.WEBSITE_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT) String website,
-                                                   @RequestParam int id) {
-        return Utils.getResponseEntity(employerService.updateEmailAndWebsite(email, website, id));
+                                                   @RequestParam int emplId) {
+        return Utils.getResponseEntity(employerService.updateEmailAndWebsite(email, website, emplId));
     }
 
-    @PutMapping(value = "/updateCompanyName")
+    @PutMapping(value = "/update/companyName")
     public ResponseEntity<?> updateCompanyName(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
                                                @Size(max = Utils.Const.MAX_COMPANY_NAME) String companyName,
-                                               @RequestParam int id) {
-        return Utils.getResponseEntity(employerService.updateCompanyName(companyName, id));
+                                               @RequestParam int emplId) {
+        return Utils.getResponseEntity(employerService.updateCompanyName(companyName, emplId));
     }
 
-    @PutMapping(value = "/updatePhoneNumber")
+    @PutMapping(value = "/update/phoneNumber")
     public ResponseEntity<?> updatePhoneNumber(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
                                                @Pattern(regexp = Utils.Const.PHONE_NUM_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT) String phoneNumber,
-                                               @RequestParam int id) {
-        return Utils.getResponseEntity(employerService.updatePhoneNumber(phoneNumber, id));
+                                               @RequestParam int emplId) {
+        return Utils.getResponseEntity(employerService.updatePhoneNumber(phoneNumber, emplId));
     }
 
-    @PutMapping(value = "/applyUpdates")
-    public ResponseEntity<?> applyUpdates(@RequestParam int jobAdvId) {
-        return Utils.getResponseEntity(employerService.applyUpdates(jobAdvId));
+    @PutMapping(value = "/update/applyChanges")
+    public ResponseEntity<?> applyChanges(@RequestParam int emplId) {
+        return Utils.getResponseEntity(employerService.applyChanges(emplId));
     }
 
-    @PutMapping(value = "/updateVerification")
-    public ResponseEntity<?> updateVerification(@RequestParam boolean status, @RequestParam int id) {
-        return Utils.getResponseEntity(employerService.updateVerification(status, id));
+    @PutMapping(value = "/update/verification")
+    public ResponseEntity<?> updateVerification(@RequestParam boolean status, @RequestParam int emplId) {
+        return Utils.getResponseEntity(employerService.updateVerification(status, emplId));
     }
 
 }

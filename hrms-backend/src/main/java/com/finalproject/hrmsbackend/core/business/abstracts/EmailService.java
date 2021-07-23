@@ -1,4 +1,4 @@
-package com.finalproject.hrmsbackend.core.abstracts;
+package com.finalproject.hrmsbackend.core.business.abstracts;
 
 import org.springframework.stereotype.Component;
 

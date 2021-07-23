@@ -10,6 +10,6 @@ public interface PositionService {
 
     DataResult<List<Position>> getAll();
 
-    Result add(Position position);
+    Result add(String positionTitle);
 
 }

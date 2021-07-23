@@ -94,14 +94,14 @@ export function filterJobAdverts(jobAdverts, filters) {
         })
     if (filters.applicationDeadLineBefore)
         filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-            new Date(jobAdvertisement.applicationDeadline).getTime() < new Date(filters.applicationDeadLineBefore).getTime())
+            new Date(jobAdvertisement.deadline).getTime() < new Date(filters.applicationDeadLineBefore).getTime())
     if (filters.applicationDeadLineAfter)
         filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-            new Date(jobAdvertisement.applicationDeadline).getTime() > new Date(filters.applicationDeadLineAfter).getTime())
+            new Date(jobAdvertisement.deadline).getTime() > new Date(filters.applicationDeadLineAfter).getTime())
     if (filters.pending && filters.pending.length > 0) {
         if (filters.pending === "releaseApproval") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                jobAdvertisement.systemRejectionStatus === null && jobAdvertisement.systemVerificationStatus === false)
+                jobAdvertisement.rejected === null && jobAdvertisement.verified === false)
         }
         /*else if (jobAdvertsFilters.pending === "updateApproval") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) => {
@@ -112,24 +112,24 @@ export function filterJobAdverts(jobAdverts, filters) {
     if (filters.verification && filters.verification.length > 0) {
         if (filters.verification === "verified") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                jobAdvertisement.systemVerificationStatus === true)
+                jobAdvertisement.verified === true)
         }
         else if (filters.verification === "rejected") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                jobAdvertisement.systemRejectionStatus === true)
+                jobAdvertisement.rejected === true)
         }
     }
     if (filters.activation && filters.activation.length > 0)
         if (filters.activation === "active") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                jobAdvertisement.activationStatus === true)
+                jobAdvertisement.active === true)
         }
         else if (filters.activation === "inactive") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                jobAdvertisement.activationStatus === false)
+                jobAdvertisement.active === false)
         } else if (filters.activation === "expired") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                new Date(jobAdvertisement.applicationDeadline).getTime() < new Date().getTime())
+                new Date(jobAdvertisement.deadline).getTime() < new Date().getTime())
         }
 
     return {
@@ -166,7 +166,7 @@ export function filterEmployers(employers, filters) {
     if (filters.pending && filters.pending.length > 0) {
         if (filters.pending === "signUpApproval") {
             filteredEmployers = filteredEmployers.filter((employer) =>
-                employer.systemRejectionStatus === null && employer.systemVerificationStatus === false)
+                employer.rejected === null && employer.verified === false)
         }
         /*else if (jobAdvertsFilters.pending === "updateApproval") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) => {
@@ -177,11 +177,11 @@ export function filterEmployers(employers, filters) {
     if (filters.verification && filters.verification.length > 0) {
         if (filters.verification === "verified") {
             filteredEmployers = filteredEmployers.filter((employer) =>
-                employer.systemVerificationStatus === true)
+                employer.verified === true)
         }
         else if (filters.verification === "rejected") {
             filteredEmployers = filteredEmployers.filter((employer) =>
-                employer.systemRejectionStatus === true)
+                employer.rejected === true)
         }
     }
 

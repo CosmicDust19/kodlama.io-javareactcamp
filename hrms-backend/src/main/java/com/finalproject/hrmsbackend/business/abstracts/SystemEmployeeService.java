@@ -11,14 +11,14 @@ public interface SystemEmployeeService {
 
     DataResult<List<SystemEmployee>> getAll();
 
-    DataResult<SystemEmployee> getById(int id);
+    DataResult<SystemEmployee> getById(int sysEmplId);
 
     DataResult<SystemEmployee> getByEmailAndPW(String email, String password);
 
     Result add(SystemEmployeesAddDto systemEmployeesAddDto);
 
-    Result updateFirstName(String firstName, int id);
+    Result updateFirstName(String firstName, int sysEmplId);
 
-    Result updateLastName(String lastName, int id);
+    Result updateLastName(String lastName, int sysEmplId);
 
 }

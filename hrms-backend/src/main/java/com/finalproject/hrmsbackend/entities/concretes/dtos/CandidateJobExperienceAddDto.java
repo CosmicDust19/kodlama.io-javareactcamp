@@ -2,7 +2,6 @@ package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.Position;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,8 +13,6 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class CandidateJobExperienceAddDto {
 
-    private Integer id;
-
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     private Integer candidateId;
 
@@ -24,7 +21,7 @@ public class CandidateJobExperienceAddDto {
     private String workPlace;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
-    private Position position;
+    private Short positionId;
 
     @NotNull(message = MSGs.ForAnnotation.REQUIRED)
     @Min(value = Utils.Const.MIN_YEAR)

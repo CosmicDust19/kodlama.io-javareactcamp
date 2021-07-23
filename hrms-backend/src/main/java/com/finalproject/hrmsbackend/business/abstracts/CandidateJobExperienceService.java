@@ -11,18 +11,18 @@ public interface CandidateJobExperienceService {
 
     DataResult<List<CandidateJobExperience>> getAll();
 
-    DataResult<List<CandidateJobExperience>> getAllByQuitYear(Short sortDirection);
+    DataResult<List<CandidateJobExperience>> getByQuitYear(Short sortDirection);
 
     Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto);
 
     DataResult<Boolean> deleteById(int id);
 
-    Result updateWorkPlace(String workPlace, int id);
+    Result updateWorkPlace(String workPlace, int candJobExpId);
 
-    Result updatePosition(short positionId, int id);
+    Result updatePosition(short positionId, int candJobExpId);
 
-    Result updateStartYear(short startYear, int id);
+    Result updateStartYear(short startYear, int candJobExpId);
 
-    Result updateQuitYear(Short quitYear, int id);
+    Result updateQuitYear(Short quitYear, int candJobExpId);
 
 }

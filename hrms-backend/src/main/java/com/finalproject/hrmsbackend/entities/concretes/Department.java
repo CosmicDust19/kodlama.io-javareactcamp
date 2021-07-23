@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
@@ -22,12 +21,15 @@ public class Department implements BaseEntity<Short> {
     @Column(name = "id")
     private Short id;
 
-    @NotBlank(message = "Empty")
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 
     public Department(short id) {
         this.id = id;
+    }
+
+    public Department(String name) {
+        this.name = name;
     }
 
 }

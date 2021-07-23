@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateLanguageService;
-import com.finalproject.hrmsbackend.core.business.CheckService;
+import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.utilities.MSGs;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
@@ -38,37 +38,38 @@ public class CandidateLanguageManager implements CandidateLanguageService {
         Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(candidateDao, candidateLanguageAddDto.getCandidateId()))
             errors.put("candidateId", MSGs.NOT_EXIST.get());
-        if (check.notExistsById(languageDao, candidateLanguageAddDto.getLanguage().getId()))
-            errors.put("language.id", MSGs.NOT_EXIST.get());
+        if (check.notExistsById(languageDao, candidateLanguageAddDto.getLanguageId()))
+            errors.put("languageId", MSGs.NOT_EXIST.get());
         if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
 
         CandidateLanguage candidateLanguage = modelMapper.map(candidateLanguageAddDto, CandidateLanguage.class);
 
         CandidateLanguage savedCandidateLanguage = candidateLanguageDao.save(candidateLanguage);
-        return new SuccessResult(Integer.toString(savedCandidateLanguage.getId()));
+        return new SuccessDataResult<>(MSGs.SAVED.getCustom("%s (data: new id)"), savedCandidateLanguage.getId());
     }
 
     @Override
-    public DataResult<Boolean> deleteById(int id) {
-        candidateLanguageDao.deleteById(id);
+    public DataResult<Boolean> deleteById(int candLangId) {
+        candidateLanguageDao.deleteById(candLangId);
         return new SuccessDataResult<>(MSGs.DELETED.get(), true);
     }
 
     @Override
-    public Result updateLanguage(short languageId, int id) {
-        Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(candidateLanguageDao, id)) errors.put("id", MSGs.NOT_EXIST.get());
-        if (check.notExistsById(languageDao, languageId)) errors.put("languageId", MSGs.NOT_EXIST.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+    public Result updateLanguage(short languageId, int candLangId) {
+        if (check.notExistsById(candidateLanguageDao, candLangId))
+            return new ErrorResult(MSGs.NOT_EXIST.get("candLangId"));
+        if (check.notExistsById(languageDao, languageId))
+            return new ErrorResult(MSGs.NOT_EXIST.get("languageId"));
 
-        candidateLanguageDao.updateLanguage(new Language(languageId), id);
+        candidateLanguageDao.updateLanguage(new Language(languageId), candLangId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
     @Override
-    public Result updateLangLevel(String languageLevel, int id) {
-        if (check.notExistsById(candidateLanguageDao, id)) return new ErrorResult(MSGs.NOT_EXIST.get("id"));
-        candidateLanguageDao.updateLanguageLevel(languageLevel, id);
+    public Result updateLangLevel(String languageLevel, int candLangId) {
+        if (check.notExistsById(candidateLanguageDao, candLangId))
+            return new ErrorResult(MSGs.NOT_EXIST.get("candLangId"));
+        candidateLanguageDao.updateLanguageLevel(languageLevel, candLangId);
         return new SuccessResult(MSGs.UPDATED.get());
     }
 
