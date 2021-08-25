@@ -1,17 +1,35 @@
 import {userProps} from "../initialStates/userProps";
 import {
-    LOGIN, SIGN_OUT, CHANGE_EMAIl,
+    LOGIN,
+    SIGN_OUT,
+    CHANGE_EMAIl,
 
-    CHANGE_GITHUB, CHANGE_LINKEDIN,
-    CHANGE_JOBEXP, CHANGE_LANG, CHANGE_SCHOOL, CHANGE_SKILL,
+    CHANGE_GITHUB,
+    CHANGE_LINKEDIN,
+    CHANGE_JOB_EXP,
+    CHANGE_LANG,
+    CHANGE_SCHOOL,
+    CHANGE_SKILL,
     CHANGE_FAVORITE_JOB_ADVS,
-    CHANGE_CV_TITLE, CHANGE_CV_COVERLETTER,
-    CHANGE_CV_JOBEXP, CHANGE_CV_LANG, CHANGE_CV_SCHOOL, CHANGE_CV_SKILL,
-    ADD_CV, DELETE_CV,
+    CHANGE_CV_TITLE,
+    CHANGE_CV_COVER_LETTER,
+    CHANGE_CV_JOB_EXP,
+    CHANGE_CV_LANG,
+    CHANGE_CV_SCHOOL,
+    CHANGE_CV_SKILL,
+    ADD_CV,
+    DELETE_CV,
 
-    CHANGE_FIRSTNAME, CHANGE_LASTNAME,
+    CHANGE_FIRSTNAME,
+    CHANGE_LASTNAME,
 
-    CHANGE_COMP_NAME, CHANGE_WEBSITE, CHANGE_PHONE, CHANGE_EMPLOYER_UPDATE
+    CHANGE_COMP_NAME,
+    CHANGE_WEBSITE,
+    CHANGE_PHONE,
+    CHANGE_EMPLOYER_UPDATE,
+    SYNC_USER,
+    SYNC_EMPL_JOB_ADVERTS,
+    SYNC_CAND_CVS, SYNC_EMPL_JOB_ADVERT
 } from "../actions/userActions";
 
 const initialState = {
@@ -32,6 +50,20 @@ export default function userReducer(state = initialState, {type, payload}) {
             state.userProps.userType = null
             state.userProps.loggedIn = false
             return {...state}
+        case SYNC_USER:
+            state.userProps.user = payload.user
+            return {...state}
+        case SYNC_EMPL_JOB_ADVERTS:
+            state.userProps.user.jobAdvertisements = payload.adverts
+            return {...state}
+        case SYNC_EMPL_JOB_ADVERT: {
+            const index = state.userProps.user.jobAdvertisements.findIndex((jobAdv) => jobAdv.id === payload.jobAdvId)
+            state.userProps.user.jobAdvertisements[index] = payload.jobAdvert
+            return {...state}
+        }
+        case SYNC_CAND_CVS:
+            state.userProps.user.cvs = payload.CVs
+            return {...state}
         case CHANGE_FIRSTNAME:
             state.userProps.user.firstName = payload.firstName
             return {...state}
@@ -47,7 +79,7 @@ export default function userReducer(state = initialState, {type, payload}) {
         case CHANGE_LINKEDIN:
             state.userProps.user.linkedinAccount = payload.link
             return {...state}
-        case CHANGE_JOBEXP:
+        case CHANGE_JOB_EXP:
             state.userProps.user.candidateJobExperiences = payload.jobExps
             return {...state}
         case CHANGE_LANG:
@@ -69,14 +101,14 @@ export default function userReducer(state = initialState, {type, payload}) {
             state.userProps.user.cvs[index].title = payload.title
             return {...state}
         }
-        case CHANGE_CV_COVERLETTER: {
+        case CHANGE_CV_COVER_LETTER: {
             let index = state.userProps.user.cvs.findIndex(cv => {
                 return cv.id === payload.cvId
             })
             state.userProps.user.cvs[index].coverLetter = payload.coverLetter
             return {...state}
         }
-        case CHANGE_CV_JOBEXP: {
+        case CHANGE_CV_JOB_EXP: {
             let index = state.userProps.user.cvs.findIndex(cv => {
                 return cv.id === payload.cvId
             })

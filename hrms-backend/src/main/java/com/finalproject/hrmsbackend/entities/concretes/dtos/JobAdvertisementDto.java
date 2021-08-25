@@ -1,6 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,38 +12,40 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class JobAdvertisementAddDto {
+public class JobAdvertisementDto {
 
-    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    private Integer id;
+
     private Integer employerId;
 
-    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.ForAnnotation.REQUIRED)
     private Short positionId;
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
     private String jobDescription;
 
-    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.ForAnnotation.REQUIRED)
     private Short cityId;
 
-    @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
+    @Positive(message = Msg.ForAnnotation.NOT_POSITIVE)
     private Double minSalary;
 
-    @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
+    @Positive(message = Msg.ForAnnotation.NOT_POSITIVE)
     private Double maxSalary;
 
-    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
-    @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE)
+    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @Positive(message = Msg.ForAnnotation.NOT_POSITIVE)
     private Short openPositions;
 
-    @Future(message = MSGs.ForAnnotation.PAST_OR_PRESENT)
+    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @Future(message = Msg.ForAnnotation.PAST_OR_PRESENT)
     private LocalDate deadline;
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
     @Size(max = Utils.Const.MAX_JOB_ADV_WORK_MODEL)
     private String workModel;
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
     @Size(max = Utils.Const.MAX_JOB_ADV_WORK_TIME)
     private String workTime;
 

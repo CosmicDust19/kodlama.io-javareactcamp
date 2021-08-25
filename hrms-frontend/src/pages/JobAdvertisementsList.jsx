@@ -15,6 +15,7 @@ import {changeFavoriteJobAdv} from "../store/actions/userActions";
 import {toast} from "react-toastify";
 import {changeJobAdvertsFilters, filterJobAdverts} from "../store/actions/filterActions";
 import filter from "../store/initialStates/filterInitial";
+import _ from "lodash";
 
 let jobAdvertisementService = new JobAdvertisementService();
 export default function JobAdvertisementsList() {
@@ -27,7 +28,7 @@ export default function JobAdvertisementsList() {
 
     const candidateService = new CandidateService();
 
-    let history = useHistory();
+    const history = useHistory();
     const dispatch = useDispatch();
     const isFirstVisit = useSelector(state => state?.user.userProps.guest)
     const user = useSelector(state => state?.user.userProps.user)
@@ -48,9 +49,9 @@ export default function JobAdvertisementsList() {
     const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
-        let cityService = new CityService();
-        let positionService = new PositionService();
-        let employerService = new EmployerService();
+        const cityService = new CityService();
+        const positionService = new PositionService();
+        const employerService = new EmployerService();
         cityService.getCities().then((result) => setCities(result.data.data));
         positionService.getPositions().then((result) => setPositions(result.data.data));
         employerService.getPublic().then((result) => setEmployers(result.data.data));
@@ -59,7 +60,8 @@ export default function JobAdvertisementsList() {
         });
     }, []);
 
-    if (filteredJobAdvertisements.length === 0 && isFirstVisit) {
+    if (filteredJobAdvertisements === undefined) filteredJobAdvertisements = jobAdvertisements
+    else if (filteredJobAdvertisements.length === 0 && isFirstVisit) {
         const _ = require('lodash');
         if (_.isEqual(filters, filter.jobAdvertsFilters)) filteredJobAdvertisements = jobAdvertisements
     }

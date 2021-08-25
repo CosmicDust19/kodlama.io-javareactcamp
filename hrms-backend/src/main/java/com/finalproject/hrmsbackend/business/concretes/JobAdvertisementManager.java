@@ -2,15 +2,13 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.JobAdvertisementService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.*;
-import com.finalproject.hrmsbackend.entities.concretes.City;
 import com.finalproject.hrmsbackend.entities.concretes.JobAdvertisement;
 import com.finalproject.hrmsbackend.entities.concretes.JobAdvertisementUpdate;
-import com.finalproject.hrmsbackend.entities.concretes.Position;
-import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementAddDto;
+import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
@@ -40,6 +38,11 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     }
 
     @Override
+    public DataResult<List<JobAdvertisement>> getAllByEmployer(Integer employerId) {
+        return new SuccessDataResult<>(jobAdvertisementDao.findAllByEmployer_Id(employerId));
+    }
+
+    @Override
     public DataResult<List<JobAdvertisement>> getActiveVerified() {
         return new SuccessDataResult<>(jobAdvertisementDao.findAllByActiveTrueAndVerifiedTrue());
     }
@@ -47,7 +50,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public DataResult<List<JobAdvertisement>> getActiveVerifiedByCreatedAt(Short sortDirection) {
         Sort sort = Utils.getSortByDirection(sortDirection, "createdAt");
-        return new SuccessDataResult<>(MSGs.SORT_DIRECTION.getCustom("%s (createdAt)"), jobAdvertisementDao.findAllByActiveTrueAndVerifiedTrue(sort));
+        return new SuccessDataResult<>(Msg.SORT_DIRECTION.getCustom("%s (createdAt)"), jobAdvertisementDao.findAllByActiveTrueAndVerifiedTrue(sort));
     }
 
     @Override
@@ -58,13 +61,13 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public DataResult<List<JobAdvertisement>> getUnverified(Short sortDirection) {
         Sort sort = Utils.getSortByDirection(sortDirection, "createdAt");
-        return new SuccessDataResult<>(MSGs.SORT_DIRECTION.getCustom("%s (createdAt)"), jobAdvertisementDao.getAllByVerifiedFalse(sort));
+        return new SuccessDataResult<>(Msg.SORT_DIRECTION.getCustom("%s (createdAt)"), jobAdvertisementDao.getAllByVerifiedFalse(sort));
     }
 
     @Override
     public DataResult<List<JobAdvertisement>> getPublic(Short sortDirection) {
         Sort sort = Utils.getSortByDirection(sortDirection, "createdAt");
-        return new SuccessDataResult<>(MSGs.SORT_DIRECTION.getCustom("%s (createdAt)"), jobAdvertisementDao.findAllByActiveTrueAndVerifiedTrueAndDeadlineAfterAndEmployer_VerifiedTrue(LocalDate.now(), sort));
+        return new SuccessDataResult<>(Msg.SORT_DIRECTION.getCustom("%s (createdAt)"), jobAdvertisementDao.findAllByActiveTrueAndVerifiedTrueAndDeadlineAfterAndEmployer_VerifiedTrue(LocalDate.now(), sort));
     }
 
     @Override
@@ -78,222 +81,250 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     }
 
     @Override
-    public Result add(JobAdvertisementAddDto jobAdvertisementAddDto) {
-        Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(employerDao, jobAdvertisementAddDto.getEmployerId()))
-            errors.put("employerId", MSGs.NOT_EXIST.get());
-        if (check.notExistsById(positionDao, jobAdvertisementAddDto.getPositionId()))
-            errors.put("positionId", MSGs.NOT_EXIST.get());
-        if (check.notExistsById(cityDao, jobAdvertisementAddDto.getCityId()))
-            errors.put("cityId", MSGs.NOT_EXIST.get());
-        if (check.greater(jobAdvertisementAddDto.getMinSalary(), jobAdvertisementAddDto.getMaxSalary()))
-            errors.put("minSalary - maxSalary", MSGs.MIN_MAX_CONFLICT.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+    public Result add(JobAdvertisementDto jobAdvertisementDto) {
+        if (check.notExistsById(employerDao, jobAdvertisementDto.getEmployerId()))
+            return new ErrorResult(Msg.NOT_EXIST.get("employerId"));
+        ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvertisementDto);
+        if (errors != null) return errors;
 
-        JobAdvertisement jobAdvertisement = modelMapper.map(jobAdvertisementAddDto, JobAdvertisement.class);
+        jobAdvertisementDto.setId(null);
+        JobAdvertisement jobAdv = modelMapper.map(jobAdvertisementDto, JobAdvertisement.class);
+        JobAdvertisement savedJobAdv = jobAdvertisementDao.save(jobAdv);
 
-        jobAdvertisementDao.save(jobAdvertisement);
-        return new SuccessResult(MSGs.SAVED.get());
+        JobAdvertisementUpdate jobAdvUpd = modelMapper.map(savedJobAdv, JobAdvertisementUpdate.class);
+        JobAdvertisementUpdate savedJobAdvUpd = jobAdvertisementUpdateDao.save(jobAdvUpd);
+
+        jobAdvertisementDao.updateUpdateId(savedJobAdvUpd.getUpdateId(), savedJobAdv.getId());
+        savedJobAdv.setJobAdvertisementUpdate(savedJobAdvUpd);
+        savedJobAdv.setPosition(positionDao.getById(savedJobAdv.getPosition().getId()));
+        savedJobAdv.setCity(cityDao.getById(savedJobAdv.getCity().getId()));
+
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedJobAdv);
     }
 
     @Override
     public DataResult<Boolean> deleteById(int jobAdvId) {
         jobAdvertisementDao.deleteById(jobAdvId);
-        return new SuccessDataResult<>(MSGs.DELETED.get(), true);
+        return new SuccessDataResult<>(Msg.DELETED.get(), true);
+    }
+
+    @Override
+    public Result update(JobAdvertisementDto jobAdvDto) {
+        if (check.notExistsById(jobAdvertisementDao, jobAdvDto.getId()))
+            return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
+        ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvDto);
+        if (errors != null) return errors;
+
+        JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvDto.getId());
+        JobAdvertisementUpdate oldJobAdvUpd = jobAdv.getJobAdvertisementUpdate();
+
+        if (noChange(oldJobAdvUpd, jobAdvDto))
+            return new ErrorResult(Msg.THE_SAME.getCustom("All fields are %s"));
+
+        JobAdvertisementUpdate newJobAdvUpd = modelMapper.map(jobAdvDto, JobAdvertisementUpdate.class);
+        newJobAdvUpd.setUpdateId(oldJobAdvUpd.getUpdateId());
+        newJobAdvUpd.setEmployer(oldJobAdvUpd.getEmployer());
+
+        jobAdv.setJobAdvertisementUpdate(newJobAdvUpd);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updatePosition(short positionId, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
-        if (check.notExistsById(positionDao, positionId)) return new ErrorResult(MSGs.NOT_EXIST.get("positionId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(positionDao, positionId)) return new ErrorResult(Msg.NOT_EXIST.get("positionId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && jobAdvUpdate.getPosition().getId() == positionId) ||
-                (jobAdvUpdate == null && jobAdv.getPosition().getId() == positionId))
-            return new ErrorResult(MSGs.THE_SAME.get("position is"));
+        if (jobAdvUpdate.getPosition().getId() == positionId)
+            return new ErrorResult(Msg.THE_SAME.get("Position is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updatePosition(new Position(positionId), jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setPosition(positionDao.getById(positionId));
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateJobDesc(String jobDescription, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && jobAdvUpdate.getJobDescription().equals(jobDescription)) ||
-                (jobAdvUpdate == null && jobAdv.getJobDescription().equals(jobDescription)))
-            return new ErrorResult(MSGs.THE_SAME.get("jobDescription is"));
+        if (jobAdvUpdate.getJobDescription().equals(jobDescription))
+            return new ErrorResult(Msg.THE_SAME.get("Job description is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateJobDesc(jobDescription, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setJobDescription(jobDescription);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateCity(short cityId, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
-        if (check.notExistsById(cityDao, cityId)) return new ErrorResult(MSGs.NOT_EXIST.get("cityId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(cityDao, cityId)) return new ErrorResult(Msg.NOT_EXIST.get("cityId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && jobAdvUpdate.getCity().getId() == cityId) ||
-                (jobAdvUpdate == null && jobAdv.getCity().getId() == cityId))
-            return new ErrorResult(MSGs.THE_SAME.get("cityId is"));
+        if (jobAdvUpdate.getCity().getId() == cityId)
+            return new ErrorResult(Msg.THE_SAME.get("cityId is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateCity(new City(cityId), jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setCity(cityDao.getById(cityId));
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateMinSalary(Double minSalary, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && check.equals(jobAdvUpdate.getMinSalary(), minSalary)) ||
-                (jobAdvUpdate == null && check.equals(jobAdv.getMinSalary(), minSalary)))
-            return new ErrorResult(MSGs.THE_SAME.get("minSalary is"));
+        if (check.equals(jobAdvUpdate.getMinSalary(), minSalary))
+            return new ErrorResult(Msg.THE_SAME.get("Minimum salary is"));
         if (check.greater(minSalary, jobAdv.getMaxSalary()))
-            return new ErrorResult(MSGs.MIN_MAX_CONFLICT.get());
+            return new ErrorResult(Msg.MIN_MAX_CONFLICT.get());
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateMinSalary(minSalary, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setMinSalary(minSalary);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateMaxSalary(Double maxSalary, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && check.equals(jobAdvUpdate.getMaxSalary(), maxSalary)) ||
-                (jobAdvUpdate == null && check.equals(jobAdv.getMaxSalary(), maxSalary)))
-            return new ErrorResult(MSGs.THE_SAME.get("maxSalary is"));
+        if (check.equals(jobAdvUpdate.getMaxSalary(), maxSalary))
+            return new ErrorResult(Msg.THE_SAME.get("Maximum salary is"));
         if (check.greater(jobAdv.getMinSalary(), maxSalary))
-            return new ErrorResult(MSGs.MIN_MAX_CONFLICT.get());
+            return new ErrorResult(Msg.MIN_MAX_CONFLICT.get());
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateMaxSalary(maxSalary, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setMaxSalary(maxSalary);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateWorkModel(String workModel, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && jobAdvUpdate.getWorkModel().equals(workModel)) ||
-                (jobAdvUpdate == null && jobAdv.getWorkModel().equals(workModel)))
-            return new ErrorResult(MSGs.THE_SAME.get("workModel is"));
+        if (jobAdvUpdate.getWorkModel().equals(workModel))
+            return new ErrorResult(Msg.THE_SAME.get("Work model is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateWorkModel(workModel, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setWorkModel(workModel);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateWorkTime(String workTime, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && jobAdvUpdate.getWorkTime().equals(workTime)) ||
-                (jobAdvUpdate == null && jobAdv.getWorkTime().equals(workTime)))
-            return new ErrorResult(MSGs.THE_SAME.get("workTime is"));
+        if (jobAdvUpdate.getWorkTime().equals(workTime))
+            return new ErrorResult(Msg.THE_SAME.get("Work time is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateWorkTime(workTime, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setWorkTime(workTime);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateOpenPositions(short openPositions, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && jobAdvUpdate.getOpenPositions() == openPositions) ||
-                (jobAdvUpdate == null && jobAdv.getOpenPositions() == openPositions))
-            return new ErrorResult(MSGs.THE_SAME.get("openPositions is"));
+        if (jobAdvUpdate.getOpenPositions() == openPositions)
+            return new ErrorResult(Msg.THE_SAME.get("Open positions is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateOpenPositions(openPositions, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setOpenPositions(openPositions);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result updateDeadLine(LocalDate deadLine, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
-        if ((jobAdvUpdate != null && check.equals(jobAdvUpdate.getDeadline(), deadLine)) ||
-                (jobAdvUpdate == null && check.equals(jobAdv.getDeadline(), deadLine)))
-            return new ErrorResult(MSGs.THE_SAME.get("deadline is"));
+        if (check.equals(jobAdvUpdate.getDeadline(), deadLine))
+            return new ErrorResult(Msg.THE_SAME.get("Deadline is"));
 
-        handleLastUpdateActions(jobAdv);
-        jobAdvertisementUpdateDao.updateDeadLine(deadLine, jobAdv.getJobAdvertisementUpdate().getUpdateId());
-        return getUpdateResult(jobAdv);
+        jobAdvUpdate.setDeadline(deadLine);
+        return execLastUpdAct(jobAdv);
     }
 
     @Override
     public Result applyChanges(int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvId"));
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
 
-        JobAdvertisement jobAdvertisement = jobAdvertisementDao.getById(jobAdvId);
-        if (jobAdvertisement.getJobAdvertisementUpdate() == null) return new ErrorResult(MSGs.NO_UPDATE.get());
-
-        jobAdvertisementDao.applyUpdates(jobAdvertisement.getJobAdvertisementUpdate(), jobAdvId);
-        jobAdvertisementDao.updateUpdateVerification(true, jobAdvId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
+        modelMapper.map(jobAdv.getJobAdvertisementUpdate(), jobAdv);
+        jobAdv.setUpdateVerified(true);
+        JobAdvertisement savedJobAdv = jobAdvertisementDao.save(jobAdv);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedJobAdv);
     }
 
     @Override
     public Result updateActivation(boolean activationStatus, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorDataResult<>(MSGs.NOT_EXIST.get("jobAdvId"), false);
-        jobAdvertisementDao.updateActivation(activationStatus, jobAdvId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId))
+            return new ErrorDataResult<>(Msg.NOT_EXIST.get("jobAdvId"), false);
+
+        JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
+        jobAdv.setActive(activationStatus);
+        JobAdvertisement savedJobAdv = jobAdvertisementDao.save(jobAdv);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedJobAdv);
     }
 
     @Override
     public Result updateVerification(boolean verificationStatus, int jobAdvId) {
-        if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorDataResult<>(MSGs.NOT_EXIST.get("jobAdvId"), false);
-        jobAdvertisementDao.updateVerification(verificationStatus, jobAdvId);
-        jobAdvertisementDao.updateRejection(!verificationStatus, jobAdvId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        if (check.notExistsById(jobAdvertisementDao, jobAdvId))
+            return new ErrorDataResult<>(Msg.NOT_EXIST.get("jobAdvId"), false);
+
+        JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
+        jobAdv.setVerified(verificationStatus);
+        jobAdv.setRejected(!verificationStatus);
+        JobAdvertisement savedJobAdv = jobAdvertisementDao.save(jobAdv);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedJobAdv);
     }
 
-    private JobAdvertisementUpdate createJobAdvUpdate(JobAdvertisement jobAdv) {
-        JobAdvertisementUpdate jobAdvertisementUpdate = modelMapper.map(jobAdv, JobAdvertisementUpdate.class);
-        JobAdvertisementUpdate savedJobAdvertisementUpdate = jobAdvertisementUpdateDao.save(jobAdvertisementUpdate);
-        jobAdvertisementDao.updateUpdateId(savedJobAdvertisementUpdate.getUpdateId(), jobAdv.getId());
-        return savedJobAdvertisementUpdate;
+    private ErrorDataResult<Map<String, String>> execCommonChecks(JobAdvertisementDto jobAdvDto) {
+        Map<String, String> errors = new HashMap<>();
+        if (check.notExistsById(positionDao, jobAdvDto.getPositionId()))
+            errors.put("positionId", Msg.NOT_EXIST.get());
+        if (check.notExistsById(cityDao, jobAdvDto.getCityId()))
+            errors.put("cityId", Msg.NOT_EXIST.get());
+        if (check.greater(jobAdvDto.getMinSalary(), jobAdvDto.getMaxSalary()))
+            errors.put("minSalary - maxSalary", Msg.MIN_MAX_CONFLICT.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
+        return null;
     }
 
-    private void handleLastUpdateActions(JobAdvertisement jobAdv) {
-        if (jobAdv.getJobAdvertisementUpdate() == null) jobAdv.setJobAdvertisementUpdate(createJobAdvUpdate(jobAdv));
+    private Result execLastUpdAct(JobAdvertisement jobAdv) {
+        JobAdvertisementUpdate savedJobAdvUpdate = jobAdvertisementUpdateDao.save(jobAdv.getJobAdvertisementUpdate());
         jobAdvertisementDao.updateUpdateVerification(false, jobAdv.getId());
         jobAdvertisementDao.updateLastModifiedAt(jobAdv.getId(), LocalDateTime.now());
+        jobAdv.setJobAdvertisementUpdate(savedJobAdvUpdate);
+        return new SuccessDataResult<>(Msg.SUCCESS_UPDATE_REQUEST.get(), jobAdv);
     }
 
-    private SuccessDataResult<Integer> getUpdateResult(JobAdvertisement jobAdv) {
-        return new SuccessDataResult<>(MSGs.SUCCESS_UPDATE_REQUEST.get(), jobAdv.getJobAdvertisementUpdate().getUpdateId());
+    private boolean noChange(JobAdvertisementUpdate jobAdvUpd, JobAdvertisementDto jobAdvDto) {
+        return  check.equals(jobAdvUpd.getPosition().getId(), jobAdvDto.getPositionId()) &&
+                check.equals(jobAdvUpd.getCity().getId(), jobAdvDto.getCityId()) &&
+                check.equals(jobAdvUpd.getMinSalary(), jobAdvDto.getMinSalary()) &&
+                check.equals(jobAdvUpd.getMaxSalary(), jobAdvDto.getMaxSalary()) &&
+                jobAdvUpd.getWorkModel().equals(jobAdvDto.getWorkModel()) &&
+                jobAdvUpd.getWorkTime().equals(jobAdvDto.getWorkTime()) &&
+                check.equals(jobAdvUpd.getOpenPositions(), jobAdvDto.getOpenPositions()) &&
+                check.equals(jobAdvUpd.getDeadline(), jobAdvDto.getDeadline()) &&
+                jobAdvUpd.getJobDescription().equals(jobAdvDto.getJobDescription());
     }
 
 }

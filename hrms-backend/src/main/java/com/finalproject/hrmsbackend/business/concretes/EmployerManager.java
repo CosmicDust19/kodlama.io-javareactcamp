@@ -5,9 +5,12 @@ import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
 import com.finalproject.hrmsbackend.core.business.abstracts.UserCheckService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.core.utilities.results.*;
+import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.ErrorResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
+import com.finalproject.hrmsbackend.core.utilities.results.SuccessDataResult;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerUpdateDao;
 import com.finalproject.hrmsbackend.entities.concretes.Employer;
@@ -70,113 +73,108 @@ public class EmployerManager implements EmployerService {
     @Override
     public Result add(EmployerAddDto employerAddDto) {
         if (userCheck.emailWebsiteDiffDomain(employerAddDto.getEmail(), employerAddDto.getWebsite()))
-            return new ErrorResult(MSGs.DIFF_DOMAIN.get("email and website"));
+            return new ErrorResult(Msg.DIFF_DOMAIN.get("Email and website"));
 
         employerAddDto.setPhoneNumber(Utils.getEditedPhoneNumber(employerAddDto.getPhoneNumber()));
-        Employer employer = modelMapper.map(employerAddDto, Employer.class);
 
-        employerDao.save(employer);
+        Employer employer = modelMapper.map(employerAddDto, Employer.class);
+        Employer savedEmployer = employerDao.save(employer);
+
+        EmployerUpdate employerUpdate = modelMapper.map(savedEmployer, EmployerUpdate.class);
+        EmployerUpdate savedEmployerUpdate = employerUpdateDao.save(employerUpdate);
+
+        employerDao.updateUpdateId(savedEmployerUpdate.getUpdateId(), savedEmployer.getId());
+        savedEmployer.setEmployerUpdate(savedEmployerUpdate);
+
         emailService.sendVerificationMail(employerAddDto.getEmail());
-        return new SuccessResult(MSGs.SAVED.getCustom("%s (needed verification)"));
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedEmployer);
     }
 
     @Override
     public Result updateCompanyName(String companyName, int emplId) {
-        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(Msg.NOT_EXIST.get("emplId"));
 
         Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
-        if ((employerUpdate != null && employerUpdate.getCompanyName().equals(companyName)) ||
-                (employerUpdate == null && employer.getCompanyName().equals(companyName)))
-            return new ErrorResult(MSGs.THE_SAME.get("companyName is"));
+        if (employerUpdate.getCompanyName().equals(companyName))
+            return new ErrorResult(Msg.THE_SAME.get("Company name is"));
 
-        handleLastUpdateActions(employer);
-        employerUpdateDao.updateCompanyName(companyName, employer.getEmployerUpdate().getUpdateId());
-        return getUpdateOutput(employer);
+        employerUpdate.setCompanyName(companyName);
+
+        EmployerUpdate savedEmplUpdate = employerUpdateDao.save(employerUpdate);
+        execLastUpdAct(employer);
+        employer.setEmployerUpdate(savedEmplUpdate);
+        return new SuccessDataResult<>(Msg.SUCCESS_UPDATE_REQUEST.get(), employer);
     }
 
     @Override
     public Result updateEmailAndWebsite(String email, String website, int emplId) {
         if (check.notExistsById(employerDao, emplId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("emplId"));
         if (userCheck.emailWebsiteDiffDomain(email, website))
-            return new ErrorResult(MSGs.DIFF_DOMAIN.get("email and website"));
+            return new ErrorResult(Msg.DIFF_DOMAIN.get("Email and website"));
 
         Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
-        boolean employerUpdateEmailSame = (employerUpdate != null && employerUpdate.getEmail().equals(email));
-        boolean firstUpdateAndEmployerEmailSame = (employerUpdate == null && employer.getEmail().equals(email));
-        boolean employerUpdateWebsiteSame = (employerUpdate != null && employerUpdate.getWebsite().equals(website));
-        boolean firstUpdateAndEmployerWebsiteSame = (employerUpdate == null && employer.getWebsite().equals(website));
-
-        if ((employerUpdateEmailSame || firstUpdateAndEmployerEmailSame) &&
-                (employerUpdateWebsiteSame || firstUpdateAndEmployerWebsiteSame))
-            return new ErrorResult(MSGs.THE_SAME.get("email and website are"));
+        if (employerUpdate.getEmail().equals(email) && employerUpdate.getWebsite().equals(website))
+            return new ErrorResult(Msg.THE_SAME.get("Email and website are"));
 
         if (!employer.getEmail().equals(email) && userDao.existsByEmail(email))
-            return new ErrorResult(MSGs.IN_USE.get("email is"));
+            return new ErrorResult(Msg.IN_USE.get("Email is"));
         if (!employer.getWebsite().equals(website) && employerDao.existsByWebsite(website))
-            return new ErrorResult(MSGs.IN_USE.get("website is"));
+            return new ErrorResult(Msg.IN_USE.get("Website is"));
 
-        handleLastUpdateActions(employer);
-        employerUpdateDao.updateEmailAndWebsite(email, website, employer.getEmployerUpdate().getUpdateId());
-        return getUpdateOutput(employer);
+        employerUpdate.setEmail(email);
+        employerUpdate.setWebsite(website);
+        return execLastUpdAct(employer);
     }
 
     @Override
     public Result updatePhoneNumber(String phoneNumber, int emplId) {
-        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(Msg.NOT_EXIST.get("emplId"));
 
         Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
-        if ((employerUpdate != null && employerUpdate.getPhoneNumber().equals(phoneNumber)) ||
-                (employerUpdate == null && employer.getPhoneNumber().equals(phoneNumber)))
-            return new ErrorResult(MSGs.THE_SAME.get("phoneNumber is"));
+        if (employerUpdate.getPhoneNumber().equals(phoneNumber))
+            return new ErrorResult(Msg.THE_SAME.get("Phone number is"));
 
-        handleLastUpdateActions(employer);
-        employerUpdateDao.updatePhoneNumber(Utils.getEditedPhoneNumber(phoneNumber), employer.getEmployerUpdate().getUpdateId());
-        return getUpdateOutput(employer);
+        employerUpdate.setPhoneNumber(Utils.getEditedPhoneNumber(phoneNumber));
+        return execLastUpdAct(employer);
     }
 
     @Override
     public Result applyChanges(int emplId) {
-        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(Msg.NOT_EXIST.get("emplId"));
 
         Employer employer = employerDao.getById(emplId);
-
-        if (employer.getEmployerUpdate() == null) return new ErrorResult(MSGs.NO_UPDATE.get());
-        employerDao.applyUpdates(employer.getEmployerUpdate(), emplId);
-        employerDao.updateUpdateVerification(true, emplId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        modelMapper.map(employer.getEmployerUpdate(), employer);
+        employer.setUpdateVerified(true);
+        Employer savedEmpl = employerDao.save(employer);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedEmpl);
     }
 
     @Override
     public Result updateVerification(boolean verificationStatus, int emplId) {
-        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(MSGs.NOT_EXIST.get("emplId"));
+        if (check.notExistsById(employerDao, emplId)) return new ErrorResult(Msg.NOT_EXIST.get("emplId"));
 
-        employerDao.updateVerification(verificationStatus, emplId);
-        employerDao.updateRejection(!verificationStatus, emplId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        Employer employer = employerDao.getById(emplId);
+        employer.setVerified(verificationStatus);
+        employer.setRejected(!verificationStatus);
+        Employer savedEmployer = employerDao.save(employer);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedEmployer);
     }
 
-    public EmployerUpdate createEmployerUpdate(Employer employer) {
-        EmployerUpdate employerUpdate = modelMapper.map(employer, EmployerUpdate.class);
-        EmployerUpdate savedEmployerUpdate = employerUpdateDao.save(employerUpdate);
-        employerDao.updateUpdateId(savedEmployerUpdate.getUpdateId(), employer.getId());
-        return savedEmployerUpdate;
-    }
-
-    private void handleLastUpdateActions(Employer employer) {
-        if (employer.getEmployerUpdate() == null) employer.setEmployerUpdate(createEmployerUpdate(employer));
+    private Result execLastUpdAct(Employer employer) {
+        EmployerUpdate savedEmplUpdate = employerUpdateDao.save(employer.getEmployerUpdate());
         employerDao.updateUpdateVerification(false, employer.getId());
         userDao.updateLastModifiedAt(LocalDateTime.now(), employer.getId());
-    }
-
-    private SuccessDataResult<Integer> getUpdateOutput(Employer employer) {
-        return new SuccessDataResult<>(MSGs.SUCCESS_UPDATE_REQUEST.get(), employer.getEmployerUpdate().getUpdateId());
+        employer.setEmployerUpdate(savedEmplUpdate);
+        employer.setUpdateVerified(false);
+        employer.setLastModifiedAt(LocalDateTime.now());
+        return new SuccessDataResult<>(Msg.SUCCESS_UPDATE_REQUEST.get(), employer);
     }
 
 }

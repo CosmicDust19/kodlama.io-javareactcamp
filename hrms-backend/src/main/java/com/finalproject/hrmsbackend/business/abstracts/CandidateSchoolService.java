@@ -15,7 +15,7 @@ public interface CandidateSchoolService {
 
     Result add(CandidateSchoolAddDto candidateSchoolAddDto);
 
-    DataResult<Boolean> deleteById(int candSchId);
+    Result deleteById(int candSchId);
 
     Result updateSchool(int schoolId, int candSchId);
 

@@ -6,6 +6,10 @@ export default class JobAdvertisementService {
         return axios.get("http://localhost:8080/api/jobAdvertisements/get/all");
     }
 
+    getAllByEmployerId(employerId) {
+        return axios.get("http://localhost:8080/api/jobAdvertisements/get/all");
+    }
+
     getPublic(sortDirection) {
         if (!sortDirection) return axios.get(`http://localhost:8080/api/jobAdvertisements/get/public`);
         return axios.get(`http://localhost:8080/api/jobAdvertisements/get/public?sortDirection=${sortDirection}`);
@@ -21,6 +25,10 @@ export default class JobAdvertisementService {
 
     add(values) {
         return axios.post("http://localhost:8080/api/jobAdvertisements/add", values);
+    }
+
+    update(values) {
+        return axios.put("http://localhost:8080/api/jobAdvertisements/update", values);
     }
 
     updatePosition(jobAdvId, positionId) {

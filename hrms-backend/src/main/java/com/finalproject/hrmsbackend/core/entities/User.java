@@ -22,6 +22,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Inheritance(strategy = InheritanceType.JOINED)
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User implements BaseEntity<Integer> {
 
     @Id
@@ -56,4 +57,5 @@ public class User implements BaseEntity<Integer> {
     public User(int id) {
         this.id = id;
     }
+
 }

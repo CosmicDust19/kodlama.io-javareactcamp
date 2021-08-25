@@ -1,9 +1,9 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.JobAdvertisementService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementAddDto;
+import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +28,11 @@ public class JobAdvertisementsController {
     @GetMapping("/get/all")
     public ResponseEntity<?> getAll() {
         return Utils.getResponseEntity(jobAdvService.getAll());
+    }
+
+    @GetMapping("/get/byEmployer")
+    public ResponseEntity<?> getAllByEmployer(Integer employerId) {
+        return Utils.getResponseEntity(jobAdvService.getAllByEmployer(employerId));
     }
 
     @GetMapping("/get/active")
@@ -66,13 +71,18 @@ public class JobAdvertisementsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestBody @Valid JobAdvertisementAddDto jobAdvertisementAddDto) {
-        return Utils.getResponseEntity(jobAdvService.add(jobAdvertisementAddDto));
+    public ResponseEntity<?> add(@RequestBody @Valid JobAdvertisementDto jobAdvertisementDto) {
+        return Utils.getResponseEntity(jobAdvService.add(jobAdvertisementDto));
     }
 
     @DeleteMapping(value = "/delete/byId")
     public ResponseEntity<?> deleteById(@RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.deleteById(jobAdvId));
+    }
+
+    @PutMapping(value = "/update")
+    public ResponseEntity<?> update(@RequestBody @Valid JobAdvertisementDto jobAdvertisementDto) {
+        return Utils.getResponseEntity(jobAdvService.update(jobAdvertisementDto));
     }
 
     @PutMapping(value = "/update/position")
@@ -81,7 +91,7 @@ public class JobAdvertisementsController {
     }
 
     @PutMapping("/update/jobDesc")
-    public ResponseEntity<?> updateJobDesc(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY) String jobDescription,
+    public ResponseEntity<?> updateJobDesc(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY) String jobDescription,
                                            @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateJobDesc(jobDescription, jobAdvId));
     }
@@ -92,39 +102,39 @@ public class JobAdvertisementsController {
     }
 
     @PutMapping("/update/minSalary")
-    public ResponseEntity<?> updateMinSalary(@RequestParam(required = false) @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE) Double minSalary,
+    public ResponseEntity<?> updateMinSalary(@RequestParam(required = false) @Positive(message = Msg.ForAnnotation.NOT_POSITIVE) Double minSalary,
                                              @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateMinSalary(minSalary, jobAdvId));
     }
 
     @PutMapping("/update/maxSalary")
-    public ResponseEntity<?> updateMaxSalary(@RequestParam(required = false) @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE) Double maxSalary,
+    public ResponseEntity<?> updateMaxSalary(@RequestParam(required = false) @Positive(message = Msg.ForAnnotation.NOT_POSITIVE) Double maxSalary,
                                              @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateMaxSalary(maxSalary, jobAdvId));
     }
 
     @PutMapping("/update/workModel")
-    public ResponseEntity<?> updateWorkModel(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    public ResponseEntity<?> updateWorkModel(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
                                              @Size(max = Utils.Const.MAX_JOB_ADV_WORK_MODEL) String workModel,
                                              @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateWorkModel(workModel, jobAdvId));
     }
 
     @PutMapping("/update/workTime")
-    public ResponseEntity<?> updateWorkTime(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    public ResponseEntity<?> updateWorkTime(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
                                             @Size(max = Utils.Const.MAX_JOB_ADV_WORK_TIME) String workTime,
                                             @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateWorkTime(workTime, jobAdvId));
     }
 
     @PutMapping(value = "/update/deadLine")
-    public ResponseEntity<?> updateDeadLine(@RequestParam(required = false) @Future(message = MSGs.ForAnnotation.PAST_OR_PRESENT) LocalDate deadLine,
+    public ResponseEntity<?> updateDeadLine(@RequestParam(required = false) @Future(message = Msg.ForAnnotation.PAST_OR_PRESENT) LocalDate deadLine,
                                             @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateDeadLine(deadLine, jobAdvId));
     }
 
     @PutMapping(value = "/update/openPositions")
-    public ResponseEntity<?> updateOpenPositions(@RequestParam @Positive(message = MSGs.ForAnnotation.NOT_POSITIVE) short number,
+    public ResponseEntity<?> updateOpenPositions(@RequestParam @Positive(message = Msg.ForAnnotation.NOT_POSITIVE) short number,
                                                  @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateOpenPositions(number, jobAdvId));
     }

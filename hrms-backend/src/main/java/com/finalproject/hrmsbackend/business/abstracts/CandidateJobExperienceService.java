@@ -15,7 +15,7 @@ public interface CandidateJobExperienceService {
 
     Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto);
 
-    DataResult<Boolean> deleteById(int id);
+    Result deleteById(int candJobExpId);
 
     Result updateWorkPlace(String workPlace, int candJobExpId);
 

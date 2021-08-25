@@ -157,7 +157,7 @@ export function CandidateManageProfile() {
             position: {id: formik.values.position.id, title: formik.values.position.title}
         };
         candidateJobExperienceService.add(newCandidateJobExperience).then(r => {
-            newCandidateJobExperience.id = r.data.data
+            newCandidateJobExperience.id = r.data.data.id
             dispatch(changeJobExps(getPushedArray(user.candidateJobExperiences, newCandidateJobExperience)))
             toast(ADDED)
             refreshPage()
@@ -183,7 +183,7 @@ export function CandidateManageProfile() {
             department: {id: formik.values.department.id, name: formik.values.department.name},
         };
         candidateSchoolService.add(newCandidateSchool).then(r => {
-            newCandidateSchool.id = r.data.data
+            newCandidateSchool.id = r.data.data.id
             dispatch(changeSchools(getPushedArray(user.candidateSchools, newCandidateSchool)))
             toast(ADDED)
             refreshPage()
@@ -203,7 +203,7 @@ export function CandidateManageProfile() {
             language: {id: formik.values.language.id, name: formik.values.language.name},
         };
         candidateLanguageService.add(newCandidateLanguage).then(r => {
-            newCandidateLanguage.id = r.data.data
+            newCandidateLanguage.id = r.data.data.id
             dispatch(changeLangs(getPushedArray(user.candidateLanguages, newCandidateLanguage)))
             toast(ADDED)
             refreshPage()
@@ -224,7 +224,7 @@ export function CandidateManageProfile() {
             skill: {id: formik.values.skill.id, name: formik.values.skill.name}
         };
         candidateSkillService.add(newCandidateSkill).then(r => {
-            newCandidateSkill.id = r.data.data
+            newCandidateSkill.id = r.data.data.id
             dispatch(changeSkills(getPushedArray(user.candidateSkills, newCandidateSkill)))
             toast(ADDED)
             refreshPage()

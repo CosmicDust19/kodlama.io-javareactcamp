@@ -1,5 +1,6 @@
-package com.finalproject.hrmsbackend.core.adapters;
+package com.finalproject.hrmsbackend.core.adapters.concretes;
 
+import com.finalproject.hrmsbackend.core.adapters.abstracts.MernisService;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateAddDto;
 import org.springframework.stereotype.Component;
 
@@ -7,13 +8,14 @@ import org.springframework.stereotype.Component;
 public class MernisServiceAdapter implements MernisService {
 
     //I removed mernis for now because it causes an error while deploying the app
-    public boolean isRealPerson(CandidateAddDto dto) {
+    @Override
+    public boolean realPerson(CandidateAddDto dto) {
 
         return true;
 
     }
 
-    /*public boolean isRealPerson(String tcno, String name, String surname, short birthYear) {
+    /*public boolean realPerson(String tcno, String name, String surname, short birthYear) {
 
         try {
             return new KPSPublicLocator().getKPSPublicSoap().TCKimlikNoDogrula(Long.parseLong(tcno), name, surname, birthYear);

@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.core.business.concretes;
 
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorResult;
 import com.finalproject.hrmsbackend.core.utilities.results.Result;
@@ -55,6 +55,11 @@ public class CheckManager implements CheckService {
     }
 
     @Override
+    public boolean equals(Integer x, Integer y) {
+        return (x == null && y == null) || (x != null && x.equals(y));
+    }
+
+    @Override
     public boolean equals(Double x, Double y) {
         return (x == null && y == null) || (x != null && x.equals(y));
     }
@@ -76,12 +81,12 @@ public class CheckManager implements CheckService {
 
     @Override
     public Result validateImage(MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(MSGs.NOT_FOUND.get("file"));
+        if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(Msg.NOT_FOUND.get("file"));
         try {
-            if (ImageIO.read(multipartFile.getInputStream()) == null) return new ErrorResult(MSGs.NOT_AN_IMAGE.get());
+            if (ImageIO.read(multipartFile.getInputStream()) == null) return new ErrorResult(Msg.NOT_AN_IMAGE.get());
             //only BMP, GIF, JPG and PNG are recognized
         } catch (IOException exception) {
-            return new ErrorResult(MSGs.IMG_VALIDATION_ERR.get());
+            return new ErrorResult(Msg.IMG_VALIDATION_ERR.get());
         }
         return null;
     }

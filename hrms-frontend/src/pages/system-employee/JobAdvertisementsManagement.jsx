@@ -1,24 +1,43 @@
 import React, {useEffect, useState} from "react";
 import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {
-    Button, Checkbox, Dropdown, Grid, Header, Icon,
-    Input, Label, Loader, Menu, Modal, Pagination, Popup, Segment, Table
+    Button,
+    Checkbox,
+    Dropdown,
+    Grid,
+    Header,
+    Icon,
+    Input,
+    Label,
+    Loader,
+    Menu,
+    Modal,
+    Pagination,
+    Popup,
+    Segment,
+    Table
 } from "semantic-ui-react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
-import {changeFilteredJobAdverts, changeJobAdvertsFilters, filterJobAdverts} from "../../store/actions/filterActions"
+import {
+    changeFilteredJobAdverts, changeJobAdvert,
+    changeJobAdvertsFilters,
+    changeJobAdvVerification,
+    filterJobAdverts
+} from "../../store/actions/filterActions"
 import CityService from "../../services/cityService";
 import PositionService from "../../services/positionService";
 import EmployerService from "../../services/employerService";
 import {toast} from "react-toastify";
 import {useHistory} from "react-router-dom";
 
-let jobAdvertisementService = new JobAdvertisementService();
+const jobAdvertisementService = new JobAdvertisementService();
+
 export default function JobAdvertisementsManagement() {
 
     const dispatch = useDispatch();
     const filters = useSelector(state => state?.filter.filter.jobAdvertsFilters)
-    const filteredJobAdvertisements = useSelector(state => state?.filter.filter.filteredJobAdverts)
+    let filteredJobAdvertisements = useSelector(state => state?.filter.filter.filteredJobAdverts)
     const history = useHistory();
     const userProps = useSelector(state => state?.user.userProps)
 
@@ -45,6 +64,8 @@ export default function JobAdvertisementsManagement() {
             setJobAdvertisements(result.data.data)
         });
     }, []);
+
+    if (filteredJobAdvertisements === undefined) filteredJobAdvertisements = jobAdvertisements
 
     const indexOfLastJobAdvertisement = currentPage * jobAdvertisementsPerPage
     const indexOfFirstJobAdvertisement = indexOfLastJobAdvertisement - jobAdvertisementsPerPage
@@ -101,7 +122,7 @@ export default function JobAdvertisementsManagement() {
         }
     });
 
-    const refreshPage = () => {
+    const refreshComp = () => {
         if (refresh === true) setRefresh(false);
         else setRefresh(true)
     }
@@ -109,7 +130,7 @@ export default function JobAdvertisementsManagement() {
     const handleCatch = (error) => {
         toast.warning("A problem has occurred")
         console.log(error.response)
-        refreshPage()
+        refreshComp()
     }
 
     const getRemainedDays = (jobAdvertisement) => {
@@ -126,21 +147,26 @@ export default function JobAdvertisementsManagement() {
     const getRowColor = (jobAdvertisement) => {
         if ((jobAdvertisement.rejected === null && jobAdvertisement.verified === false)) return "rgba(0,94,255,0.07)"
         else if (jobAdvertisement.rejected) return "rgba(255,0,0,0.07)"
+        else if (jobAdvertisement.updateVerified === false) return "rgba(253,110,2,0.1)"
         else if (Math.floor((new Date(jobAdvertisement.deadline).getTime() - new Date().getTime()) / 86400000) + 1 <= 0) return "rgba(200,0,255,0.05)"
-        else if (!jobAdvertisement.active) return "rgba(80,39,39,0.07)"
+        else if (!jobAdvertisement.active) return "rgba(80,49,39,0.07)"
         else if (jobAdvertisement.verified) return "rgba(27,252,3,0.05)"
         else return "rgba(255,255,255,0.1)"
     }
 
-    const handleChangeVerification = (jobAdvertisement, status) => {
-        jobAdvertisementService.updateVerification(jobAdvertisement.id, status).then(() => {
-            jobAdvertisement.verified = status
-            jobAdvertisement.rejected = !status
-            const index = filteredJobAdvertisements.findIndex((filteredJobAdv) => filteredJobAdv.id === jobAdvertisement.id)
-            filteredJobAdvertisements[index] = jobAdvertisement
-            dispatch(changeFilteredJobAdverts(filteredJobAdvertisements))
+    const handleChangeVerification = (jobAdvert, status) => {
+        jobAdvertisementService.updateVerification(jobAdvert.id, status).then(r => {
+            dispatch(changeJobAdvert(jobAdvert.id, r.data.data))
             toast("Successful")
-            refreshPage()
+            refreshComp()
+        }).catch(handleCatch)
+    }
+
+    const verifyUpdate = (jobAdvert) => {
+        jobAdvertisementService.applyChanges(jobAdvert.id).then(r => {
+            dispatch(changeJobAdvert(jobAdvert.id, r.data.data))
+            toast("Successful")
+            refreshComp()
         }).catch(handleCatch)
     }
 
@@ -167,7 +193,6 @@ export default function JobAdvertisementsManagement() {
         } else {
             formik.values.pending = activeItem
             handleChangeFilter("pending", activeItem)
-            if (activeItem === "updateApproval") toast("Update is not supported for now, it won't affect the filtering process")
         }
         dispatch(changeJobAdvertsFilters(formik.values))
     }
@@ -234,7 +259,7 @@ export default function JobAdvertisementsManagement() {
             <Modal basic onClose={() => setInfoPopUpOpen(false)} onOpen={() => setInfoPopUpOpen(true)}
                    open={infoPopUpOpen} size='small'>
 
-                <Segment placeholder inverted style = {{backgroundColor: "rgba(10,10,10,0.5)", borderRadius: 20}}>
+                <Segment placeholder inverted style={{backgroundColor: "rgba(10,10,10,0.5)", borderRadius: 20}}>
                     <Grid padded>
                         <Grid.Row>
                             <Header size={"small"} style={{color: "rgba(185,108,253,0.61)", marginTop: -3}}>
@@ -242,8 +267,8 @@ export default function JobAdvertisementsManagement() {
                                     <Icon name="wait"/> Pending
                                 </Header.Content>
                             </Header>&nbsp;:&nbsp;Pending you to
-                            &nbsp;<font color = "green">verify</font>&nbsp;or
-                            &nbsp;<font color = "red">reject</font>&nbsp;
+                            &nbsp;<font color="green">verify</font>&nbsp;or
+                            &nbsp;<font color="red">reject</font>&nbsp;
                         </Grid.Row>
                         <Grid.Row>
                             <Header size={"small"} style={{color: "rgba(250,212,98,0.73)", marginTop: -3}}>
@@ -251,8 +276,8 @@ export default function JobAdvertisementsManagement() {
                                     <Icon name="check circle outline"/> Verification
                                 </Header.Content>
                             </Header>&nbsp;:
-                            &nbsp;<font color = "green">Verification</font>&nbsp;and
-                            &nbsp;<font color = "red">rejection</font>&nbsp;status
+                            &nbsp;<font color="green">Verification</font>&nbsp;and
+                            &nbsp;<font color="red">rejection</font>&nbsp;status
                         </Grid.Row>
                         <Grid.Row>
                             <Header size={"small"} style={{color: "rgba(252,108,141,0.66)", marginTop: -3}}>
@@ -260,23 +285,26 @@ export default function JobAdvertisementsManagement() {
                                     <Icon name="checkmark"/> Activation
                                 </Header.Content>
                             </Header>&nbsp;:&nbsp;Employer has
-                            &nbsp;<font color = "green">activated</font>&nbsp;-
-                            &nbsp;<font color = "#8b4513">deactivated</font>&nbsp;or the advertisement has
-                            &nbsp;<font color = "purple">expired</font>&nbsp;
+                            &nbsp;<font color="green">activated</font>&nbsp;-
+                            &nbsp;<font color="#8b4513">deactivated</font>&nbsp;or the advertisement has
+                            &nbsp;<font color="purple">expired</font>&nbsp;
                         </Grid.Row>
                         <Grid.Row>
                             <Header style={{marginTop: -7}}>
-                                <Button basic animated="fade" size = "mini" color={"green"} style={{borderRadius: 10}}>
+                                <Button basic animated="fade" size="mini" color={"green"} style={{borderRadius: 10}}>
                                     <Button.Content visible>Apply</Button.Content>
-                                    <Button.Content hidden><Icon name='filter' style = {{marginLeft: 10}}/></Button.Content>
+                                    <Button.Content hidden><Icon name='filter'
+                                                                 style={{marginLeft: 10}}/></Button.Content>
                                 </Button>
-                            </Header>&nbsp;:&nbsp;Executes the filters<Icon name='filter'/> and syncs job adverts with the database<Icon name='database'/>
+                            </Header>&nbsp;:&nbsp;Executes the filters<Icon name='filter'/> and syncs job adverts with
+                            the database<Icon name='database'/>
                         </Grid.Row>
                         <Grid.Row>
                             <Header style={{marginTop: -7}}>
-                                <Button animated="fade" basic size = "mini" color = "grey" style={{borderRadius: 10}}>
+                                <Button animated="fade" basic size="mini" color="grey" style={{borderRadius: 10}}>
                                     <Button.Content visible>Reset Filters</Button.Content>
-                                    <Button.Content hidden><Icon name='sync alternate' style = {{marginLeft: 10}}/></Button.Content>
+                                    <Button.Content hidden><Icon name='sync alternate'
+                                                                 style={{marginLeft: 10}}/></Button.Content>
                                 </Button>
                             </Header>&nbsp;:&nbsp;Resets<Icon name='sync alternate'/> the filters
                         </Grid.Row>
@@ -284,8 +312,8 @@ export default function JobAdvertisementsManagement() {
                             <Header size={"small"} style={{color: "rgba(252,0,0,0.87)", marginTop: -3}}>
                                 <Header.Content>Tip</Header.Content>
                             </Header>&nbsp;:&nbsp;If you have a problem, you can refresh the page and click the
-                            &nbsp;<font color = "grey">reset</font>&nbsp;or
-                            &nbsp;<font color = "green">apply</font>&nbsp;button
+                            &nbsp;<font color="grey">reset</font>&nbsp;or
+                            &nbsp;<font color="green">apply</font>&nbsp;button
                         </Grid.Row>
                     </Grid>
                 </Segment>
@@ -297,9 +325,9 @@ export default function JobAdvertisementsManagement() {
         return (
             <div>
                 <Segment style={{borderRadius: 20}} disabled={jobAdvertisements.length === 0} raised vertical>
-                    <Label attached={"top right"} style = {{marginTop: 5, marginRight: 5}} color = "blue" circular
-                           onClick = {() => setInfoPopUpOpen(true)}>
-                        <Icon name = "help" style = {{marginRight: 0}}/>
+                    <Label attached={"top right"} style={{marginTop: 5, marginRight: 5}} color="blue" circular
+                           onClick={() => setInfoPopUpOpen(true)}>
+                        <Icon name="help" style={{marginRight: 0}}/>
                     </Label>
                     <Grid stackable padded={"horizontally"}>
                         <Grid.Column width="6">
@@ -454,16 +482,18 @@ export default function JobAdvertisementsManagement() {
                                         <Header size="tiny" disabled={jobAdvertisements.length === 0}>
                                             Application DeadLine
                                         </Header>
-                                        <font style = {{fontStyle: "italic"}}>Before</font>&nbsp;&nbsp;&nbsp;
+                                        <font style={{fontStyle: "italic"}}>Before</font>&nbsp;&nbsp;&nbsp;
                                         <Input placeholder="Before" value={formik.values.applicationDeadLineBefore}
                                                loading={jobAdvertisements.length === 0}
                                                name="applicationDeadLineBefore" type="date"
                                                onChange={formik.handleChange}/>
-                                        <Header style = {{marginTop: 0}}/>
-                                        <font style = {{fontStyle: "italic", marginLeft: 8}}>After</font>&nbsp;&nbsp;&nbsp;
+                                        <Header style={{marginTop: 0}}/>
+                                        <font
+                                            style={{fontStyle: "italic", marginLeft: 8}}>After</font>&nbsp;&nbsp;&nbsp;
                                         <Input placeholder="After" value={formik.values.applicationDeadLineAfter}
                                                loading={jobAdvertisements.length === 0}
-                                               name="applicationDeadLineAfter" type="date" style={{marginTop: -4, marginBottom: 15}}
+                                               name="applicationDeadLineAfter" type="date"
+                                               style={{marginTop: -4, marginBottom: 15}}
                                                onChange={formik.handleChange}/>
                                     </Segment>
                                 </Grid.Column>
@@ -519,7 +549,6 @@ export default function JobAdvertisementsManagement() {
             )
         }
 
-
         return (
             <Table>
                 <Table.Body>
@@ -538,38 +567,37 @@ export default function JobAdvertisementsManagement() {
                                 {getRemainedDays(jobAdvertisement)}
                             </Table.Cell>
                             <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
-                                {!jobAdvertisement.verified && jobAdvertisement.rejected === null ?
+                                {jobAdvertisement.verified === false && jobAdvertisement.rejected === null ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
                                         <Icon name="bullhorn" color="blue"/>Release Approval
                                     </Label> : null}
-                                {jobAdvertisement.updateVerified === null || !!jobAdvertisement.updateVerified ? null :
+                                {jobAdvertisement.updateVerified === false ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(255,113,0,0.1)"}}>
                                         <Icon name="redo alternate" color="orange"/>Update Approval
-                                    </Label>}
-                                {!jobAdvertisement.verified ? null :
+                                    </Label> : null}
+                                {jobAdvertisement.verified === true ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(58,255,0,0.1)"}}>
                                         <Icon name="check circle outline" color="green"/>Verified
-                                    </Label>}
-                                {(jobAdvertisement.verified || !jobAdvertisement.rejected) ? null :
+                                    </Label> : null}
+                                {jobAdvertisement.rejected === true ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
                                         <Icon name="ban" color="red"/>Rejected
-                                    </Label>}
-                                {!jobAdvertisement.active ? null :
+                                    </Label> : null}
+                                {jobAdvertisement.active === true ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(57,255,0,0.1)"}}>
                                         <Icon name="checkmark" color="green"/>Active
-                                    </Label>}
-                                {!!jobAdvertisement.active ? null :
+                                    </Label> :
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(76,16,11,0.1)"}}>
                                         <Icon name="minus circle" color="brown"/>Inactive
                                     </Label>}
-                                {!jobAdvertisement.employer?.verified && jobAdvertisement.employer?.verified === null ?
+                                {jobAdvertisement.employer?.verified === false && jobAdvertisement.employer?.rejected === null ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
                                         <Icon name="user plus" color="blue"/>Sign Up Approval
                                     </Label> : null}
-                                {(jobAdvertisement.employer?.verified || !jobAdvertisement.employer?.verified) ? null :
+                                {jobAdvertisement.employer?.rejected === true ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
                                         <Icon name="ban" color="red"/> Employer Rejected
-                                    </Label>}
+                                    </Label> : null}
                             </Table.Cell>
                             <Table.Cell>
                                 <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>}
@@ -581,26 +609,25 @@ export default function JobAdvertisementsManagement() {
                                             backgroundColor: "rgba(250,250,250, 0.7)",
                                             borderRadius: 10
                                         }}>
-                                        {(!jobAdvertisement.verified && jobAdvertisement.rejected === null) ?
+                                        {jobAdvertisement.updateVerified === false ?
+                                            <Dropdown.Item
+                                                onClick={() => {verifyUpdate(jobAdvertisement)}}>
+                                                <Icon name="redo alternate" color="orange"/>Verify Update
+                                            </Dropdown.Item> : null}
+                                        {jobAdvertisement.verified === false ?
                                             <Dropdown.Item
                                                 onClick={() => handleChangeVerification(jobAdvertisement, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
-                                            </Dropdown.Item> : null}
-                                        {(!jobAdvertisement.verified && jobAdvertisement.rejected === null) ?
-                                            <Dropdown.Item
-                                                onClick={() => handleChangeVerification(jobAdvertisement, false)}>
-                                                <Icon name="ban" color="red"/>Reject
-                                            </Dropdown.Item> : null}
-                                        {!jobAdvertisement.verified ? null :
+                                            </Dropdown.Item> :
                                             <Dropdown.Item
                                                 onClick={() => handleChangeVerification(jobAdvertisement, false)}>
                                                 <Icon name="ban" color="red"/>Cancel Verification
                                             </Dropdown.Item>}
-                                        {jobAdvertisement.verified ? null :
+                                        {jobAdvertisement.verified === false && jobAdvertisement.rejected === null ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(jobAdvertisement, true)}>
-                                                <Icon name="check circle outline" color="green"/>Verify
-                                            </Dropdown.Item>}
+                                                onClick={() => handleChangeVerification(jobAdvertisement, false)}>
+                                                <Icon name="ban" color="red"/>Reject
+                                            </Dropdown.Item> : null}
                                         <Dropdown.Item
                                             onClick={() => handleAdvertisementInfoClick(jobAdvertisement.id)}>
                                             <Icon name="info" color="yellow"/>Info

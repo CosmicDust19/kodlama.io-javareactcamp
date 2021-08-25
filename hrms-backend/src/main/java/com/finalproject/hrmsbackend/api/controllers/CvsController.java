@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.CvService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateJobExperienceDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateLanguageDao;
@@ -57,7 +57,7 @@ public class CvsController {
     }
 
     @PutMapping(value = "/update/title")
-    public ResponseEntity<?> updateTitle(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    public ResponseEntity<?> updateTitle(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
                                          @Size(max = Utils.Const.MAX_CV_TITLE) String title, @RequestParam int cvId) {
         return Utils.getResponseEntity(cvService.updateTitle(title, cvId));
     }

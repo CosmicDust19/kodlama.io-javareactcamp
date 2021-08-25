@@ -2,8 +2,9 @@ package com.finalproject.hrmsbackend.core.utilities;
 
 import lombok.experimental.UtilityClass;
 
-public enum MSGs {
+public enum Msg {
 
+    //simple
     SUCCESS("Successful"),
     SUCCESS_UPDATE_REQUEST("Update request received, updateId:"),
     FAILED("Failed"),
@@ -14,6 +15,8 @@ public enum MSGs {
     UPLOADED("Uploaded"),
     UPLOAD_ERROR("An error has occurred during upload"),
     RESULT_SUM("Result summary"),
+
+    //customizable
     INVALID("invalid"),
     INVALID_DATE("invalid date format (should be yyyy-mm-dd)"),
     USED("used before"),
@@ -21,15 +24,17 @@ public enum MSGs {
     NOT_HAVE("does not have this"),
     NOT_EXIST("does not exist"),
     NOT_FOUND("not found"),
-    WRONG("wrong"),
     THE_SAME("the same as before"),
     ALREADY_CONTAINS("already contains this"),
     DIFF_DOMAIN("have different domain"),
     EXTERNAL_INTERVENTION("can have been intervened externally"),
+
+    //explanation
+    WRONG("Wrong"),
     EMPTY("Empty"),
-    NO_ID_FOUND("No ids found, nothing executed"),
-    NO_UPDATE("No updates available"),
-    START_END_CONFLICT("The end year cannot be a date before the start year"),
+    NO_ID_FOUND("No ids were found, nothing executed"),
+    NO_UPDATE("There are no updates available"),
+    START_END_YEAR_CONFLICT("The end year cannot be a date before the start year"),
     MIN_MAX_CONFLICT("Min value cannot be greater than max value"),
     INVALID_LANG_LVL("Not a language level according to the common european framework (A1, A2 etc.)"),
     MERNIS_FAIL("Mernis verification failed"),
@@ -40,7 +45,7 @@ public enum MSGs {
 
     private final String MSG;
 
-    MSGs(String msg) {
+    Msg(String msg) {
         MSG = msg;
     }
 
@@ -66,7 +71,7 @@ public enum MSGs {
         public static final String NOT_POSITIVE = "Not positive";
         public static final String PAST_OR_PRESENT = "Past or Present";
         public static final String INVALID_LANG_LVL = "Should be A1, A2 etc.";
-        public static final String INVALID_NAT_ID = "must consist of 11 digits";
+        public static final String INVALID_NAT_ID = "Nationality id must consist of 11 digits";
 
     }
 

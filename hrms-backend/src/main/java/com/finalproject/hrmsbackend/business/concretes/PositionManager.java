@@ -1,9 +1,10 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.PositionService;
-import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
-import com.finalproject.hrmsbackend.core.utilities.results.*;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
+import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.Result;
+import com.finalproject.hrmsbackend.core.utilities.results.SuccessDataResult;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.PositionDao;
 import com.finalproject.hrmsbackend.entities.concretes.Position;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import java.util.List;
 public class PositionManager implements PositionService {
 
     private final PositionDao positionDao;
-    private final CheckService check;
 
     @Override
     public DataResult<List<Position>> getAll() {
@@ -25,7 +25,7 @@ public class PositionManager implements PositionService {
 
     @Override
     public Result add(String positionTitle) {
-        positionDao.save(new Position(positionTitle));
-        return new SuccessResult(MSGs.SAVED.get());
+        Position savedPosition = positionDao.save(new Position(positionTitle));
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedPosition);
     }
 }

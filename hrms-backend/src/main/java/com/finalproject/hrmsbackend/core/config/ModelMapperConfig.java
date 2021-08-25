@@ -15,18 +15,26 @@ public class ModelMapperConfig {
     public ModelMapper getModelMapper() {
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        modelMapper.addMappings(jobAdvAddDtoJobAdvPropertyMap);
+        modelMapper.addMappings(jobAdvDtoToJobAdvPropertyMap);
+        modelMapper.addMappings(jobAdvDtoToJobAdvUpdPropertyMap);
         modelMapper.addMappings(cvAddDtoCvPropertyMap);
-        modelMapper.addMappings(candidateJobExpAddDtoCandidateJobExpPropertyMap);
-        modelMapper.addMappings(candidateLangAddDtoCandidateLangPropertyMap);
-        modelMapper.addMappings(candidateSchoolAddDtoCandidateSchoolPropertyMap);
-        modelMapper.addMappings(candidateSkillAddDtoCandidateSkillPropertyMap);
+        modelMapper.addMappings(candJobExpAddDtoToCandJobExpPropertyMap);
+        modelMapper.addMappings(candLangAddDtoToCandLangPropertyMap);
+        modelMapper.addMappings(candSchoolAddDtoToCandSchoolPropertyMap);
+        modelMapper.addMappings(candSkillAddDtoToCandSkillPropertyMap);
         return modelMapper;
     }
 
-    private final PropertyMap<JobAdvertisementAddDto, JobAdvertisement> jobAdvAddDtoJobAdvPropertyMap = new PropertyMap<JobAdvertisementAddDto, JobAdvertisement>() {
+    private final PropertyMap<JobAdvertisementDto, JobAdvertisement> jobAdvDtoToJobAdvPropertyMap = new PropertyMap<JobAdvertisementDto, JobAdvertisement>() {
         protected void configure() {
             map(source.getEmployerId(), destination.getEmployer().getId());
+            map(source.getPositionId(), destination.getPosition().getId());
+            map(source.getCityId(), destination.getCity().getId());
+        }
+    };
+
+    private final PropertyMap<JobAdvertisementDto, JobAdvertisementUpdate> jobAdvDtoToJobAdvUpdPropertyMap = new PropertyMap<JobAdvertisementDto, JobAdvertisementUpdate>() {
+        protected void configure() {
             map(source.getPositionId(), destination.getPosition().getId());
             map(source.getCityId(), destination.getCity().getId());
         }
@@ -38,21 +46,21 @@ public class ModelMapperConfig {
         }
     };
 
-    private final PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience> candidateJobExpAddDtoCandidateJobExpPropertyMap = new PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience>() {
+    private final PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience> candJobExpAddDtoToCandJobExpPropertyMap = new PropertyMap<CandidateJobExperienceAddDto, CandidateJobExperience>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
             map(source.getPositionId(), destination.getPosition().getId());
         }
     };
 
-    private final PropertyMap<CandidateLanguageAddDto, CandidateLanguage> candidateLangAddDtoCandidateLangPropertyMap = new PropertyMap<CandidateLanguageAddDto, CandidateLanguage>() {
+    private final PropertyMap<CandidateLanguageAddDto, CandidateLanguage> candLangAddDtoToCandLangPropertyMap = new PropertyMap<CandidateLanguageAddDto, CandidateLanguage>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
             map(source.getLanguageId(), destination.getLanguage().getId());
         }
     };
 
-    private final PropertyMap<CandidateSchoolAddDto, CandidateSchool> candidateSchoolAddDtoCandidateSchoolPropertyMap = new PropertyMap<CandidateSchoolAddDto, CandidateSchool>() {
+    private final PropertyMap<CandidateSchoolAddDto, CandidateSchool> candSchoolAddDtoToCandSchoolPropertyMap = new PropertyMap<CandidateSchoolAddDto, CandidateSchool>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
             map(source.getSchoolId(), destination.getSchool().getId());
@@ -60,7 +68,7 @@ public class ModelMapperConfig {
         }
     };
 
-    private final PropertyMap<CandidateSkillAddDto, CandidateSkill> candidateSkillAddDtoCandidateSkillPropertyMap = new PropertyMap<CandidateSkillAddDto, CandidateSkill>() {
+    private final PropertyMap<CandidateSkillAddDto, CandidateSkill> candSkillAddDtoToCandSkillPropertyMap = new PropertyMap<CandidateSkillAddDto, CandidateSkill>() {
         protected void configure() {
             map(source.getCandidateId(), destination.getCandidate().getId());
             map(source.getSkillId(), destination.getSkill().getId());

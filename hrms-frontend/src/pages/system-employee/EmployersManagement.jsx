@@ -1,16 +1,27 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button, Dropdown, Grid, Header, Icon,
-    Label, Loader, Menu, Modal, Pagination, Popup, Segment, Table
+    Button,
+    Dropdown,
+    Grid,
+    Header,
+    Icon,
+    Label,
+    Loader,
+    Menu,
+    Modal,
+    Pagination,
+    Popup,
+    Segment,
+    Table
 } from "semantic-ui-react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmployersFilters, changeFilteredEmployers, filterEmployers} from "../../store/actions/filterActions"
+import {changeEmployer, changeEmployersFilters, filterEmployers} from "../../store/actions/filterActions"
 import EmployerService from "../../services/employerService";
 import {toast} from "react-toastify";
 import {useHistory} from "react-router-dom";
 
-let employerService = new EmployerService();
+const employerService = new EmployerService();
 export default function EmployersManagement() {
 
     const dispatch = useDispatch();
@@ -84,18 +95,23 @@ export default function EmployersManagement() {
 
     const getRowColor = (employer) => {
         if ((employer.rejected === null && employer.verified === false)) return "rgba(0,94,255,0.07)"
-        else if (employer.rejected) return "rgba(255,0,0,0.07)"
+        else if (employer.rejected === true) return "rgba(255,0,0,0.07)"
+        else if (employer.updateVerified === false) return "rgba(253,93,2,0.13)"
         else if (employer.verified) return "rgba(27,252,3,0.05)"
         else return "rgba(255,255,255,0.1)"
     }
 
-    const handleChangeVerification = (employer, status) => {
-        employerService.updateVerification(employer.id, status).then(() => {
-            employer.verified = status
-            employer.rejected = !status
-            const index = filteredEmployers.findIndex((filteredEmployer) => filteredEmployer.id === employer.id)
-            filteredEmployers[index] = employer
-            dispatch(changeFilteredEmployers(filteredEmployers))
+    const changeVerification = (employer, status) => {
+        employerService.updateVerification(employer.id, status).then(r => {
+            dispatch(changeEmployer(employer.id, r.data.data))
+            toast("Successful")
+            refreshPage()
+        }).catch(handleCatch)
+    }
+
+    const verifyUpdate = (employer) => {
+        employerService.applyChanges(employer.id).then(r => {
+            dispatch(changeEmployer(employer.id, r.data.data))
             toast("Successful")
             refreshPage()
         }).catch(handleCatch)
@@ -359,26 +375,25 @@ export default function EmployersManagement() {
                                             backgroundColor: "rgba(250,250,250, 0.7)",
                                             borderRadius: 10
                                         }}>
-                                        {(!employer.verified && employer.rejected === null) ?
+                                        {employer.updateVerified === false ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(employer, true)}>
+                                                onClick={() => verifyUpdate(employer)}>
+                                                <Icon name="redo alternate" color="orange"/>Verify Update
+                                            </Dropdown.Item> : null}
+                                        {employer.verified === false ?
+                                            <Dropdown.Item
+                                                onClick={() => changeVerification(employer, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
-                                            </Dropdown.Item> : null}
-                                        {(!employer.verified && employer.rejected === null) ?
+                                            </Dropdown.Item> :
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(employer, false)}>
-                                                <Icon name="ban" color="red"/>Reject
-                                            </Dropdown.Item> : null}
-                                        {!employer.verified ? null :
-                                            <Dropdown.Item
-                                                onClick={() => handleChangeVerification(employer, false)}>
+                                                onClick={() => changeVerification(employer, false)}>
                                                 <Icon name="ban" color="red"/>Cancel Verification
                                             </Dropdown.Item>}
-                                        {!employer.rejected ? null :
+                                        {employer.verified === false && employer.rejected === null ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(employer, true)}>
-                                                <Icon name="check circle outline" color="green"/>Verify
-                                            </Dropdown.Item>}
+                                                onClick={() => changeVerification(employer, false)}>
+                                                <Icon name="ban" color="red"/>Reject
+                                            </Dropdown.Item> : null}
                                         <Dropdown.Item
                                             onClick={() => handleEmployerInfoClick(employer.id)}>
                                             <Icon name="info" color="yellow"/>Info
@@ -472,9 +487,11 @@ export default function EmployersManagement() {
             {filtersSegment()}
             <Grid padded>
                 <Grid.Column width={8}>
-                    <Dropdown placeholder="Search employers" search className="icon" label = {formik.values.employerId === 0 ? null :
-                        <Button icon="x" circular disabled={employers.length === 0 || loading} loading={loading}
-                                onClick={() => handleChangeFilter("employerId", 0)}/>}
+                    <Dropdown placeholder="Search employers" search className="icon" selectOnBlur ={false}
+                              label={formik.values.employerId === 0 ? null :
+                                  <Button icon="x" circular disabled={employers.length === 0 || loading}
+                                          loading={loading}
+                                          onClick={() => handleChangeFilter("employerId", 0)}/>}
                               loading={employers.length === 0} button labeled icon="search"
                               options={employerOption} value={formik.values.employerId}
                               style={{borderRadius: 10}} basic

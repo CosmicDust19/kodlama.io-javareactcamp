@@ -24,8 +24,8 @@ import java.util.List;
 public class Cv implements BaseEntity<Integer> {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "candidates_cvs_id_generator")
-    @SequenceGenerator(name = "candidates_cvs_id_generator", sequenceName = "candidates_cvs_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cvs_id_generator")
+    @SequenceGenerator(name = "cvs_id_generator", sequenceName = "cvs_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Integer id;
 
@@ -50,28 +50,28 @@ public class Cv implements BaseEntity<Integer> {
     private LocalDateTime lastModifiedAt;
 
     @ManyToMany
-    @JoinTable(name = "candidates_cvs_job_experiences",
+    @JoinTable(name = "cvs_job_experiences",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_job_exp_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateJobExperience> candidateJobExperiences;
 
     @ManyToMany
-    @JoinTable(name = "candidates_cvs_languages",
+    @JoinTable(name = "cvs_languages",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_language_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateLanguage> candidateLanguages;
 
     @ManyToMany
-    @JoinTable(name = "candidates_cvs_schools",
+    @JoinTable(name = "cvs_schools",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_school_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
     private List<CandidateSchool> candidateSchools;
 
     @ManyToMany
-    @JoinTable(name = "candidates_cvs_skills",
+    @JoinTable(name = "cvs_skills",
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_skill_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})

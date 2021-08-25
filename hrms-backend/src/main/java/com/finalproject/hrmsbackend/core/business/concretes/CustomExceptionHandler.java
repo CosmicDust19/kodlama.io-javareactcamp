@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.core.business.concretes;
 
 import com.finalproject.hrmsbackend.core.entities.ApiError;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -19,7 +19,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Path;
 import java.util.*;
 
 @ControllerAdvice
@@ -32,8 +31,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
             errors.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        ApiError apiError = new ApiError(MSGs.INVALID.getCustom("%s input(s)"), errors, null);
-        return ResponseEntity.badRequest().body(new ErrorDataResult<>(MSGs.FAILED.get(), apiError));
+        ApiError apiError = new ApiError(Msg.INVALID.getCustom("%s input(s)"), errors, null);
+        return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
     }
 
     @Override
@@ -41,19 +40,21 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ex.printStackTrace();
         Set<String> details = new LinkedHashSet<>();
         details.add(ex.getMessage());
-        ApiError apiError = new ApiError(MSGs.MALFORMED_JSON_REQUEST.get(), null, details);
-        return ResponseEntity.badRequest().body(new ErrorDataResult<>(MSGs.FAILED.get(), apiError));
+        ApiError apiError = new ApiError(Msg.MALFORMED_JSON_REQUEST.get(), null, details);
+        return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
     public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException exceptions, WebRequest request) {
         exceptions.printStackTrace();
-        Map<Path, String> errors = new LinkedHashMap<>();
+        Map<String, String> errors = new LinkedHashMap<>();
         for (ConstraintViolation<?> violation : exceptions.getConstraintViolations()) {
-            errors.put(violation.getPropertyPath(), violation.getMessage());
+            String propPath = violation.getPropertyPath().toString();
+            String invalidProp = propPath.substring(propPath.lastIndexOf('.') + 1);
+            errors.put(invalidProp, violation.getMessage());
         }
-        ApiError apiError = new ApiError(MSGs.INVALID.getCustom("%s input(s)"), errors, null);
-        return ResponseEntity.badRequest().body(new ErrorDataResult<>(MSGs.FAILED.get(), apiError));
+        ApiError apiError = new ApiError(Msg.INVALID.getCustom("%s input(s)"), errors, null);
+        return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
     }
 
     @ExceptionHandler({DataIntegrityViolationException.class})
@@ -62,21 +63,21 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         Set<String> details = new LinkedHashSet<>();
         details.add(Objects.requireNonNull(ex.getMostSpecificCause()).getMessage());
         ApiError apiError = new ApiError(ex.getCause().getMessage(), null, details);
-        return ResponseEntity.badRequest().body(new ErrorDataResult<>(MSGs.FAILED.get(), apiError));
+        return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
     }
 
     @ExceptionHandler({EmptyResultDataAccessException.class})
     public ResponseEntity<Object> handleEmptyResultDataAccess(EmptyResultDataAccessException ex, WebRequest request) {
         ex.printStackTrace();
         ApiError apiError = new ApiError(ex.getMostSpecificCause().getMessage(), null, null);
-        return ResponseEntity.badRequest().body(new ErrorDataResult<>(MSGs.FAILED.get(), apiError));
+        return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
     }
 
     @Override
     public ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
         ex.printStackTrace();
         ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMostSpecificCause().getMessage(), null, null);
-        return ResponseEntity.badRequest().body(new ErrorDataResult<>(MSGs.FAILED.get(), apiError));
+        return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
     }
 
 }

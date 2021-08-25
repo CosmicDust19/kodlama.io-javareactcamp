@@ -1,10 +1,12 @@
 export const CHANGE_JOB_ADVERTS_FILTERS = "CHANGE_FILTER"
-export const CHANGE_FILTERED_JOBADVS = "CHANGE_FILTERED_JOBADVS"
-export const FILTER_JOBADVS = "FILTER_JOBADVS"
+export const CHANGE_FILTERED_JOB_ADVS = "CHANGE_FILTERED_JOB_ADVS"
+export const CHANGE_JOB_ADVERT = "CHANGE_JOB_ADVERT"
+export const CHANGE_JOB_ADV_VERIFICATION = "CHANGE_JOB_ADV_VERIFICATION"
+export const FILTER_JOB_ADVS = "FILTER_JOB_ADVS"
 export const CHANGE_EMPLOYERS_FILTERS = "CHANGE_EMPLOYERS_FILTERS"
 export const CHANGE_FILTERED_EMPLOYERS = "CHANGE_FILTERED_EMPLOYERS"
+export const CHANGE_EMPLOYER = "CHANGE_EMPLOYER"
 export const FILTER_EMPLOYERS = "FILTER_EMPLOYERS"
-
 
 export function changeJobAdvertsFilters(jobAdvertsFilters) {
     return {
@@ -15,8 +17,22 @@ export function changeJobAdvertsFilters(jobAdvertsFilters) {
 
 export function changeFilteredJobAdverts(filteredJobAdverts) {
     return {
-        type: CHANGE_FILTERED_JOBADVS,
+        type: CHANGE_FILTERED_JOB_ADVS,
         payload: {filteredJobAdverts}
+    }
+}
+
+export function changeJobAdvert(jobAdvId, jobAdvert) {
+    return {
+        type: CHANGE_JOB_ADVERT,
+        payload: {jobAdvId, jobAdvert}
+    }
+}
+
+export function changeJobAdvVerification(jobAdvId, status) {
+    return {
+        type: CHANGE_JOB_ADV_VERIFICATION,
+        payload: {jobAdvId, status}
     }
 }
 
@@ -99,22 +115,16 @@ export function filterJobAdverts(jobAdverts, filters) {
         filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
             new Date(jobAdvertisement.deadline).getTime() > new Date(filters.applicationDeadLineAfter).getTime())
     if (filters.pending && filters.pending.length > 0) {
-        if (filters.pending === "releaseApproval") {
-            filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
-                jobAdvertisement.rejected === null && jobAdvertisement.verified === false)
-        }
-        /*else if (jobAdvertsFilters.pending === "updateApproval") {
-            filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) => {
-                return jobAdvertisement.updateVerificationStatus === false
-            })
-        }*/
+        if (filters.pending === "releaseApproval")
+            filteredJobAdverts = filteredJobAdverts.filter(jobAdv => jobAdv.rejected === null && jobAdv.verified === false)
+        else if (filters.pending === "updateApproval")
+            filteredJobAdverts = filteredJobAdverts.filter(jobAdvertisement => jobAdvertisement.updateVerified === false)
     }
     if (filters.verification && filters.verification.length > 0) {
         if (filters.verification === "verified") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
                 jobAdvertisement.verified === true)
-        }
-        else if (filters.verification === "rejected") {
+        } else if (filters.verification === "rejected") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
                 jobAdvertisement.rejected === true)
         }
@@ -123,8 +133,7 @@ export function filterJobAdverts(jobAdverts, filters) {
         if (filters.activation === "active") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
                 jobAdvertisement.active === true)
-        }
-        else if (filters.activation === "inactive") {
+        } else if (filters.activation === "inactive") {
             filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) =>
                 jobAdvertisement.active === false)
         } else if (filters.activation === "expired") {
@@ -133,7 +142,7 @@ export function filterJobAdverts(jobAdverts, filters) {
         }
 
     return {
-        type: FILTER_JOBADVS,
+        type: FILTER_JOB_ADVS,
         payload: {filteredJobAdverts}
     }
 }
@@ -152,10 +161,17 @@ export function changeFilteredEmployers(filteredEmployers) {
     }
 }
 
+export function changeEmployer(emplId, employer) {
+    return {
+        type: CHANGE_EMPLOYER,
+        payload: {emplId, employer}
+    }
+}
+
 export function filterEmployers(employers, filters) {
 
     let filteredEmployers = [...employers]
-    if (filters.employerId > 0){
+    if (filters.employerId > 0) {
         const index = filteredEmployers.findIndex((employer) => employer.id === filters.employerId)
         filteredEmployers = [filteredEmployers[index]]
         return {
@@ -164,22 +180,16 @@ export function filterEmployers(employers, filters) {
         }
     }
     if (filters.pending && filters.pending.length > 0) {
-        if (filters.pending === "signUpApproval") {
-            filteredEmployers = filteredEmployers.filter((employer) =>
-                employer.rejected === null && employer.verified === false)
-        }
-        /*else if (jobAdvertsFilters.pending === "updateApproval") {
-            filteredJobAdverts = filteredJobAdverts.filter((jobAdvertisement) => {
-                return jobAdvertisement.updateVerificationStatus === false
-            })
-        }*/
+        if (filters.pending === "signUpApproval")
+            filteredEmployers = filteredEmployers.filter((employer) => employer.rejected === null && employer.verified === false)
+        else if (filters.pending === "updateApproval")
+            filteredEmployers = filteredEmployers.filter((employer) => employer.updateVerified === false)
     }
     if (filters.verification && filters.verification.length > 0) {
         if (filters.verification === "verified") {
             filteredEmployers = filteredEmployers.filter((employer) =>
                 employer.verified === true)
-        }
-        else if (filters.verification === "rejected") {
+        } else if (filters.verification === "rejected") {
             filteredEmployers = filteredEmployers.filter((employer) =>
                 employer.rejected === true)
         }

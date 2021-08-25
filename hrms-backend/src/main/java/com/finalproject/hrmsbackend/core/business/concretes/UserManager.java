@@ -3,7 +3,8 @@ package com.finalproject.hrmsbackend.core.business.concretes;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.UserService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.entities.User;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,26 +31,33 @@ public class UserManager implements UserService {
     @Override
     public Result deleteById(int userId) {
         userDao.deleteById(userId);
-        return new SuccessResult(MSGs.DELETED.get());
+        return new SuccessResult(Msg.DELETED.get());
     }
 
     @Override
     public Result updateEmail(String email, int userId) {
-        if (check.notExistsById(userDao, userId)) return new ErrorResult(MSGs.NOT_EXIST.get("userId"));
-        if (userDao.existsByEmail(email)) return new ErrorResult(MSGs.IN_USE.get("email is"));
+        if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
+        if (userDao.existsByEmail(email)) return new ErrorResult(Msg.IN_USE.get("Email is"));
 
-        userDao.updateEmail(email, userId);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), userId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        User user = userDao.getById(userId);
+        user.setEmail(email);
+        return execLastUpdAct(user);
     }
 
     @Override
-    public Result updatePW(String password, String oldPassword, int id) {
-        if (!userDao.existsByIdAndPassword(id, oldPassword)) return new ErrorResult(MSGs.WRONG.getCustom("%s oldPassword"));
+    public Result updatePW(String password, String oldPassword, int userId) {
+        if (!userDao.existsByIdAndPassword(userId, oldPassword))
+            return new ErrorResult(Msg.WRONG.getCustom("%s password"));
 
-        userDao.updatePassword(password, id);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), id);
-        return new SuccessResult(MSGs.UPDATED.get());
+        User user = userDao.getById(userId);
+        user.setPassword(password);
+        return execLastUpdAct(user);
+    }
+
+    private Result execLastUpdAct(User user) {
+        user.setLastModifiedAt(LocalDateTime.now());
+        User savedUser = userDao.save(user);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedUser);
     }
 
 }

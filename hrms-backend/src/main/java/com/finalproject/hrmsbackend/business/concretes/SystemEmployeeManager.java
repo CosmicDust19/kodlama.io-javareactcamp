@@ -2,8 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.SystemEmployeeService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.SystemEmployeeDao;
 import com.finalproject.hrmsbackend.entities.concretes.SystemEmployee;
@@ -20,7 +19,6 @@ import java.util.List;
 public class SystemEmployeeManager implements SystemEmployeeService {
 
     private final SystemEmployeeDao systemEmployeeDao;
-    private final UserDao userDao;
     private final CheckService check;
     private final ModelMapper modelMapper;
 
@@ -43,25 +41,31 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
         SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
         systemEmployeeDao.save(systemEmployee);
-        return new SuccessResult(MSGs.SAVED.get());
+        return new SuccessResult(Msg.SAVED.get());
     }
 
     @Override
     public Result updateFirstName(String firstName, int sysEmplId) {
-        if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(MSGs.NOT_EXIST.get("sysEmplId"));
+        if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(Msg.NOT_EXIST.get("sysEmplId"));
 
-        systemEmployeeDao.updateFirstName(firstName, sysEmplId);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), sysEmplId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        SystemEmployee sysEmpl = systemEmployeeDao.getById(sysEmplId);
+        sysEmpl.setFirstName(firstName);
+        return execLastUpdAct(sysEmpl);
     }
 
     @Override
     public Result updateLastName(String lastName, int sysEmplId) {
-        if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(MSGs.NOT_EXIST.get("sysEmplId"));
+        if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(Msg.NOT_EXIST.get("sysEmplId"));
 
-        systemEmployeeDao.updateLastName(lastName, sysEmplId);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), sysEmplId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        SystemEmployee sysEmpl = systemEmployeeDao.getById(sysEmplId);
+        sysEmpl.setLastName(lastName);
+        return execLastUpdAct(sysEmpl);
+    }
+
+    private Result execLastUpdAct(SystemEmployee sysEmpl) {
+        sysEmpl.setLastModifiedAt(LocalDateTime.now());
+        SystemEmployee savedSysEmpl = systemEmployeeDao.save(sysEmpl);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedSysEmpl);
     }
 
 }

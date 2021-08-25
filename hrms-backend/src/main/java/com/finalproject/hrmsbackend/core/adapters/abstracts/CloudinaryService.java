@@ -1,4 +1,4 @@
-package com.finalproject.hrmsbackend.core.adapters;
+package com.finalproject.hrmsbackend.core.adapters.abstracts;
 
 import org.springframework.web.multipart.MultipartFile;
 

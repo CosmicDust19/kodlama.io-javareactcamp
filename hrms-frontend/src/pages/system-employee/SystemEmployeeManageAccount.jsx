@@ -1,8 +1,8 @@
 import {
     Header, Grid, Menu, Input, Icon, Form, Button,
-    Item, Modal, Image, Placeholder,
+    Item, Modal
 } from "semantic-ui-react";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
 import UserService from "../../services/userService";
@@ -25,13 +25,6 @@ export function SystemEmployeeManageAccount() {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [activeItem, setActiveItem] = useState('name')
     const [refresh, setRefresh] = useState(0);
-    const [loading, setLoading] = useState(true)
-
-    useEffect(() => {
-        setTimeout(() => {
-            setLoading(false)
-        }, 1000)
-    }, [])
 
     const handleItemClick = (activeItem) => {
         setActiveItem(activeItem)
@@ -119,7 +112,7 @@ export function SystemEmployeeManageAccount() {
             console.log(r)
             if (r.data.success) {
                 if (!r.data.data) {
-                    systemEmployeeService.updateEmail(user.id, formik.values.email).then(r => {
+                    userService.updateEmail(user.id, formik.values.email).then(r => {
                         console.log(r)
                         if (r.data.success) {
                             dispatch(changeEmail(formik.values.email))
@@ -148,7 +141,7 @@ export function SystemEmployeeManageAccount() {
             toast.warning("Wrong password!")
             return;
         }
-        systemEmployeeService.existsByEmailAndPassword(user.email, formik.values.currentPassword).then((r) => {
+        userService.existsByEmailAndPW(user.email, formik.values.currentPassword).then((r) => {
             console.log(r)
             if (r.data.success) {
                 if (r.data.data) {
@@ -180,7 +173,7 @@ export function SystemEmployeeManageAccount() {
             toast.warning("You are already using this password")
             return;
         }
-        systemEmployeeService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(r => {
+        userService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(r => {
             console.log(r)
             if (r.data.success) {
                 toast("Saved")
@@ -205,7 +198,7 @@ export function SystemEmployeeManageAccount() {
                 </Header>
                 <Modal.Actions>
                     <Button color='red' inverted size='large' onClick={() => {
-                        systemEmployeeService.deleteAccount(user.id).then(r => {
+                        userService.deleteById(user.id).then(r => {
                             console.log(r)
                             dispatch(signOut())
                             history.push("/")
@@ -317,16 +310,7 @@ export function SystemEmployeeManageAccount() {
                 <Grid.Column width={8}>
                     <Item.Group unstackable>
                         <Item>
-                            {loading ?
-                                <Item.Image>
-                                    <Image circular>
-                                        <Placeholder style={{height: 175, width: 175}}>
-                                            <Placeholder.Image/>
-                                        </Placeholder>
-                                    </Image>
-                                </Item.Image> :
-                                <Item.Image src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
-                            }
+                            <Item.Image src={"https://freesvg.org/img/abstract-user-flat-1.png"}/>
                             <Item.Content verticalAlign={"middle"}>
                                 <Item.Header as='a'>
                                     <Header>
@@ -373,22 +357,22 @@ export function SystemEmployeeManageAccount() {
                     <strong>Change</strong>
                     <Menu fluid vertical secondary>
                         <Menu.Item
-                            name='Name'
+                            color={"yellow"} icon={"user"} name='Name'
                             active={activeItem === 'name'}
                             onClick={() => handleItemClick("name")}
                         />
                         <Menu.Item
-                            name='Email'
+                            color={"orange"} icon={"envelope"} name='Email'
                             active={activeItem === 'email'}
                             onClick={() => handleItemClick("email")}
                         />
                         <Menu.Item
-                            name='Password'
+                            color={"blue"} icon={"lock"} name='Password'
                             active={activeItem === 'password'}
                             onClick={() => handleItemClick("password")}
                         />
                         <Menu.Item
-                            color={"red"}
+                            icon={"warning sign"} color={"red"}
                             name='Danger Zone'
                             active={activeItem === 'danger'}
                             onClick={() => handleItemClick("danger")}
@@ -403,7 +387,6 @@ export function SystemEmployeeManageAccount() {
                     </Grid>
                 </Grid.Column>
             </Grid>
-            {loading ? <Image src={"https://freesvg.org/img/abstract-user-flat-1.png"} style={{opacity: 0}}/> : null}
         </div>
     )
 }

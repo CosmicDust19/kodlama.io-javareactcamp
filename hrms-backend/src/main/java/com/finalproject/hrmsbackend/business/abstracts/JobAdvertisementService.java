@@ -3,7 +3,7 @@ package com.finalproject.hrmsbackend.business.abstracts;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.JobAdvertisement;
-import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementAddDto;
+import com.finalproject.hrmsbackend.entities.concretes.dtos.JobAdvertisementDto;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,6 +11,8 @@ import java.util.List;
 public interface JobAdvertisementService {
 
     DataResult<List<JobAdvertisement>> getAll();
+
+    DataResult<List<JobAdvertisement>> getAllByEmployer(Integer employerId);
 
     DataResult<List<JobAdvertisement>> getActiveVerified();
 
@@ -26,9 +28,11 @@ public interface JobAdvertisementService {
 
     DataResult<JobAdvertisement> getById(int jobAdvId);
 
-    Result add(JobAdvertisementAddDto jobAdvertisementAddDto);
+    Result add(JobAdvertisementDto jobAdvertisementDto);
 
     DataResult<Boolean> deleteById(int jobAdvId);
+
+    Result update(JobAdvertisementDto jobAdvAddDto);
 
     Result updatePosition(short positionId, int jobAdvId);
 
@@ -36,15 +40,15 @@ public interface JobAdvertisementService {
 
     Result updateCity(short cityId, int jobAdvId);
 
-    Result updateMinSalary(Double minSalary, int id);
+    Result updateMinSalary(Double minSalary, int jobAdvId);
 
-    Result updateMaxSalary(Double maxSalary, int id);
+    Result updateMaxSalary(Double maxSalary, int jobAdvId);
 
-    Result updateWorkModel(String workModel, int id);
+    Result updateWorkModel(String workModel, int jobAdvId);
 
-    Result updateWorkTime(String workTime, int id);
+    Result updateWorkTime(String workTime, int jobAdvId);
 
-    Result updateOpenPositions(short num, int id);
+    Result updateOpenPositions(short num, int jobAdvId);
 
     Result updateDeadLine(LocalDate deadLine, int id);
 

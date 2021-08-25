@@ -118,16 +118,21 @@ CREATE TABLE public.employers
 CREATE TABLE public.job_advertisements_update
 (
     job_adv_update_id integer,
-    position_id       smallint,
-    job_description   text,
-    city_id           smallint,
+    employer_id       integer          NOT NULL,
+    position_id       smallint         NOT NULL,
+    job_description   text             NOT NULL,
+    city_id           smallint         NOT NULL,
     min_salary        integer,
     max_salary        integer,
-    open_positions    smallint,
-    work_model        char varying(20),
-    work_time         char varying(20),
+    open_positions    smallint         NOT NULL,
+    work_model        char varying(20) NOT NULL,
+    work_time         char varying(20) NOT NULL,
     deadline          date,
     CONSTRAINT pk_job_advertisements_update PRIMARY KEY (job_adv_update_id),
+    CONSTRAINT uk_job_advertisement_updates_emp_pos_desc_city UNIQUE (employer_id, position_id, job_description, city_id),
+    CONSTRAINT fk_job_advertisements_employer_id FOREIGN KEY (employer_id)
+        REFERENCES public.employers (user_id)
+        ON DELETE CASCADE,
     CONSTRAINT fk_job_advertisements_city_id FOREIGN KEY (city_id)
         REFERENCES public.cities (id),
     CONSTRAINT fk_job_advertisements_position_id FOREIGN KEY (position_id)
@@ -259,7 +264,7 @@ CREATE TABLE public.cvs
         ON DELETE CASCADE
 );
 
-CREATE TABLE public.candidates_cvs_schools
+CREATE TABLE public.cvs_schools
 (
     cv_id               integer NOT NULL,
     candidate_school_id integer NOT NULL,
@@ -272,7 +277,7 @@ CREATE TABLE public.candidates_cvs_schools
         ON DELETE CASCADE
 );
 
-CREATE TABLE public.candidates_cvs_languages
+CREATE TABLE public.cvs_languages
 (
     cv_id                 integer NOT NULL,
     candidate_language_id integer NOT NULL,
@@ -285,7 +290,7 @@ CREATE TABLE public.candidates_cvs_languages
         ON DELETE CASCADE
 );
 
-CREATE TABLE public.candidates_cvs_job_experiences
+CREATE TABLE public.cvs_job_experiences
 (
     cv_id                integer NOT NULL,
     candidate_job_exp_id integer NOT NULL,
@@ -298,7 +303,7 @@ CREATE TABLE public.candidates_cvs_job_experiences
         ON DELETE CASCADE
 );
 
-CREATE TABLE public.candidates_cvs_skills
+CREATE TABLE public.cvs_skills
 (
     cv_id              integer NOT NULL,
     candidate_skill_id integer NOT NULL,
@@ -604,7 +609,12 @@ SET github_account   = 'https://github.com/CosmicDust19',
     linkedin_account = 'https://www.linkedin.com/in/semih-kayan/'
 WHERE user_id = 4;
 
+INSERT INTO employers_updates
+VALUES (7, 'example7@example.com', 'example_company7', 'www.example_web_site7.com', '05005005057'),
+       (8, 'example8@example.com', 'example_company8', 'www.example_web_site8.com', '05005005058'),
+       (9, 'example9@example.com', 'example_company9', 'www.example_web_site9.com', '05005005059');
+
 INSERT INTO employers
-VALUES (7, 'example_company7', 'www.example_web_site7.com', '05005005057', null, true),
-       (8, 'example_company8', 'www.example_web_site8.com', '05005005058', null, true),
-       (9, 'example_company9', 'www.example_web_site9.com', '05005005059', null, true);
+VALUES (7, 'example_company7', 'www.example_web_site7.com', '05005005057', 7, true),
+       (8, 'example_company8', 'www.example_web_site8.com', '05005005058', 8, true),
+       (9, 'example_company9', 'www.example_web_site9.com', '05005005059', 9, true);

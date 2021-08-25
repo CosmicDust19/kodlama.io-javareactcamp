@@ -1,6 +1,6 @@
 package com.finalproject.hrmsbackend.core.entities;
 
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,11 +15,11 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UserAddDto {
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.EMAIL_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
+    @Pattern(regexp = Utils.Const.EMAIL_REGEXP, message = Msg.ForAnnotation.INVALID_FORMAT)
     private String email;
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
     @Size(min = Utils.Const.MIN_PW, max = Utils.Const.MAX_PW)
     private String password;
 

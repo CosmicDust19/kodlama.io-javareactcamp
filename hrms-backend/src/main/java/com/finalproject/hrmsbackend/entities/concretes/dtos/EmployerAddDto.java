@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
 import com.finalproject.hrmsbackend.core.entities.UserAddDto;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,17 +18,17 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class EmployerAddDto extends UserAddDto {
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
     @Size(max = Utils.Const.MAX_COMPANY_NAME)
     private String companyName;
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.WEBSITE_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
+    @Pattern(regexp = Utils.Const.WEBSITE_REGEXP, message = Msg.ForAnnotation.INVALID_FORMAT)
     private String website;
     // domain extensions: https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.PHONE_NUM_REGEXP, message = MSGs.ForAnnotation.INVALID_FORMAT)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
+    @Pattern(regexp = Utils.Const.PHONE_NUM_REGEXP, message = Msg.ForAnnotation.INVALID_FORMAT)
     private String phoneNumber;
 
 }

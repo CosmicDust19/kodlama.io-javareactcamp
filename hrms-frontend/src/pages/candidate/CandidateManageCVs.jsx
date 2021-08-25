@@ -69,7 +69,7 @@ export function CandidateManageCvs() {
         if (user.cvs && user.cvs[index]) setSelectedCv(user?.cvs[index]);
     }, [index, user?.cvs]);
 
-    const refreshPage = () => {
+    const refreshComp = () => {
         if (refresh === 0) setRefresh(1);
         else setRefresh(0)
     }
@@ -77,7 +77,7 @@ export function CandidateManageCvs() {
     const handleCatch = (error) => {
         toast.warning("An error has occurred")
         console.log(error.response)
-        refreshPage()
+        refreshComp()
     }
 
     const candidateJobExperienceOption = user.candidateJobExperiences?.filter((candJobExp) => {
@@ -144,7 +144,7 @@ export function CandidateManageCvs() {
             }))
             setSelectedCv(user.cvs[user.cvs.length - 1])
             setActiveItem(formik.values.cvAddTitle)
-            refreshPage()
+            refreshComp()
             formik.values.cvAddTitle = ""
         }).catch(handleCatch)
     }
@@ -154,7 +154,7 @@ export function CandidateManageCvs() {
             dispatch(deleteCv(selectedCv.id))
             if (user.cvs.length === 0) setSelectedCv({})
             else setSelectedCv(user.cvs[0])
-            refreshPage()
+            refreshComp()
         }).catch(handleCatch)
     }
 
@@ -162,7 +162,7 @@ export function CandidateManageCvs() {
         if (formik.values.coverLetter === "") formik.values.coverLetter = undefined
         candidateCvService.updateCoverLetter(selectedCv.id, formik.values.coverLetter).then(() => {
             dispatch(changeCoverLetter(selectedCv.id, formik.values.coverLetter))
-            refreshPage()
+            refreshComp()
         }).catch(handleCatch)
     }
 
@@ -178,7 +178,7 @@ export function CandidateManageCvs() {
         }
         candidateCvService.updateTitle(selectedCv.id, formik.values.title).then(() => {
             dispatch(changeTitle(selectedCv.id, formik.values.title))
-            refreshPage()
+            refreshComp()
         }).catch(handleCatch)
     }
 
@@ -239,7 +239,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateJobExperiences.splice(index, 1)
         candidateCvService.updateJobExperiences(selectedCv.id, [candJobExpId], "remove").then(() => {
             dispatch(changeCvJobExp(selectedCv.id, selectedCv.candidateJobExperiences))
-            refreshPage()
+            refreshComp()
             toast("Deleted")
         }).catch(handleCatch)
     }
@@ -249,7 +249,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateLanguages.splice(index, 1)
         candidateCvService.updateLanguages(selectedCv.id, [candidateLangId], "remove").then(() => {
             dispatch(changeCvLang(selectedCv.id, selectedCv.candidateLanguages))
-            refreshPage()
+            refreshComp()
             toast("Deleted")
         }).catch(handleCatch)
     }
@@ -259,7 +259,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateSchools.splice(index, 1)
         candidateCvService.updateSchools(selectedCv.id, [candidateSchoolId], "remove").then(() => {
             dispatch(changeCvSchool(selectedCv.id, selectedCv.candidateSchools))
-            refreshPage()
+            refreshComp()
             toast("Deleted")
         }).catch(handleCatch)
     }
@@ -269,7 +269,7 @@ export function CandidateManageCvs() {
         selectedCv.candidateSkills.splice(index, 1)
         candidateCvService.updateSkills(selectedCv.id, [candidateSkillId], "remove").then(() => {
             dispatch(changeCvSkill(selectedCv.id, selectedCv.candidateSkills))
-            refreshPage()
+            refreshComp()
             toast("Deleted")
         }).catch(handleCatch)
     }

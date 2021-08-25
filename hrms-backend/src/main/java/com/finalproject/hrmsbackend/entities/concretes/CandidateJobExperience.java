@@ -14,6 +14,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "candidates_job_experiences", uniqueConstraints = {@UniqueConstraint(columnNames = {"candidate_id", "workplace", "position_id"})})
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CandidateJobExperience implements CvProp {
 
     @Id
@@ -24,7 +25,7 @@ public class CandidateJobExperience implements CvProp {
 
     @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
-    @JsonIgnoreProperties(value = {"candidateCvs", "candidateImages", "candidateJobExperiences",
+    @JsonIgnoreProperties(value = {"cvs", "candidateImages", "candidateJobExperiences",
             "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 

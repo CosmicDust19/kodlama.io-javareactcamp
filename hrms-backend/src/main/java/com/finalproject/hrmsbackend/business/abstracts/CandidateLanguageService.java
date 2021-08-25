@@ -13,7 +13,7 @@ public interface CandidateLanguageService {
 
     Result add(CandidateLanguageAddDto candidateLanguageAddDto);
 
-    DataResult<Boolean> deleteById(int candLangId);
+    Result deleteById(int candLangId);
 
     Result updateLanguage(short languageId, int candLangId);
 

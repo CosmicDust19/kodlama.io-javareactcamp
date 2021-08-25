@@ -1,5 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class City implements BaseEntity<Short> {
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "city")
     @JsonIgnoreProperties(value = {"city"})
     private List<JobAdvertisement> jobAdvertisements;

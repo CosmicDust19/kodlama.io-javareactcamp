@@ -5,8 +5,8 @@ import {login, signOut} from "../store/actions/userActions";
 import {Link, useHistory} from "react-router-dom";
 import SignedOut from "./SignedOut";
 import CandidateService from "../services/candidateService";
-import {toast} from "react-toastify";
-
+import EmployerService from "../services/employerService";
+import SystemEmployeeService from "../services/systemEmployeeService";
 
 export default function SignedIn() {
 
@@ -60,16 +60,12 @@ export default function SignedIn() {
                     <Menu.Item name="Employers" as={Link} to={"/employers"}
                                onClick={handleScrollToTop}>Employers</Menu.Item>
 
-                    <Menu.Item name="Users" as={Link} to={"/users"} onClick={() => {
-                        window.scrollTo(0, 40)
-                    }}>Users</Menu.Item>
-
-                    {/*<Menu.Item name="sync" onClick={() => {
+                    <Menu.Item name="sync" onClick={() => {
                         const candidateService = new CandidateService();
                         candidateService.getById(userProps.user.id).then((result) => {
                             dispatch(login(result.data.data, "candidate"))
                         });
-                    }}/>*/}
+                    }}/>
 
                     <Menu.Menu position='right'>
                         <Menu.Item>
@@ -114,16 +110,15 @@ export default function SignedIn() {
                     <Menu.Item name="Candidates" as={Link} to={"/candidates"}
                                onClick={handleScrollToTop}>Candidates</Menu.Item>
 
-                    <Menu.Item name="Post Job" as={Link} to={"/postJobAdvertisement"} onClick={() => {
-                        window.scrollTo(0, 50)
-                    }}>Post Job</Menu.Item>
-
                     <Menu.Item name="Job Advertisements" as={Link} to={"/jobAdvertisements"}>Job
                         Advertisements</Menu.Item>
 
-                    <Menu.Item name="Users" as={Link} to={"/users"} onClick={() => {
-                        window.scrollTo(0, 40)
-                    }}>Users</Menu.Item>
+                    <Menu.Item name="sync" onClick={() => {
+                        const employerService = new EmployerService();
+                        employerService.getById(userProps.user.id).then((result) => {
+                            dispatch(login(result.data.data, "employer"))
+                        });
+                    }}/>
 
                     <Menu.Menu position='right'>
                         <Menu.Item>
@@ -134,12 +129,11 @@ export default function SignedIn() {
                                     style={{marginTop: 0, backgroundColor: "rgba(250,250,250, 0.3)", borderRadius: 10}}>
                                     <Dropdown.Item as={Link} to={"/employerManageAccount"} onClick={() => {
                                         handleScrollToTop()
-                                        toast.warning("THIS PAGE IS NOT WORKING PROPERLY")
                                     }}>
                                         <Icon name="setting" color="yellow"/>Account
                                     </Dropdown.Item>
                                     <Dropdown.Item as={Link} to={"/employerJobAdverts"} onClick={handleScrollToTop}>
-                                        <Icon name="file outline" color="orange"/>My Adverts
+                                        <Icon name="file outline" color="orange"/>Adverts
                                     </Dropdown.Item>
                                     <Dropdown.Divider/>
                                     <Dropdown.Item onClick={() => {
@@ -200,6 +194,13 @@ export default function SignedIn() {
                             </Dropdown.Menu>
                         </Dropdown>
                     </Menu.Item>
+
+                    <Menu.Item name="sync" onClick={() => {
+                        const systemEmployeeService = new SystemEmployeeService();
+                        systemEmployeeService.getById(userProps.user.id).then((result) => {
+                            dispatch(login(result.data.data, "systemEmployee"))
+                        });
+                    }}/>
 
                     <Menu.Menu position='right' style={{borderRadius: 10}}>
                         <Menu.Item>

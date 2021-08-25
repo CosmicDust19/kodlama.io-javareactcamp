@@ -1,7 +1,5 @@
 package com.finalproject.hrmsbackend;
 
-import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,13 +15,9 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class HrmsBackendApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(HrmsBackendApplication.class, args);
 
-        new Cloudinary(ObjectUtils.asMap(
-                "cloud_name", "cloudinary73",
-                "api_key", "679978937925928",
-                "api_secret", "UqnesSlyURtTNFsomM0H_x4INNU",
-                "secure", true));
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes.dtos;
 
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,10 +16,10 @@ import java.util.Set;
 @NoArgsConstructor
 public class CvAddDto {
 
-    @NotNull(message = MSGs.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.ForAnnotation.REQUIRED)
     private Integer candidateId;
 
-    @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    @NotBlank(message = Msg.ForAnnotation.EMPTY)
     @Size(max = Utils.Const.MAX_CV_TITLE)
     private String title;
 

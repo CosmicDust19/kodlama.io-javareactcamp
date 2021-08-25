@@ -2,14 +2,13 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateJobExperienceService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateJobExperienceDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.PositionDao;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateJobExperience;
-import com.finalproject.hrmsbackend.entities.concretes.Position;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateJobExperienceAddDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -38,79 +37,86 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
     @Override
     public DataResult<List<CandidateJobExperience>> getByQuitYear(Short sortDirection) {
         Sort sort = Utils.getSortByDirection(sortDirection, "quitYear");
-        return new SuccessDataResult<>(MSGs.SORT_DIRECTION.getCustom("%s (quitYear)"), candidateJobExpDao.findAll(sort));
+        return new SuccessDataResult<>(Msg.SORT_DIRECTION.getCustom("%s (quitYear)"), candidateJobExpDao.findAll(sort));
     }
 
     @Override
     public Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto) {
         Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(candidateDao, candidateJobExperienceAddDto.getCandidateId()))
-            errors.put("candidateId", MSGs.NOT_EXIST.get());
+            errors.put("candidateId", Msg.NOT_EXIST.get());
         if (check.notExistsById(positionDao, candidateJobExperienceAddDto.getPositionId()))
-            errors.put("positionId", MSGs.NOT_EXIST.get());
+            errors.put("positionId", Msg.NOT_EXIST.get());
         if (check.startEndConflict(candidateJobExperienceAddDto.getStartYear(), candidateJobExperienceAddDto.getQuitYear()))
-            errors.put("startYear - quitYear", MSGs.START_END_CONFLICT.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(MSGs.FAILED.get(), errors);
+            errors.put("startYear - quitYear", Msg.START_END_YEAR_CONFLICT.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
 
-        CandidateJobExperience candidateJobExp = modelMapper.map(candidateJobExperienceAddDto, CandidateJobExperience.class);
+        CandidateJobExperience candJobExp = modelMapper.map(candidateJobExperienceAddDto, CandidateJobExperience.class);
 
-        CandidateJobExperience savedCandidateJobExperience = candidateJobExpDao.save(candidateJobExp);
-        return new SuccessDataResult<>(MSGs.SAVED.getCustom("%s (data: new id)"), savedCandidateJobExperience.getId());
+        CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandJobExp);
     }
 
     @Override
-    public DataResult<Boolean> deleteById(int candJobExpId) {
+    public Result deleteById(int candJobExpId) {
         candidateJobExpDao.deleteById(candJobExpId);
-        return new SuccessDataResult<>(MSGs.DELETED.get(), true);
+        return new SuccessResult(Msg.DELETED.get());
     }
 
     @Override
     public Result updateWorkPlace(String workPlace, int candJobExpId) {
         if (check.notExistsById(candidateJobExpDao, candJobExpId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("candJobExpId"));
-        candidateJobExpDao.updateWorkPlace(workPlace, candJobExpId);
-        return new SuccessResult(MSGs.UPDATED.get());
+            return new ErrorResult(Msg.NOT_EXIST.get("candJobExpId"));
+
+        CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
+        candJobExp.setWorkPlace(workPlace);
+        CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
     }
 
     @Override
     public Result updatePosition(short positionId, int candJobExpId) {
         if (check.notExistsById(candidateJobExpDao, candJobExpId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("candJobExpId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("candJobExpId"));
         if (check.notExistsById(positionDao, positionId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("positionId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("positionId"));
 
-        candidateJobExpDao.updatePosition(new Position(positionId), candJobExpId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
+        candJobExp.setPosition(positionDao.getById(positionId));
+        CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
     }
 
     @Override
     public Result updateStartYear(short startYear, int candJobExpId) {
         if (check.notExistsById(candidateJobExpDao, candJobExpId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("candJobExpId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("candJobExpId"));
 
-        CandidateJobExperience candidateJobExp = candidateJobExpDao.getById(candJobExpId);
-        if (candidateJobExp.getStartYear() == startYear)
-            return new ErrorResult(MSGs.THE_SAME.get("startYear is"));
-        if (check.startEndConflict(startYear, candidateJobExp.getQuitYear()))
-            return new ErrorResult(MSGs.START_END_CONFLICT.get());
+        CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
+        if (candJobExp.getStartYear() == startYear)
+            return new ErrorResult(Msg.THE_SAME.get("Start year is"));
+        if (check.startEndConflict(startYear, candJobExp.getQuitYear()))
+            return new ErrorResult(Msg.START_END_YEAR_CONFLICT.get());
 
-        candidateJobExpDao.updateStartYear(startYear, candJobExpId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        candJobExp.setStartYear(startYear);
+        CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
     }
 
     @Override
     public Result updateQuitYear(Short quitYear, int candJobExpId) {
         if (check.notExistsById(candidateJobExpDao, candJobExpId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("candJobExpId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("candJobExpId"));
 
-        CandidateJobExperience candidateJobExperience = candidateJobExpDao.getById(candJobExpId);
-        if (check.equals(candidateJobExperience.getQuitYear(), quitYear))
-            return new ErrorResult(MSGs.THE_SAME.get("quitYear is"));
-        if (check.startEndConflict(candidateJobExperience.getStartYear(), quitYear))
-            return new ErrorResult(MSGs.START_END_CONFLICT.get());
+        CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
+        if (check.equals(candJobExp.getQuitYear(), quitYear))
+            return new ErrorResult(Msg.THE_SAME.get("QuitYear is"));
+        if (check.startEndConflict(candJobExp.getStartYear(), quitYear))
+            return new ErrorResult(Msg.START_END_YEAR_CONFLICT.get());
 
-        candidateJobExpDao.updateQuitYear(quitYear, candJobExpId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        candJobExp.setQuitYear(quitYear);
+        CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
     }
 
 }

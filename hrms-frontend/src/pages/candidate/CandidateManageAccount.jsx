@@ -1,14 +1,11 @@
-import {
-    Header, Grid, Menu, Input, Icon, Form, Button,
-    Item, Modal,
-} from "semantic-ui-react";
+import {Button, Form, Grid, Header, Icon, Input, Item, Menu, Modal,} from "semantic-ui-react";
 import React, {useState} from "react";
 import {useFormik} from "formik";
 import {toast} from "react-toastify";
 import UserService from "../../services/userService";
 import CandidateService from "../../services/candidateService";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmail, changeGithub, changeLinkedin, signOut} from "../../store/actions/userActions";
+import {changeEmail, signOut, syncUser} from "../../store/actions/userActions";
 import {useHistory} from "react-router-dom";
 
 export function CandidateManageAccount() {
@@ -42,77 +39,54 @@ export function CandidateManageAccount() {
         return new Date().getFullYear() - user?.birthYear
     }
 
-    const refreshPage = () => {
+    const refreshComp = () => {
         if (refresh === true) setRefresh(false);
         else setRefresh(true)
     }
 
     const handleCatch = (error) => {
-        toast.warning("An error has occurred")
-        console.log(error.response)
-        refreshPage()
+        const resp = error.response
+        console.log(error)
+        console.log(resp)
+        if (resp.data.data?.errors) {
+            Object.entries(resp.data.data.errors).forEach((invalidProp) => {
+                invalidProp[1] = invalidProp[1].toLowerCase()
+                const message = `${invalidProp[1].charAt(0).toUpperCase()}${invalidProp[1].substr(1)}`
+                const propName = `${invalidProp[0].charAt(0).toUpperCase()}${invalidProp[0].substr(1)}`
+                toast.warning(`${message} (${propName})`)
+            })
+            return
+        }
+        if (resp.data.message) {
+            toast.warning(resp.data.message)
+        }
+    }
+
+    const lastUpdAct = (response, msg) => {
+        dispatch(syncUser(response.data.data))
+        refreshComp()
+        toast(msg)
     }
 
     const handleEmailSubmit = () => {
-        if (!formik.values.email) {
-            toast.warning("Please enter an email")
-            return;
-        }
         formik.values.email = formik.values.email.trim()
-        if (user.email === formik.values.email) {
-            toast.warning("You are already using this email")
-            return;
-        } else if (formik.values.email < 4 || formik.values.email > 100 ||
-            !/^\w+(\.\w+)*@[a-zA-Z]+(\.\w{2,6})+$/.test(formik.values.email)) {
-            toast.warning("Invalid email format")
-            return;
-        }
-        userService.existsByEmail(formik.values.email).then(r => {
-            if (!r.data.data) {
-                userService.updateEmail(user.id, formik.values.email).then(() => {
-                    dispatch(changeEmail(formik.values.email))
-                    refreshPage()
-                    toast("Saved")
-                }).catch(handleCatch)
-            } else toast.warning("This email in use")
+        userService.updateEmail(user.id, formik.values.email).then(r => {
+            dispatch(changeEmail(r.data.data.email))
+            refreshComp()
+            toast("Saved")
         }).catch(handleCatch)
     }
 
     const handleCurrentPasswordSubmit = () => {
-        if (!formik.values.currentPassword) {
-            toast.warning("Please enter your old password")
-            return;
-        }
-        if (formik.values.currentPassword.length < 6 || formik.values.currentPassword.length > 20) {
-            toast.warning("Wrong password!")
-            return;
-        }
-        userService.existsByEmailAndPW(user?.email, formik.values.currentPassword).then((r) => {
+        userService.existsByEmailAndPW(user.email, formik.values.currentPassword).then(r => {
             if (r.data.data) {
                 setIsAuthenticated(true)
                 toast("Authentication Successful")
-            } else toast.warning("Wrong password!")
+            } else toast.warning("Wrong password")
         }).catch(handleCatch)
     }
 
     const handlePasswordSubmit = () => {
-        if (!formik.values.password) {
-            toast.warning("Please enter a new password")
-            return;
-        }
-        formik.values.password = formik.values.password.trim()
-        if (formik.values.password.length < 6 || formik.values.password.length > 20) {
-            toast.warning("Password should be a text between 6 - 20 long")
-            return;
-        }
-        if (formik.values.password !== formik.values.passwordRepeat) {
-            toast.warning("Passwords are not matching")
-            return;
-        }
-        if (formik.values.password === formik.values.currentPassword) {
-            toast.warning("You are already using this password")
-            return;
-        }
         userService.updatePassword(user.id, formik.values.password, formik.values.currentPassword).then(() => {
             toast("Saved")
             formik.values.currentPassword = formik.values.password
@@ -120,76 +94,32 @@ export function CandidateManageAccount() {
     }
 
     const handleGithubLinkSubmit = () => {
-        if (!formik.values.githubAccountLink) {
-            toast.warning("Please enter your github account link")
-            return;
-        }
         formik.values.githubAccountLink = formik.values.githubAccountLink.trim()
-        if (formik.values.githubAccountLink.length < 4) {
-            toast.warning("Invalid link")
-            return;
-        }
-        if (formik.values.githubAccountLink === user.githubAccountLink) {
-            toast.warning("You are already using this link")
-            return;
-        }
-        console.log(formik.values.githubAccountLink)
-        candidateService.updateGithubAccount(user.id, formik.values.githubAccountLink).then(() => {
-            console.log(formik.values.githubAccountLink)
-            dispatch(changeGithub(formik.values.githubAccountLink))
-            refreshPage()
-            toast("Saved")
-        }).catch(handleCatch)
+        candidateService.updateGithubAccount(user.id, formik.values.githubAccountLink)
+            .then(r => lastUpdAct(r, "Saved"))
+            .catch(handleCatch)
     }
 
     const handleLinkedinLinkSubmit = () => {
-        if (!formik.values.linkedinAccountLink) {
-            toast.warning("Please enter your linkedin account link")
-            return;
-        }
         formik.values.linkedinAccountLink = formik.values.linkedinAccountLink.trim()
-        if (formik.values.linkedinAccountLink.length < 4) {
-            toast.warning("Invalid link")
-            return;
-        }
-        if (formik.values.linkedinAccountLink === user.linkedinAccountLink) {
-            toast.warning("You are already using this link")
-            return;
-        }
-        candidateService.updateLinkedinAccount(user.id, formik.values.linkedinAccountLink).then(() => {
-            dispatch(changeLinkedin(formik.values.linkedinAccountLink))
-            refreshPage()
-            toast("Saved")
-        }).catch(handleCatch)
+        candidateService.updateLinkedinAccount(user.id, formik.values.linkedinAccountLink)
+            .then(r => lastUpdAct(r, "Saved"))
+            .catch(handleCatch)
     }
 
     const handleGithubLinkRemove = () => {
-        if (user.githubAccount == null) {
-            toast.warning("Already you do not have a github link")
-            return;
-        }
-        candidateService.updateGithubAccount(user.id, undefined).then(() => {
-            dispatch(changeGithub(null))
-            refreshPage()
-            toast("Removed")
-        }).catch(handleCatch)
+        candidateService.updateGithubAccount(user.id, undefined)
+            .then(r => lastUpdAct(r, "Removed"))
+            .catch(handleCatch)
     }
 
     const handleLinkedinLinkRemove = () => {
-        if (user.linkedinAccount == null) {
-            toast.warning("Already you do not have a linkedin link")
-            return;
-        }
-        candidateService.updateLinkedinAccount(user.id, undefined).then(() => {
-            dispatch(changeLinkedin(null))
-            refreshPage()
-            toast("Removed")
-        }).catch(handleCatch)
+        candidateService.updateLinkedinAccount(user.id, undefined)
+            .then(r => lastUpdAct(r, "Removed"))
+            .catch(handleCatch)
     }
 
-    const handleDeleteAccount = () => {
-        setDeletePopupOpen(true)
-    }
+    const handleDeleteAccount = () => setDeletePopupOpen(true)
 
     function areYouSurePopup() {
         return (
@@ -365,23 +295,22 @@ export function CandidateManageAccount() {
                     <strong>Change</strong>
                     <Menu fluid vertical secondary>
                         <Menu.Item
-                            name='Email'
+                            icon={"envelope"} color={"pink"} name='Email'
                             active={activeItem === 'email'}
                             onClick={() => handleItemClick("email")}
                         />
                         <Menu.Item
-                            name='Password'
+                            icon={"lock"} color={"blue"} name='Password'
                             active={activeItem === 'password'}
                             onClick={() => handleItemClick("password")}
                         />
                         <Menu.Item
-                            name='Account Links'
+                            icon={"linkify"} color={"yellow"} name='Account Links'
                             active={activeItem === 'links'}
                             onClick={() => handleItemClick("links")}
                         />
                         <Menu.Item
-                            color={"red"}
-                            name='Danger Zone'
+                            icon={"warning sign"} color={"red"} name='Danger Zone'
                             active={activeItem === 'danger'}
                             onClick={() => handleItemClick("danger")}
                         />

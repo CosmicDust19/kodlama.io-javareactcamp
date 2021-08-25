@@ -1,7 +1,8 @@
-package com.finalproject.hrmsbackend.core.adapters;
+package com.finalproject.hrmsbackend.core.adapters.concretes;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.finalproject.hrmsbackend.core.adapters.abstracts.CloudinaryService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateJobExperienceService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateJobExperienceAddDto;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class CandidateJobExperiencesController {
     }
 
     @PutMapping(value = "/update/workPlace")
-    public ResponseEntity<?> updateWorkPlace(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    public ResponseEntity<?> updateWorkPlace(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
                                              @Size(max = Utils.Const.MAX_JOB_EXP_WORKPLACE) String workPlace,
                                              @RequestParam int candJobExpId) {
         return Utils.getResponseEntity(candidateJobExperienceService.updateWorkPlace(workPlace, candJobExpId));

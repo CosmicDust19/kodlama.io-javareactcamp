@@ -1,7 +1,7 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.SystemEmployeeService;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.SystemEmployeesAddDto;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +43,14 @@ public class SystemEmployeesController {
     }
 
     @PutMapping(value = "/update/firstName")
-    public ResponseEntity<?> updateFirstName(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    public ResponseEntity<?> updateFirstName(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
                                              @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN) String firstName,
                                              @RequestParam int sysEmplId) {
         return Utils.getResponseEntity(systemEmployeeService.updateFirstName(firstName, sysEmplId));
     }
 
     @PutMapping(value = "/update/lastName")
-    public ResponseEntity<?> updateLastName(@RequestParam @NotBlank(message = MSGs.ForAnnotation.EMPTY)
+    public ResponseEntity<?> updateLastName(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
                                             @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN) String lastName,
                                             @RequestParam int sysEmplId) {
         return Utils.getResponseEntity(systemEmployeeService.updateLastName(lastName, sysEmplId));

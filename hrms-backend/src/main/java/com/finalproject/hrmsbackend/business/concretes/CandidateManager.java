@@ -2,10 +2,9 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateService;
 import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
-import com.finalproject.hrmsbackend.core.adapters.MernisServiceAdapter;
+import com.finalproject.hrmsbackend.core.adapters.concretes.MernisServiceAdapter;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
-import com.finalproject.hrmsbackend.core.utilities.MSGs;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
@@ -24,7 +23,6 @@ import java.util.List;
 public class CandidateManager implements CandidateService {
 
     private final CandidateDao candidateDao;
-    private final UserDao userDao;
     private final MernisServiceAdapter mernisServiceAdapter;
     private final CheckService check;
     private final EmailService emailService;
@@ -53,41 +51,50 @@ public class CandidateManager implements CandidateService {
 
     @Override
     public Result add(CandidateAddDto candidateAddDto) {
-        if (!mernisServiceAdapter.isRealPerson(candidateAddDto)) return new ErrorResult(MSGs.MERNIS_FAIL.get());
+        if (!mernisServiceAdapter.realPerson(candidateAddDto)) return new ErrorResult(Msg.MERNIS_FAIL.get());
 
         Candidate candidate = modelMapper.map(candidateAddDto, Candidate.class);
 
-        candidateDao.save(candidate);
+        Candidate savedCandidate = candidateDao.save(candidate);
         emailService.sendVerificationMail(candidateAddDto.getEmail());
-        return new SuccessResult(MSGs.SAVED.get());
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandidate);
     }
 
     @Override
     public Result updateGithubAccount(String githubAccount, int candId) {
-        if (check.notExistsById(candidateDao, candId)) return new ErrorResult(MSGs.NOT_EXIST.get("candId"));
-        candidateDao.updateGithubAccount(githubAccount, candId);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), candId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        if (check.notExistsById(candidateDao, candId)) return new ErrorResult(Msg.NOT_EXIST.get("candId"));
+
+        Candidate candidate = candidateDao.getById(candId);
+        candidate.setGithubAccount(githubAccount);
+        return execLastUpdAct(candidate);
     }
 
     @Override
     public Result updateLinkedinAccount(String linkedinAccount, int candId) {
-        if (check.notExistsById(candidateDao, candId)) return new ErrorResult(MSGs.NOT_EXIST.get("candId"));
-        candidateDao.updateLinkedinAccount(linkedinAccount, candId);
-        userDao.updateLastModifiedAt(LocalDateTime.now(), candId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        if (check.notExistsById(candidateDao, candId)) return new ErrorResult(Msg.NOT_EXIST.get("candId"));
+
+        Candidate candidate = candidateDao.getById(candId);
+        candidate.setLinkedinAccount(linkedinAccount);
+        return execLastUpdAct(candidate);
     }
 
     @Override
     public Result updateFavoriteJobAdverts(int jobAdvertisementId, int candId, String updateType) {
         if (check.notExistsById(candidateDao, candId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("candId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("candId"));
         if (check.notExistsById(jobAdvertisementDao, jobAdvertisementId))
-            return new ErrorResult(MSGs.NOT_EXIST.get("jobAdvertisementId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("jobAdvertisementId"));
 
         if (updateType.equals(Utils.UpdateType.DEL)) candidateDao.deleteJobAdvFromFavorites(jobAdvertisementId, candId);
         else candidateDao.addJobAdvToFavorites(jobAdvertisementId, candId);
-        return new SuccessResult(MSGs.UPDATED.get());
+        Candidate savedCand = candidateDao.getById(candId);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedCand);
+    }
+
+    private Result execLastUpdAct(Candidate candidate) {
+        candidate.setLastModifiedAt(LocalDateTime.now());
+        Candidate savedCand = candidateDao.save(candidate);
+        return new SuccessDataResult<>(Msg.UPDATED.get(), savedCand);
     }
 
 }

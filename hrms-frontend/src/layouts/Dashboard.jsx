@@ -3,7 +3,6 @@ import {Container, Segment} from 'semantic-ui-react'
 import {Route} from "react-router-dom";
 import JobAdvertisementsList from "../pages/JobAdvertisementsList";
 import JobAdvertisementDetail from "../pages/JobAdvertisementDetail";
-import JobAdvertisementAdd from "../pages/employer/JobAdvertisementAdd";
 import EmployerDetail from "../pages/employer/EmployerDetail";
 import Navi from "./Navi";
 import Footer from "./Footer";
@@ -24,7 +23,7 @@ import {SystemEmployeeManageAccount} from "../pages/system-employee/SystemEmploy
 import JobAdvertisementsManagement from "../pages/system-employee/JobAdvertisementsManagement";
 import EmployersManagement from "../pages/system-employee/EmployersManagement";
 import {EmployerManageAccount} from "../pages/employer/EmployerManageAccount";
-import {EmployerAdverts} from "../pages/employer/EmployerManageAdverts";
+import {EmployerAdverts} from "../pages/employer/EmployerAdverts";
 
 export default function Dashboard() {
 
@@ -62,7 +61,6 @@ export default function Dashboard() {
                     <Route exact path="/employersManagement" component={EmployersManagement}/>
                     <Route exact path="/jobAdvertisements" component={JobAdvertisementsList}/>
                     <Route path="/jobAdvertisements/:id" component={JobAdvertisementDetail}/>
-                    <Route path="/postJobAdvertisement" component={JobAdvertisementAdd}/>
                     <Route exact path="/signUpSystemEmployee" component={SignUpSystemEmployee}/>
                     <Route exact path="/systemEmployeeManageAccount" component={SystemEmployeeManageAccount}/>
                 </Container>

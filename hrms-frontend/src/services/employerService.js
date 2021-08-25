@@ -30,8 +30,8 @@ export default class EmployerService {
         return axios.post("http://localhost:8080/api/employers/add", values)
     }
 
-    updateCompanyName(id, companyName) {
-        return axios.put(`http://localhost:8080/api/employers/updateCompanyName?companyName=${companyName}&emplId=${id}`)
+    updateCompanyName(emplId, companyName) {
+        return axios.put(`http://localhost:8080/api/employers/update/companyName?companyName=${companyName}&emplId=${emplId}`)
     }
 
     updateEmailAndWebsite(emplId, email, website) {

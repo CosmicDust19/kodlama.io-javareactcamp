@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "job_advertisements_update")
+@Table(name = "job_advertisements_update", uniqueConstraints = {@UniqueConstraint(columnNames = {"employer_id", "position_id", "job_description", "city_id"})})
 @JsonIgnoreProperties("hibernateLazyInitializer")
 public class JobAdvertisementUpdate {
 
@@ -22,6 +22,11 @@ public class JobAdvertisementUpdate {
     @SequenceGenerator(name = "job_adv_update_id_generator", sequenceName = "job_adv_update_id_seq", allocationSize = 1)
     @Column(name = "job_adv_update_id")
     private Integer updateId;
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id", nullable = false)
+    @JsonIgnoreProperties(value = {"jobAdvertisements", "password"})
+    private Employer employer;
 
     @ManyToOne
     @JoinColumn(name = "position_id")

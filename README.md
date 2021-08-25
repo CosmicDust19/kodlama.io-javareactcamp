@@ -23,4 +23,3 @@ About Servers
 * ###### ***You may get an error while starting the server, you should refresh the page -maybe 2 times- and it will start (It is all about heroku)*** ⚠
 * ###### ***When the [front-end server](https://javareactcamp-hrms-frontend.herokuapp.com/) starts, the [back-end server](https://javareactcamp-hrms-backend.herokuapp.com/swagger-ui.html) also needs to be started, so you can start both of them simultaneously to wait less***
 * ###### ***It takes about 1.5 minutes to start the servers***
-

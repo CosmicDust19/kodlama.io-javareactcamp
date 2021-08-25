@@ -18,6 +18,8 @@ import java.util.List;
 @Repository
 public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Integer> {
 
+    List<JobAdvertisement> findAllByEmployer_Id(Integer employerId);
+
     List<JobAdvertisement> findAllByActiveTrueAndVerifiedTrue();
 
     List<JobAdvertisement> findAllByActiveTrueAndVerifiedTrue(Sort sort);

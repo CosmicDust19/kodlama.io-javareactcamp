@@ -1,18 +1,24 @@
+import {CHANGE_JOB_ADVERT} from "./filterActions";
+
 export const LOGIN = "LOGIN"
 export const SIGN_OUT = "SIGN_OUT"
+export const SYNC_USER = "SYNC_USER"
+export const SYNC_EMPL_JOB_ADVERTS = "SYNC_EMPL_JOB_ADVERTS"
+export const SYNC_EMPL_JOB_ADVERT = "SYNC_EMPL_JOB_ADVERT"
+export const SYNC_CAND_CVS = "SYNC_CAND_CVS"
 export const CHANGE_FIRSTNAME = "CHANGE_FIRSTNAME"
 export const CHANGE_LASTNAME = "CHANGE_LASTNAME"
 export const CHANGE_EMAIl = "CHANGE_EMAIl"
 export const CHANGE_GITHUB = "CHANGE_GITHUB"
 export const CHANGE_LINKEDIN = "CHANGE_LINKEDIN"
-export const CHANGE_JOBEXP = "CHANGE_JOBEXP"
+export const CHANGE_JOB_EXP = "CHANGE_JOB_EXP"
 export const CHANGE_LANG = "CHANGE_LANG"
 export const CHANGE_SCHOOL = "CHANGE_SCHOOL"
 export const CHANGE_SKILL = "CHANGE_SKILL"
 export const CHANGE_FAVORITE_JOB_ADVS = "CHANGE_FAVORITE_JOB_ADVS"
-export const CHANGE_CV_COVERLETTER = "CHANGE_CV_COVERLETTER"
+export const CHANGE_CV_COVER_LETTER = "CHANGE_CV_COVER_LETTER"
 export const CHANGE_CV_TITLE = "CHANGE_CV_TITLE"
-export const CHANGE_CV_JOBEXP  = "CHANGE_CV_JOBEXP"
+export const CHANGE_CV_JOB_EXP  = "CHANGE_CV_JOB_EXP"
 export const CHANGE_CV_LANG  = "CHANGE_CV_LANG"
 export const CHANGE_CV_SCHOOL  = "CHANGE_CV_SCHOOL"
 export const CHANGE_CV_SKILL  = "CHANGE_CV_SKILL"
@@ -33,6 +39,34 @@ export function login(user, userType) {
 export function signOut() {
     return {
         type: SIGN_OUT
+    }
+}
+
+export function syncUser(user) {
+    return {
+        type: SYNC_USER,
+        payload: {user}
+    }
+}
+
+export function syncEmplJobAdverts(adverts) {
+    return {
+        type: SYNC_EMPL_JOB_ADVERTS,
+        payload: {adverts}
+    }
+}
+
+export function syncEmplJobAdvert(jobAdvId, jobAdvert) {
+    return {
+        type: CHANGE_JOB_ADVERT,
+        payload: {jobAdvId, jobAdvert}
+    }
+}
+
+export function syncCandCVs(CVs) {
+    return {
+        type: SYNC_CAND_CVS,
+        payload: {CVs}
     }
 }
 
@@ -73,7 +107,7 @@ export function changeLinkedin(link) {
 
 export function changeJobExps(jobExps) {
     return {
-        type: CHANGE_JOBEXP,
+        type: CHANGE_JOB_EXP,
         payload: {jobExps}
     }
 }
@@ -115,14 +149,14 @@ export function changeTitle(cvId, title) {
 
 export function changeCoverLetter(cvId, coverLetter) {
     return {
-        type: CHANGE_CV_COVERLETTER,
+        type: CHANGE_CV_COVER_LETTER,
         payload: {cvId, coverLetter}
     }
 }
 
 export function changeCvJobExp(cvId, jobExps) {
     return {
-        type: CHANGE_CV_JOBEXP,
+        type: CHANGE_CV_JOB_EXP,
         payload: {cvId, jobExps}
     }
 }
@@ -155,24 +189,10 @@ export function changeEmployerUpdate (employerUpdate){
     }
 }
 
-export function changeWebsite(website) {
-    return {
-        type: CHANGE_WEBSITE,
-        payload: {website}
-    }
-}
-
 export function changeCompName(companyName) {
     return {
         type: CHANGE_COMP_NAME,
         payload: {companyName}
-    }
-}
-
-export function changePhone(phone) {
-    return {
-        type: CHANGE_PHONE,
-        payload: {phone}
     }
 }
 
