@@ -16,21 +16,21 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class CandidateAddDto extends UserAddDto {
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN, message = Msg.Annotation.SIZE)
     private String firstName;
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN, message = Msg.Annotation.SIZE)
     private String lastName;
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.NAT_ID_REGEXP, message = Msg.ForAnnotation.INVALID_NAT_ID)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Pattern(regexp = Utils.Const.NAT_ID_REGEXP, message = Msg.Annotation.PATTERN + " (It must consist of 11 digits)")
     private String nationalityId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
-    @Min(value = Utils.Const.MIN_YEAR)
-    @Max(value = Utils.Const.THIS_YEAR)
+    @NotNull(message = Msg.Annotation.REQUIRED)
+    @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+    @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX)
     private Short birthYear;
 
 }

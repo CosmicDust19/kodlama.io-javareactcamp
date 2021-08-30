@@ -26,8 +26,8 @@ public class SchoolsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                 @Size(max = Utils.Const.MAX_SCHOOL_NAME) String schoolName) {
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                 @Size(max = Utils.Const.MAX_SCHOOL_NAME, message = Msg.Annotation.SIZE) String schoolName) {
         return Utils.getResponseEntity(schoolService.add(schoolName));
     }
 }

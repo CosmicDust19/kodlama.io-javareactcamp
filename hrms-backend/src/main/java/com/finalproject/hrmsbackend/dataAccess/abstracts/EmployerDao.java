@@ -15,6 +15,8 @@ import java.util.List;
 @Repository
 public interface EmployerDao extends JpaRepository<Employer, Integer> {
 
+    boolean existsByEmailAndPassword(String email, String password);
+
     boolean existsByWebsite(String website);
 
     boolean existsByCompanyName(String companyName);

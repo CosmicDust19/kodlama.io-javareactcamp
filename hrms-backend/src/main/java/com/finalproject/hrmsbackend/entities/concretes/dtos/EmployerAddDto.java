@@ -18,17 +18,17 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class EmployerAddDto extends UserAddDto {
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Size(max = Utils.Const.MAX_COMPANY_NAME)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Size(max = Utils.Const.MAX_COMPANY_NAME, message = Msg.Annotation.SIZE)
     private String companyName;
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.WEBSITE_REGEXP, message = Msg.ForAnnotation.INVALID_FORMAT)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Pattern(regexp = Utils.Const.WEBSITE_REGEXP, message = Msg.Annotation.PATTERN)
     private String website;
     // domain extensions: https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.PHONE_NUM_REGEXP, message = Msg.ForAnnotation.INVALID_FORMAT)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Pattern(regexp = Utils.Const.PHONE_NUM_REGEXP, message = Msg.Annotation.PATTERN)
     private String phoneNumber;
 
 }

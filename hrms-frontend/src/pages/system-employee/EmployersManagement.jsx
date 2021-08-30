@@ -1,18 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button,
-    Dropdown,
-    Grid,
-    Header,
-    Icon,
-    Label,
-    Loader,
-    Menu,
-    Modal,
-    Pagination,
-    Popup,
-    Segment,
-    Table
+    Button, Dropdown, Grid, Header, Icon, Label,
+    Loader, Menu, Modal, Pagination, Popup,
+    Segment, Table
 } from "semantic-ui-react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
@@ -487,7 +477,7 @@ export default function EmployersManagement() {
             {filtersSegment()}
             <Grid padded>
                 <Grid.Column width={8}>
-                    <Dropdown placeholder="Search employers" search className="icon" selectOnBlur ={false}
+                    <Dropdown placeholder="Search employers" search className="icon" selectOnBlur={false}
                               label={formik.values.employerId === 0 ? null :
                                   <Button icon="x" circular disabled={employers.length === 0 || loading}
                                           loading={loading}

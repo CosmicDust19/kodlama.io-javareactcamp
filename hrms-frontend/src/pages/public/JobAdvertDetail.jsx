@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
-import JobAdvertisementService from "../services/jobAdvertisementService";
+import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {Button, Card, Dropdown, Grid, Icon, Label, Loader, Table} from "semantic-ui-react";
 import {useDispatch, useSelector} from "react-redux";
-import {changeFavoriteJobAdv} from "../store/actions/userActions";
+import {changeFavoriteJobAdv} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
-import CandidateService from "../services/candidateService";
-import {changeJobAdvert, changeJobAdvVerification} from "../store/actions/filterActions";
+import CandidateService from "../../services/candidateService";
+import {changeJobAdvert, changeJobAdvVerification} from "../../store/actions/filterActions";
 
 const jobAdvertisementService = new JobAdvertisementService();
 
-export default function JobAdvertisementDetail() {
+export default function JobAdvertDetail() {
 
     const colors = ['red', 'orange', 'yellow', 'olive', 'green',
         'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']

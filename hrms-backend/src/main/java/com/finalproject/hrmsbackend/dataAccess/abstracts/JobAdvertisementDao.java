@@ -18,6 +18,8 @@ import java.util.List;
 @Repository
 public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Integer> {
 
+    boolean existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription(Short cityId, Short positionId, Integer employerId, String jobDescription);
+
     List<JobAdvertisement> findAllByEmployer_Id(Integer employerId);
 
     List<JobAdvertisement> findAllByActiveTrueAndVerifiedTrue();

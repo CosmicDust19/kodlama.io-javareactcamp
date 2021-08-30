@@ -17,7 +17,7 @@ ___
 * ###### ***You may get an error while starting the server, you should refresh the page and it will start (It is all about heroku)*** ⚠
 * ###### ***It takes about 1.5 minutes to start the server***
 ___
-**SQL Script** ([hrms-database.sql](https://github.com/CosmicDust19/javareactcamp-hrms-backend/blob/master/hrms-database.sql))
+**SQL Script** ([hrms-database.sql](https://github.com/CosmicDust19/kodlama.io-javareactcamp/blob/master/hrms-backend/hrms-database.sql))
 
-**PostgreSQL ER Diagram** ([hrms-database.pgerd](https://github.com/CosmicDust19/javareactcamp-hrms-backend/blob/master/hrms-database.pgerd))
+**PostgreSQL ER Diagram** ([hrms-database.pgerd](https://github.com/CosmicDust19/kodlama.io-javareactcamp/blob/master/hrms-backend/hrms-database.pgerd))
 ###### ![](https://user-images.githubusercontent.com/74824916/128173949-ccd41827-4938-4b5a-a6e0-88add8fb2f4e.png)

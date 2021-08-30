@@ -11,6 +11,8 @@ public interface UserService {
 
     Result deleteById(int userId);
 
+    Result login(String email, String password);
+
     Result updateEmail(String email, int userId);
 
     Result updatePW(String password, String oldPassword, int userId);

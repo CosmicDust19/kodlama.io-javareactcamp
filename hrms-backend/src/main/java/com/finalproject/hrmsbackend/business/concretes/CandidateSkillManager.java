@@ -35,7 +35,7 @@ public class CandidateSkillManager implements CandidateSkillService {
         if (check.notExistsById(candidateDao, candidateSkillAddDto.getCandidateId()))
             return new ErrorResult(Msg.NOT_EXIST.get("candidateId"));
         if (check.notExistsById(skillDao, candidateSkillAddDto.getSkillId()))
-            return new ErrorResult(Msg.NOT_EXIST.get("skill.id"));
+            return new ErrorResult(Msg.NOT_EXIST.get("skillId"));
 
         CandidateSkill candidateSkill = modelMapper.map(candidateSkillAddDto, CandidateSkill.class);
 

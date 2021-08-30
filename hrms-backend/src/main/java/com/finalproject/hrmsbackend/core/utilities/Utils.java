@@ -2,8 +2,11 @@ package com.finalproject.hrmsbackend.core.utilities;
 
 import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import lombok.experimental.UtilityClass;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+
+import java.util.Locale;
 
 @UtilityClass
 public class Utils {
@@ -31,7 +34,7 @@ public class Utils {
         public static final int MAX_PW = 20;
         public static final int MIN_ACCOUNT_LINK = 4;
         public static final int MAX_ACCOUNT_LINK = 100;
-        public static final int MAX_JOB_EXP_WORKPLACE = 100;
+        public static final int MAX_WORKPLACE = 100;
         public static final int MAX_CV_TITLE = 50;
         public static final int MAX_CV_COVER_LETTER = 200;
         public static final int MAX_COMPANY_NAME = 100;
@@ -62,6 +65,11 @@ public class Utils {
     public ResponseEntity<?> getResponseEntity(Result result) {
         if (result.isSuccess()) return ResponseEntity.ok(result);
         else return ResponseEntity.badRequest().body(result);
+    }
+
+    public String getViolationMsg(String camelCaseProp, String rawMsg) {
+        String propName = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(camelCaseProp), " ").toLowerCase(Locale.ENGLISH);
+        return String.format("%s%s %s", Character.toUpperCase(propName.charAt(0)), propName.substring(1), rawMsg);
     }
 
     public Sort getSortByDirection(Short sortDirection, String propName) {

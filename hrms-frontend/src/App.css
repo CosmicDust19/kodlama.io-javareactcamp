@@ -6,3 +6,11 @@
   text-align: center;
   margin-top: 850px;
 }
+
+.ui.sidebar.menu {
+  overflow: visible !important;
+}
+
+.handWriting{
+  font-family: "Lucida Handwriting", cursive;
+}

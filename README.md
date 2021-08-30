@@ -1,4 +1,4 @@
-Java - React Camp Homeworks | **Kodlama.io**
+Java - React Camp Works | **Kodlama.io**
 
 Discord: CosmicDust#4917
 

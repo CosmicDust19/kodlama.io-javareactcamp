@@ -26,8 +26,8 @@ public class DepartmentsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                 @Size(max = Utils.Const.MAX_DEPARTMENT_NAME) String departmentName) {
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                 @Size(max = Utils.Const.MAX_DEPARTMENT_NAME, message = Msg.Annotation.SIZE) String departmentName) {
         return Utils.getResponseEntity(departmentService.add(departmentName));
     }
 

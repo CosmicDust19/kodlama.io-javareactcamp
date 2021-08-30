@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.SystemEmployeeService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.SystemEmployeeDao;
@@ -18,6 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SystemEmployeeManager implements SystemEmployeeService {
 
+    private final UserDao userDao;
     private final SystemEmployeeDao systemEmployeeDao;
     private final CheckService check;
     private final ModelMapper modelMapper;
@@ -39,6 +41,7 @@ public class SystemEmployeeManager implements SystemEmployeeService {
 
     @Override
     public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
+        if (userDao.existsByEmail(systemEmployeesAddDto.getEmail())) return new ErrorResult(Msg.IS_IN_USE.get("Email"));
         SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
         systemEmployeeDao.save(systemEmployee);
         return new SuccessResult(Msg.SAVED.get());
@@ -49,6 +52,9 @@ public class SystemEmployeeManager implements SystemEmployeeService {
         if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(Msg.NOT_EXIST.get("sysEmplId"));
 
         SystemEmployee sysEmpl = systemEmployeeDao.getById(sysEmplId);
+        if (sysEmpl.getFirstName().equals(firstName))
+            return new ErrorResult(Msg.IS_THE_SAME.get("First name"));
+
         sysEmpl.setFirstName(firstName);
         return execLastUpdAct(sysEmpl);
     }
@@ -58,6 +64,9 @@ public class SystemEmployeeManager implements SystemEmployeeService {
         if (check.notExistsById(systemEmployeeDao, sysEmplId)) return new ErrorResult(Msg.NOT_EXIST.get("sysEmplId"));
 
         SystemEmployee sysEmpl = systemEmployeeDao.getById(sysEmplId);
+        if (sysEmpl.getLastName().equals(lastName))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Last name"));
+
         sysEmpl.setLastName(lastName);
         return execLastUpdAct(sysEmpl);
     }
@@ -65,6 +74,7 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     private Result execLastUpdAct(SystemEmployee sysEmpl) {
         sysEmpl.setLastModifiedAt(LocalDateTime.now());
         SystemEmployee savedSysEmpl = systemEmployeeDao.save(sysEmpl);
+        savedSysEmpl.setPassword(null);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedSysEmpl);
     }
 

@@ -26,8 +26,8 @@ public class LanguagesController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                 @Size(max = Utils.Const.MAX_LANGUAGE_NAME) String languageName) {
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                 @Size(max = Utils.Const.MAX_LANGUAGE_NAME, message = Msg.Annotation.SIZE) String languageName) {
         return Utils.getResponseEntity(languageService.add(languageName));
     }
 

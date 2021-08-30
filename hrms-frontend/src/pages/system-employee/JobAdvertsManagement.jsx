@@ -1,46 +1,37 @@
 import React, {useEffect, useState} from "react";
 import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {
-    Button,
-    Checkbox,
-    Dropdown,
-    Grid,
-    Header,
-    Icon,
-    Input,
-    Label,
-    Loader,
-    Menu,
-    Modal,
-    Pagination,
-    Popup,
-    Segment,
-    Table
+    Button, Checkbox, Dropdown, Grid, Header,
+    Icon, Input, Label, Loader, Menu, Modal,
+    Pagination, Segment, Table
 } from "semantic-ui-react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    changeFilteredJobAdverts, changeJobAdvert,
-    changeJobAdvertsFilters,
-    changeJobAdvVerification,
-    filterJobAdverts
+    changeFilteredJobAdverts,
+    changeJobAdvert, changeJobAdvertsFilters, filterJobAdverts
 } from "../../store/actions/filterActions"
 import CityService from "../../services/cityService";
 import PositionService from "../../services/positionService";
 import EmployerService from "../../services/employerService";
 import {toast} from "react-toastify";
 import {useHistory} from "react-router-dom";
+import filter from "../../store/initialStates/filterInitial";
+import {handleCatch, inputStyle} from "../../utilities/Utils";
+import SDropdown from "../../utilities/customFormControls/SDropdown";
 
 const jobAdvertisementService = new JobAdvertisementService();
 
-export default function JobAdvertisementsManagement() {
+export default function JobAdvertsManagement() {
 
     const dispatch = useDispatch();
     const filters = useSelector(state => state?.filter.filter.jobAdvertsFilters)
-    let filteredJobAdvertisements = useSelector(state => state?.filter.filter.filteredJobAdverts)
     const history = useHistory();
     const userProps = useSelector(state => state?.user.userProps)
+    const initialFilters = {...filter.jobAdvertsFilters, pending: undefined, verification: undefined, activation: undefined}
 
+    const [filteredJobAdverts, setFilteredJobAdverts] = useState(useSelector(state => state?.filter.filter.filteredJobAdverts));
+    const [noAdvFound, setNoAdvFound] = useState(false);
     const [infoPopUpOpen, setInfoPopUpOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -54,22 +45,23 @@ export default function JobAdvertisementsManagement() {
     const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
-        let cityService = new CityService();
-        let positionService = new PositionService();
-        let employerService = new EmployerService();
+        const cityService = new CityService();
+        const positionService = new PositionService();
+        const employerService = new EmployerService();
         cityService.getCities().then((result) => setCities(result.data.data));
         positionService.getPositions().then((result) => setPositions(result.data.data));
         employerService.getAll().then((result) => setEmployers(result.data.data));
         jobAdvertisementService.getAll().then((result) => {
             setJobAdvertisements(result.data.data)
+            if (filteredJobAdverts.length === 0) setFilteredJobAdverts(result.data.data)
         });
-    }, []);
-
-    if (filteredJobAdvertisements === undefined) filteredJobAdvertisements = jobAdvertisements
+    }, [filteredJobAdverts.length]);
 
     const indexOfLastJobAdvertisement = currentPage * jobAdvertisementsPerPage
     const indexOfFirstJobAdvertisement = indexOfLastJobAdvertisement - jobAdvertisementsPerPage
-    const currentJobAdvertisements = filteredJobAdvertisements.slice(indexOfFirstJobAdvertisement, indexOfLastJobAdvertisement)
+    const currentJobAdvertisements = filteredJobAdverts.slice(indexOfFirstJobAdvertisement, indexOfLastJobAdvertisement)
+
+    const advertsLoading = jobAdvertisements.length === 0
 
     const cityOption = cities.map((city, index) => ({
         key: index,
@@ -122,19 +114,10 @@ export default function JobAdvertisementsManagement() {
         }
     });
 
-    const refreshComp = () => {
-        if (refresh === true) setRefresh(false);
-        else setRefresh(true)
-    }
-
-    const handleCatch = (error) => {
-        toast.warning("A problem has occurred")
-        console.log(error.response)
-        refreshComp()
-    }
+    const refreshComp = () => setRefresh(!refresh);
 
     const getRemainedDays = (jobAdvertisement) => {
-        let remainedDays = Math.floor((new Date(jobAdvertisement.deadline).getTime() - new Date().getTime()) / 86400000) + 1
+        const remainedDays = Math.floor((new Date(jobAdvertisement.deadline).getTime() - new Date().getTime()) / 86400000) + 1
         if (remainedDays <= 0)
             return <font style={{color: "rgba(123,12,219,0.96)"}}>Expired</font>
         else if (remainedDays === 1)
@@ -154,7 +137,7 @@ export default function JobAdvertisementsManagement() {
         else return "rgba(255,255,255,0.1)"
     }
 
-    const handleChangeVerification = (jobAdvert, status) => {
+    const changeVerification = (jobAdvert, status) => {
         jobAdvertisementService.updateVerification(jobAdvert.id, status).then(r => {
             dispatch(changeJobAdvert(jobAdvert.id, r.data.data))
             toast("Successful")
@@ -171,7 +154,7 @@ export default function JobAdvertisementsManagement() {
     }
 
     const handleAdvertisementInfoClick = id => {
-        history.push(`/jobAdvertisements/${id}`);
+        history.push(`/jobAdverts/${id}`);
         window.scrollTo(0, 0)
     };
 
@@ -186,71 +169,31 @@ export default function JobAdvertisementsManagement() {
         setJobAdvertisementsPerPage(number)
     }
 
-    const handlePendingMenuClick = (activeItem) => {
+    const handleMenuClick = (activeItem, menuName) => {
         if (activeItem === formik.values.pending) {
             formik.values.pending = ""
-            handleChangeFilter("pending", "")
+            handleChangeFilter(menuName, "")
         } else {
             formik.values.pending = activeItem
-            handleChangeFilter("pending", activeItem)
-        }
-        dispatch(changeJobAdvertsFilters(formik.values))
-    }
-
-    const handleVerificationMenuClick = (activeItem) => {
-        if (activeItem === formik.values.verification) {
-            formik.values.verification = ""
-            handleChangeFilter("verification", "")
-        } else {
-            formik.values.verification = activeItem
-            handleChangeFilter("verification", activeItem)
-        }
-        dispatch(changeJobAdvertsFilters(formik.values))
-    }
-
-    const handleActivationMenuClick = (activeItem) => {
-        if (activeItem === formik.values.activation) {
-            formik.values.activation = ""
-            handleChangeFilter("activation", "")
-        } else {
-            formik.values.activation = activeItem
-            handleChangeFilter("activation", activeItem)
+            handleChangeFilter(menuName, activeItem)
         }
         dispatch(changeJobAdvertsFilters(formik.values))
     }
 
     const handlePaginationChange = (e, {activePage}) => setCurrentPage(activePage)
 
-    const handleResetFilters = () => {
-        handleChangeFilter("cityIds", [])
-        handleChangeFilter("positionIds", [])
-        handleChangeFilter("employerIds", [])
-        handleChangeFilter("workModels", [])
-        handleChangeFilter("workTimes", [])
-        handleChangeFilter("minSalaryLessThan", "")
-        handleChangeFilter("maxSalaryLessThan", "")
-        handleChangeFilter("minSalaryMoreThan", "")
-        handleChangeFilter("maxSalaryMoreThan", "")
-        handleChangeFilter("applicationDeadLineBefore", "")
-        handleChangeFilter("applicationDeadLineAfter", "")
-        handleChangeFilter("today", false)
-        handleChangeFilter("thisWeek", false)
-        handleChangeFilter("pending", "")
-        handleChangeFilter("verification", "")
-        handleChangeFilter("activation", "")
-        formik.values = {
-            cityIds: [], positionIds: [], employerIds: [], workTimes: [], workModels: [],
-            minSalaryLessThan: "", maxSalaryLessThan: "", minSalaryMoreThan: "", maxSalaryMoreThan: "",
-            applicationDeadLineBefore: "", applicationDeadLineAfter: "",
-            today: false, thisWeek: false,
-            pending: "", verification: "", activation: "",
-        }
+    const resetFilters = () => {
+        formik.setValues(initialFilters)
+        formik.values = initialFilters
         handleFilter()
     }
 
     const handleFilter = () => {
         dispatch(changeJobAdvertsFilters(formik.values))
-        dispatch(filterJobAdverts(jobAdvertisements, formik.values))
+        const filteredJobAdverts = filterJobAdverts(jobAdvertisements, formik.values)
+        dispatch(changeFilteredJobAdverts(filteredJobAdverts));
+        setFilteredJobAdverts(filteredJobAdverts)
+        setNoAdvFound(filteredJobAdverts.length === 0)
         setCurrentPage(1)
     }
 
@@ -324,7 +267,7 @@ export default function JobAdvertisementsManagement() {
     function filtersSegment() {
         return (
             <div>
-                <Segment style={{borderRadius: 20}} disabled={jobAdvertisements.length === 0} raised vertical>
+                <Segment style={{borderRadius: 20}} disabled={advertsLoading} raised vertical textAlign={"center"}>
                     <Label attached={"top right"} style={{marginTop: 5, marginRight: 5}} color="blue" circular
                            onClick={() => setInfoPopUpOpen(true)}>
                         <Icon name="help" style={{marginRight: 0}}/>
@@ -333,113 +276,82 @@ export default function JobAdvertisementsManagement() {
                         <Grid.Column width="6">
 
                             <Segment basic>
-                                <Header size={"small"} textAlign={"center"} style={{color: "rgba(20,23,182,0.63)"}}>
-                                    <Header.Content>
-                                        <Icon name="wait"/> Pending
-                                    </Header.Content>
-                                </Header>
-                                <Menu secondary style={{borderRadius: 10}}>
-                                    <Menu.Item active={filters.pending === "releaseApproval"} color={"blue"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handlePendingMenuClick("releaseApproval")
-                                    }}><Icon name="bullhorn"/>Release Approval</Menu.Item>
-                                    <Menu.Item active={filters.pending === "updateApproval"} color={"orange"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handlePendingMenuClick("updateApproval")
-                                    }}><Icon name="redo alternate"/>Update Approval</Menu.Item>
+                                <Header size={"small"} textAlign={"center"} style={{color: "rgba(20,23,182,0.63)"}}
+                                        content={<div><Icon name="wait"/> Pending</div>}/>
+                                <Menu secondary stackable style={{borderRadius: 10}}>
+                                    <Menu.Item
+                                        active={filters.pending === "releaseApproval"} color={"blue"} style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("releaseApproval", "pending")}>
+                                        <Icon name="bullhorn"/>Release Approval
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        active={filters.pending === "updateApproval"} color={"orange"}
+                                        style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("updateApproval", "pending")}>
+                                        <Icon name="redo alternate"/>Update Approval
+                                    </Menu.Item>
                                 </Menu>
                             </Segment>
 
                             <Segment basic>
-                                <Header size={"small"} textAlign={"center"} style={{color: "rgba(250,180,2,0.73)"}}>
-                                    <Header.Content>
-                                        <Icon name="check circle outline"/> Verification
-                                    </Header.Content>
-                                </Header>
-                                <Menu secondary style={{borderRadius: 10}}>
-                                    <Menu.Item active={filters.verification === "verified"} color={"green"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleVerificationMenuClick("verified")
-                                    }}><Icon name="check circle outline"/>Verified</Menu.Item>
-                                    <Menu.Item active={filters.verification === "rejected"} color={"red"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleVerificationMenuClick("rejected")
-                                    }}><Icon name="ban"/>Rejected</Menu.Item>
+                                <Header size={"small"} textAlign={"center"} style={{color: "rgba(250,180,2,0.73)"}}
+                                        content={<div><Icon name="check circle outline"/> Verification</div>}/>
+                                <Menu secondary stackable style={{borderRadius: 10}}>
+                                    <Menu.Item
+                                        active={filters.verification === "verified"} color={"green"} style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("verified", "verification")}>
+                                        <Icon name="check circle outline"/>Verified
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        active={filters.verification === "rejected"} color={"red"} style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("rejected", "verification")}>
+                                        <Icon name="ban"/>Rejected
+                                    </Menu.Item>
                                 </Menu>
                             </Segment>
 
                             <Segment basic>
-                                <Header size={"small"} textAlign={"center"} style={{color: "rgba(250,2,52,0.66)"}}>
-                                    <Header.Content>
-                                        <Icon name="checkmark"/> Activation
-                                    </Header.Content>
-                                </Header>
-                                <Menu secondary style={{borderRadius: 10}}>
-                                    <Menu.Item active={formik.values.activation === "active"} color={"green"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleActivationMenuClick("active")
-                                    }}><Icon name="checkmark"/>Active</Menu.Item>
-                                    <Menu.Item active={formik.values.activation === "inactive"} color="brown"
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleActivationMenuClick("inactive")
-                                    }}><Icon name="minus circle"/>Inactive</Menu.Item>
-                                    <Menu.Item active={formik.values.activation === "expired"} color="purple"
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleActivationMenuClick("expired")
-                                    }}><Icon name="calendar times"/>Expired</Menu.Item>
+                                <Header size={"small"} textAlign={"center"} style={{color: "rgba(250,2,52,0.66)"}}
+                                        content={<div><Icon name="checkmark"/> Activation</div>}/>
+                                <Menu secondary stackable style={{borderRadius: 10}}>
+                                    <Menu.Item
+                                        active={formik.values.activation === "active"} color={"green"} style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("active", "activation")}>
+                                        <Icon name="checkmark"/>Active
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        active={formik.values.activation === "inactive"} color="brown" style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("inactive", "activation")}>
+                                        <Icon name="minus circle"/>Inactive
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        active={formik.values.activation === "expired"} color="purple" style={{borderRadius: 10}}
+                                        onClick={() => handleMenuClick("expired", "activation")}>
+                                        <Icon name="calendar times"/>Expired
+                                    </Menu.Item>
                                 </Menu>
                             </Segment>
 
                         </Grid.Column>
                         <Grid.Column width="10">
-                            <Dropdown clearable item placeholder="Select cities" search multiple selection
-                                      loading={jobAdvertisements.length === 0}
-                                      options={cityOption} value={formik.values.cityIds}
-                                      style={{marginLeft: 10, marginTop: 10, borderRadius: 10}}
-                                      onChange={(event, data) => {
-                                          handleChangeFilter("cityIds", data.value)
-                                      }}/>
-                            <Dropdown clearable item placeholder="Select positions" search multiple selection
-                                      loading={jobAdvertisements.length === 0}
-                                      options={positionOption} value={formik.values.positionIds}
-                                      style={{marginLeft: 10, marginTop: 10, borderRadius: 10}}
-                                      onChange={(event, data) => {
-                                          handleChangeFilter("positionIds", data.value)
-                                      }}/>
-                            <Dropdown clearable item placeholder="Select employers" search multiple selection
-                                      loading={jobAdvertisements.length === 0}
-                                      options={employerOption} value={formik.values.employerIds}
-                                      style={{marginLeft: 10, marginTop: 10, borderRadius: 10}}
-                                      onChange={(event, data) => {
-                                          handleChangeFilter("employerIds", data.value)
-                                      }}/>
-                            <Dropdown clearable item placeholder="Select work model" search multiple selection
-                                      loading={jobAdvertisements.length === 0}
-                                      options={workModelOption} value={formik.values.workModels}
-                                      style={{marginLeft: 10, marginTop: 10, borderRadius: 10}}
-                                      onChange={(event, data) => {
-                                          handleChangeFilter("workModels", data.value)
-                                      }}/>
-                            <Dropdown clearable item placeholder="Select work time" search multiple selection
-                                      loading={jobAdvertisements.length === 0}
-                                      options={workTimeOption} value={formik.values.workTimes}
-                                      style={{marginLeft: 10, marginTop: 10, borderRadius: 10}}
-                                      onChange={(event, data) => {
-                                          handleChangeFilter("workTimes", data.value)
-                                      }}/>
+                            <SDropdown name={"cityIds"} placeholder="Cities" multiple options={cityOption} formik={formik}/>
+                            <SDropdown name={"positionIds"} placeholder="Positions" multiple options={positionOption} formik={formik}/>
+                            <SDropdown name={"employerIds"} placeholder="Employers" multiple options={employerOption} formik={formik}/>
+                            <SDropdown name={"workModels"} placeholder="Work models" multiple options={workModelOption} formik={formik}/>
+                            <SDropdown name={"workTimes"} placeholder="Work times" multiple options={workTimeOption} formik={formik}/>
 
                             <Grid columns="equal" style={{marginTop: 10}} stackable>
                                 <Grid.Column>
                                     <Segment basic>
-                                        <Header size="tiny" disabled={jobAdvertisements.length === 0}>
+                                        <Header size="tiny" disabled={advertsLoading}>
                                             Minimum Salary
                                         </Header>
                                         <Input placeholder="More than" value={formik.values.minSalaryMoreThan}
-                                               loading={jobAdvertisements.length === 0}
+                                               loading={advertsLoading}
                                                name="minSalaryMoreThan" type="number" style={{borderRadius: 10}}
                                                onChange={formik.handleChange} icon={"money bill alternate"}/>
                                         <Input placeholder="Less than" value={formik.values.minSalaryLessThan}
-                                               loading={jobAdvertisements.length === 0}
+                                               loading={advertsLoading}
                                                name="minSalaryLessThan" type="number"
                                                style={{marginTop: 10, borderRadius: 10}}
                                                onChange={formik.handleChange} icon={"money bill alternate"}/>
@@ -447,15 +359,15 @@ export default function JobAdvertisementsManagement() {
                                 </Grid.Column>
                                 <Grid.Column>
                                     <Segment basic>
-                                        <Header size="tiny" disabled={jobAdvertisements.length === 0}>
+                                        <Header size="tiny" disabled={advertsLoading}>
                                             Maximum Salary
                                         </Header>
                                         <Input placeholder="More than" value={formik.values.maxSalaryMoreThan}
-                                               loading={jobAdvertisements.length === 0}
+                                               loading={advertsLoading}
                                                name="maxSalaryMoreThan" type="number" style={{borderRadius: 10}}
                                                onChange={formik.handleChange} icon={"money bill alternate"}/>
                                         <Input placeholder="Less than" value={formik.values.maxSalaryLessThan}
-                                               loading={jobAdvertisements.length === 0}
+                                               loading={advertsLoading}
                                                name="maxSalaryLessThan" type="number"
                                                style={{marginTop: 10, borderRadius: 10}}
                                                onChange={formik.handleChange} icon={"money bill alternate"}/>
@@ -465,33 +377,28 @@ export default function JobAdvertisementsManagement() {
 
                             <Grid columns="equal" style={{marginTop: -20}} stackable>
                                 <Grid.Column>
-                                    <Segment basic style={{marginTop: 10}}>
-                                        <Checkbox label='Today' checked={formik.values.today} style={{marginLeft: 7}}
-                                                  disabled={jobAdvertisements.length === 0} onChange={() => {
-                                            handleChangeFilter("today", !formik.values.today)
-                                        }}/>
-                                        <Checkbox label='This Week' checked={formik.values.thisWeek}
-                                                  style={{marginLeft: 20}}
-                                                  disabled={jobAdvertisements.length === 0} onChange={() => {
-                                            handleChangeFilter("thisWeek", !formik.values.thisWeek)
-                                        }}/>
-                                    </Segment>
+                                    <Checkbox label='Today' checked={formik.values.today} style={inputStyle}
+                                              disabled={advertsLoading} onChange={() => {
+                                        handleChangeFilter("today", !formik.values.today)
+                                    }}/>
+                                    <Checkbox label='This Week' checked={formik.values.thisWeek} style={inputStyle}
+                                              disabled={advertsLoading} onChange={() => {
+                                        handleChangeFilter("thisWeek", !formik.values.thisWeek)
+                                    }}/>
                                 </Grid.Column>
                                 <Grid.Column>
                                     <Segment basic>
-                                        <Header size="tiny" disabled={jobAdvertisements.length === 0}>
-                                            Application DeadLine
-                                        </Header>
+                                        <Header size="tiny" disabled={advertsLoading} content={"Application Deadline"}/>
                                         <font style={{fontStyle: "italic"}}>Before</font>&nbsp;&nbsp;&nbsp;
                                         <Input placeholder="Before" value={formik.values.applicationDeadLineBefore}
-                                               loading={jobAdvertisements.length === 0}
+                                               loading={advertsLoading}
                                                name="applicationDeadLineBefore" type="date"
                                                onChange={formik.handleChange}/>
                                         <Header style={{marginTop: 0}}/>
                                         <font
                                             style={{fontStyle: "italic", marginLeft: 8}}>After</font>&nbsp;&nbsp;&nbsp;
                                         <Input placeholder="After" value={formik.values.applicationDeadLineAfter}
-                                               loading={jobAdvertisements.length === 0}
+                                               loading={advertsLoading}
                                                name="applicationDeadLineAfter" type="date"
                                                style={{marginTop: -4, marginBottom: 15}}
                                                onChange={formik.handleChange}/>
@@ -505,7 +412,7 @@ export default function JobAdvertisementsManagement() {
                 <Grid padded stackable>
                     <Grid.Column width="10">
                         <Button basic animated="fade" fluid color={"green"} style={{borderRadius: 10}} loading={loading}
-                                disabled={jobAdvertisements.length === 0 || loading} active onClick={() => {
+                                disabled={advertsLoading || loading} active onClick={() => {
                             setLoading(true)
                             setTimeout(() => {
                                 handleFilter()
@@ -518,10 +425,10 @@ export default function JobAdvertisementsManagement() {
                     </Grid.Column>
                     <Grid.Column width="6">
                         <Button animated="fade" basic fluid color={"grey"} style={{borderRadius: 10}} loading={loading}
-                                disabled={jobAdvertisements.length === 0 || loading} active onClick={() => {
+                                disabled={advertsLoading || loading} active onClick={() => {
                             setLoading(true)
                             setTimeout(() => {
-                                handleResetFilters()
+                                resetFilters()
                                 setLoading(false)
                             }, 500)
                         }}>
@@ -535,37 +442,19 @@ export default function JobAdvertisementsManagement() {
     }
 
     function listJobAdvertisements(currentJobAdvertisements) {
-        if (jobAdvertisements.length === 0 && (!currentJobAdvertisements || currentJobAdvertisements.length === 0)) {
-            return (
-                <Segment basic size={"large"}>
-                    <Loader active inline='centered' size={"large"}/>
-                </Segment>
-            )
-        } else if (currentJobAdvertisements.length === 0) {
-            return (
-                <Header style={{marginTop: "2em", marginLeft: "2em"}}>
-                    <font style={{fontStyle: "italic"}} color="black">No results were found</font>
-                </Header>
-            )
-        }
+        if (noAdvFound) return <Header style={{marginTop: "2em", marginLeft: "2em"}}
+                                       content={<font class={"handWriting"}>No results were found</font>}/>
+
 
         return (
             <Table>
                 <Table.Body>
                     {currentJobAdvertisements.map((jobAdvertisement) => (
                         <Table.Row style={{backgroundColor: getRowColor(jobAdvertisement)}} key={jobAdvertisement.id}>
-                            <Table.Cell>
-                                {jobAdvertisement.employer.companyName}
-                            </Table.Cell>
-                            <Table.Cell>
-                                {jobAdvertisement.position.title}
-                            </Table.Cell>
-                            <Table.Cell>
-                                {jobAdvertisement.city.name}
-                            </Table.Cell>
-                            <Table.Cell>
-                                {getRemainedDays(jobAdvertisement)}
-                            </Table.Cell>
+                            <Table.Cell content={jobAdvertisement.employer.companyName}/>
+                            <Table.Cell content={jobAdvertisement.position.title}/>
+                            <Table.Cell content={jobAdvertisement.city.name}/>
+                            <Table.Cell content={getRemainedDays(jobAdvertisement)}/>
                             <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
                                 {jobAdvertisement.verified === false && jobAdvertisement.rejected === null ?
                                     <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
@@ -611,21 +500,23 @@ export default function JobAdvertisementsManagement() {
                                         }}>
                                         {jobAdvertisement.updateVerified === false ?
                                             <Dropdown.Item
-                                                onClick={() => {verifyUpdate(jobAdvertisement)}}>
+                                                onClick={() => {
+                                                    verifyUpdate(jobAdvertisement)
+                                                }}>
                                                 <Icon name="redo alternate" color="orange"/>Verify Update
                                             </Dropdown.Item> : null}
                                         {jobAdvertisement.verified === false ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(jobAdvertisement, true)}>
+                                                onClick={() => changeVerification(jobAdvertisement, true)}>
                                                 <Icon name="check circle outline" color="green"/>Verify
                                             </Dropdown.Item> :
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(jobAdvertisement, false)}>
+                                                onClick={() => changeVerification(jobAdvertisement, false)}>
                                                 <Icon name="ban" color="red"/>Cancel Verification
                                             </Dropdown.Item>}
                                         {jobAdvertisement.verified === false && jobAdvertisement.rejected === null ?
                                             <Dropdown.Item
-                                                onClick={() => handleChangeVerification(jobAdvertisement, false)}>
+                                                onClick={() => changeVerification(jobAdvertisement, false)}>
                                                 <Icon name="ban" color="red"/>Reject
                                             </Dropdown.Item> : null}
                                         <Dropdown.Item
@@ -648,19 +539,19 @@ export default function JobAdvertisementsManagement() {
                 <Menu secondary icon={"labeled"} vertical pagination
                       style={{marginRight: "3em", marginTop: "16em"}} fixed={"right"}>
                     <Menu.Item name='5' active={jobAdvertisementsPerPage === 5}
-                               disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
+                               disabled={filteredJobAdverts.length === 0 || jobAdvertisements.length === 0}
                                onClick={() => handlePagePerJobAdvMenuClick(5)}>5</Menu.Item>
                     <Menu.Item name='10' active={jobAdvertisementsPerPage === 10}
-                               disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
+                               disabled={filteredJobAdverts.length === 0 || jobAdvertisements.length === 0}
                                onClick={() => handlePagePerJobAdvMenuClick(10)}>10</Menu.Item>
                     <Menu.Item name='20' active={jobAdvertisementsPerPage === 20}
-                               disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
+                               disabled={filteredJobAdverts.length === 0 || jobAdvertisements.length === 0}
                                onClick={() => handlePagePerJobAdvMenuClick(20)}>20</Menu.Item>
                     <Menu.Item name='50' active={jobAdvertisementsPerPage === 50}
-                               disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
+                               disabled={filteredJobAdverts.length === 0 || jobAdvertisements.length === 0}
                                onClick={() => handlePagePerJobAdvMenuClick(50)}>50</Menu.Item>
                     <Menu.Item name='100' active={jobAdvertisementsPerPage === 100}
-                               disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
+                               disabled={filteredJobAdverts.length === 0 || jobAdvertisements.length === 0}
                                onClick={() => handlePagePerJobAdvMenuClick(100)}>100</Menu.Item>
                     <Menu.Item>
                         <Button animated="vertical" fluid color={"violet"} size="small"
@@ -681,53 +572,32 @@ export default function JobAdvertisementsManagement() {
 
     function paginationBar() {
         return (
-            <Popup
-                trigger={
-                    <Pagination
-                        totalPages={Math.ceil(filteredJobAdvertisements.length / jobAdvertisementsPerPage)}
-                        onPageChange={handlePaginationChange}
-                        activePage={currentPage}
-                        secondary
-                        pointing
-                        firstItem={null}
-                        lastItem={null}
-                        siblingRange={2}
-                        disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
-                    />
-                }
-                disabled={filteredJobAdvertisements.length === 0 || jobAdvertisements.length === 0}
-                content={"Page number"}
-                style={{
-                    borderRadius: 15,
-                    opacity: 0.9,
-                    color: "rgb(18,18,18)"
-                }}
-                position={"top center"}
-                on={"hover"}
-                mouseEnterDelay={1000}
-                mouseLeaveDelay={150}
+            <Pagination
+                totalPages={Math.ceil(filteredJobAdverts.length / jobAdvertisementsPerPage)} onPageChange={handlePaginationChange}
+                activePage={currentPage} secondary pointing firstItem={null} lastItem={null} siblingRange={2}
+                disabled={filteredJobAdverts.length === 0 || jobAdvertisements.length === 0}
             />
         )
     }
 
-    if (String(userProps.userType) !== "systemEmployee")
-        return (
-            <Header>
-                Nice Try !
-            </Header>
-        )
+    if (String(userProps.userType) !== "systemEmployee") return <Header content={"Nice Try !"}/>
 
     return (
         <div>
             {infoPopUp()}
             {itemsPerPageBar()}
             {filtersSegment()}
-            <Grid padded textAlign={"center"}>
-                <Grid.Row>
-                    {paginationBar("top")}
-                </Grid.Row>
-            </Grid>
-            {listJobAdvertisements(currentJobAdvertisements)}
+            {advertsLoading ?
+                <Loader active inline='centered' size={"big"}/> :
+                <div>
+                    <Grid padded textAlign={"center"}>
+                        <Grid.Row>
+                            {paginationBar("top")}
+                        </Grid.Row>
+                    </Grid>
+                    {listJobAdvertisements(currentJobAdvertisements)}
+                </div>
+            }
         </div>
     );
 }

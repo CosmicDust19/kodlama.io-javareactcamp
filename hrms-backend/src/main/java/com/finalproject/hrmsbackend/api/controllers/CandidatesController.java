@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateService;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateAddDto;
 import lombok.RequiredArgsConstructor;
@@ -47,14 +48,15 @@ public class CandidatesController {
 
     @PutMapping(value = "/update/githubAccount")
     public ResponseEntity<?> updateGithubAccount(@RequestParam(required = false)
-                                                 @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String githubAccount,
+                                                 @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK, message = Msg.Annotation.SIZE) String githubAccount,
                                                  @RequestParam int candId) {
         return Utils.getResponseEntity(candidateService.updateGithubAccount(githubAccount, candId));
     }
 
     @PutMapping(value = "/update/linkedinAccount")
     public ResponseEntity<?> updateLinkedinAccount(@RequestParam(required = false)
-                                                   @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK) String linkedinAccount, @RequestParam int candId) {
+                                                   @Size(min = Utils.Const.MIN_ACCOUNT_LINK, max = Utils.Const.MAX_ACCOUNT_LINK, message = Msg.Annotation.SIZE) String linkedinAccount,
+                                                   @RequestParam int candId) {
         return Utils.getResponseEntity(candidateService.updateLinkedinAccount(linkedinAccount, candId));
     }
 

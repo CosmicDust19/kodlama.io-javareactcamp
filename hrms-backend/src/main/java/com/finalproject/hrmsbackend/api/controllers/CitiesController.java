@@ -26,8 +26,8 @@ public class CitiesController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                 @Size(max = Utils.Const.MAX_CITY_NAME) String cityName) {
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                 @Size(max = Utils.Const.MAX_CITY_NAME, message = Msg.Annotation.SIZE) String cityName) {
         return Utils.getResponseEntity(cityService.add(cityName));
     }
 

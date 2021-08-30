@@ -26,8 +26,8 @@ public class PositionsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                 @Size(max = Utils.Const.MAX_POSITION_TITLE) String positionTitle) {
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                 @Size(max = Utils.Const.MAX_POSITION_TITLE, message = Msg.Annotation.SIZE) String positionTitle) {
         return Utils.getResponseEntity(positionService.add(positionTitle));
     }
 

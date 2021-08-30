@@ -91,7 +91,7 @@ public class JobAdvertisementsController {
     }
 
     @PutMapping("/update/jobDesc")
-    public ResponseEntity<?> updateJobDesc(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY) String jobDescription,
+    public ResponseEntity<?> updateJobDesc(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED) String jobDescription,
                                            @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateJobDesc(jobDescription, jobAdvId));
     }
@@ -102,41 +102,41 @@ public class JobAdvertisementsController {
     }
 
     @PutMapping("/update/minSalary")
-    public ResponseEntity<?> updateMinSalary(@RequestParam(required = false) @Positive(message = Msg.ForAnnotation.NOT_POSITIVE) Double minSalary,
+    public ResponseEntity<?> updateMinSalary(@RequestParam(required = false) @Positive(message = Msg.Annotation.POSITIVE) Double minSalary,
                                              @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateMinSalary(minSalary, jobAdvId));
     }
 
     @PutMapping("/update/maxSalary")
-    public ResponseEntity<?> updateMaxSalary(@RequestParam(required = false) @Positive(message = Msg.ForAnnotation.NOT_POSITIVE) Double maxSalary,
+    public ResponseEntity<?> updateMaxSalary(@RequestParam(required = false) @Positive(message = Msg.Annotation.POSITIVE) Double maxSalary,
                                              @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateMaxSalary(maxSalary, jobAdvId));
     }
 
     @PutMapping("/update/workModel")
-    public ResponseEntity<?> updateWorkModel(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                             @Size(max = Utils.Const.MAX_JOB_ADV_WORK_MODEL) String workModel,
+    public ResponseEntity<?> updateWorkModel(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                             @Size(max = Utils.Const.MAX_JOB_ADV_WORK_MODEL, message = Msg.Annotation.SIZE) String workModel,
                                              @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateWorkModel(workModel, jobAdvId));
     }
 
     @PutMapping("/update/workTime")
-    public ResponseEntity<?> updateWorkTime(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                            @Size(max = Utils.Const.MAX_JOB_ADV_WORK_TIME) String workTime,
+    public ResponseEntity<?> updateWorkTime(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                            @Size(max = Utils.Const.MAX_JOB_ADV_WORK_TIME, message = Msg.Annotation.SIZE) String workTime,
                                             @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateWorkTime(workTime, jobAdvId));
     }
 
     @PutMapping(value = "/update/deadLine")
-    public ResponseEntity<?> updateDeadLine(@RequestParam(required = false) @Future(message = Msg.ForAnnotation.PAST_OR_PRESENT) LocalDate deadLine,
+    public ResponseEntity<?> updateDeadLine(@RequestParam(required = false) @Future(message = Msg.Annotation.FUTURE) LocalDate deadLine,
                                             @RequestParam int jobAdvId) {
         return Utils.getResponseEntity(jobAdvService.updateDeadLine(deadLine, jobAdvId));
     }
 
     @PutMapping(value = "/update/openPositions")
-    public ResponseEntity<?> updateOpenPositions(@RequestParam @Positive(message = Msg.ForAnnotation.NOT_POSITIVE) short number,
+    public ResponseEntity<?> updateOpenPositions(@RequestParam @Positive(message = Msg.Annotation.POSITIVE) short openPositions,
                                                  @RequestParam int jobAdvId) {
-        return Utils.getResponseEntity(jobAdvService.updateOpenPositions(number, jobAdvId));
+        return Utils.getResponseEntity(jobAdvService.updateOpenPositions(openPositions, jobAdvId));
     }
 
     @PutMapping(value = "/update/applyChanges")

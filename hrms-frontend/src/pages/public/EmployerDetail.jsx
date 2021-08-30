@@ -6,6 +6,7 @@ import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {useDispatch, useSelector} from "react-redux";
 import {changeEmployer} from "../../store/actions/filterActions";
 import {toast} from "react-toastify";
+import {handleCatch} from "../../utilities/Utils";
 
 export default function EmployerDetail() {
 
@@ -27,13 +28,13 @@ export default function EmployerDetail() {
     const history = useHistory();
 
     const handleAdvertisementClick = id => {
-        history.push(`/jobAdvertisements/${id}`);
+        history.push(`/jobAdverts/${id}`);
         window.scrollTo(0, 0)
     };
 
     useEffect(() => {
         const employerService = new EmployerService();
-        const jobAdvertisementService = new JobAdvertisementService()
+        const jobAdvertisementService = new JobAdvertisementService();
         employerService.getById(id).then((result) => setEmployer(result.data.data));
         if (String(userProps.userType) === "systemEmployee")
             jobAdvertisementService.getAllByEmployerId(employer.id).then(result => setJobAdvertisements(result.data.data))
@@ -42,11 +43,6 @@ export default function EmployerDetail() {
     }, [employer.id, id, userProps.userType]);
 
     const systemEmployee = String(userProps.userType) === "systemEmployee";
-
-    const handleCatch = (error) => {
-        toast.warning("A problem has occurred")
-        console.log(error.response)
-    }
 
     const changeVerification = (employer, status) => {
         employerService.updateVerification(employer.id, status).then(r => {

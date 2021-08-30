@@ -55,6 +55,11 @@ public class CheckManager implements CheckService {
     }
 
     @Override
+    public boolean equals(String x, String y) {
+        return (x == null && y == null) || (x != null && x.equals(y));
+    }
+
+    @Override
     public boolean equals(Integer x, Integer y) {
         return (x == null && y == null) || (x != null && x.equals(y));
     }

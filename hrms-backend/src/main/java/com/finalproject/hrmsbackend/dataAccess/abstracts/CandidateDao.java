@@ -13,6 +13,8 @@ import javax.transaction.Transactional;
 @Repository
 public interface CandidateDao extends JpaRepository<Candidate, Integer> {
 
+    boolean existsByEmailAndPassword(String email, String password);
+
     boolean existsByNationalityId(String nationalityId);
 
     Candidate getByEmailAndPassword(String email, String password);

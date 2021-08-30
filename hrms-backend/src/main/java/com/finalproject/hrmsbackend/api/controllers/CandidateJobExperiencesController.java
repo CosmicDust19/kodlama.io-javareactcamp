@@ -45,8 +45,8 @@ public class CandidateJobExperiencesController {
     }
 
     @PutMapping(value = "/update/workPlace")
-    public ResponseEntity<?> updateWorkPlace(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                             @Size(max = Utils.Const.MAX_JOB_EXP_WORKPLACE) String workPlace,
+    public ResponseEntity<?> updateWorkPlace(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                             @Size(max = Utils.Const.MAX_WORKPLACE, message = Msg.Annotation.SIZE) String workPlace,
                                              @RequestParam int candJobExpId) {
         return Utils.getResponseEntity(candidateJobExperienceService.updateWorkPlace(workPlace, candJobExpId));
     }
@@ -57,15 +57,15 @@ public class CandidateJobExperiencesController {
     }
 
     @PutMapping(value = "/update/startYear")
-    public ResponseEntity<?> updateStartYear(@RequestParam @Min(value = Utils.Const.MIN_YEAR)
-                                             @Max(value = Utils.Const.THIS_YEAR) short startYear,
+    public ResponseEntity<?> updateStartYear(@RequestParam @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+                                             @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX) short startYear,
                                              @RequestParam int candJobExpId) {
         return Utils.getResponseEntity(candidateJobExperienceService.updateStartYear(startYear, candJobExpId));
     }
 
     @PutMapping(value = "/update/quitYear")
-    public ResponseEntity<?> updateQuitYear(@RequestParam(required = false) @Min(value = Utils.Const.MIN_YEAR)
-                                            @Max(value = Utils.Const.THIS_YEAR) Short quitYear,
+    public ResponseEntity<?> updateQuitYear(@RequestParam(required = false) @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+                                            @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX) Short quitYear,
                                             @RequestParam int candJobExpId) {
         return Utils.getResponseEntity(candidateJobExperienceService.updateQuitYear(quitYear, candJobExpId));
     }

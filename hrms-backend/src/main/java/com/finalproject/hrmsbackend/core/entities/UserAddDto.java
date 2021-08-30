@@ -15,12 +15,12 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 public class UserAddDto {
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Pattern(regexp = Utils.Const.EMAIL_REGEXP, message = Msg.ForAnnotation.INVALID_FORMAT)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Pattern(regexp = Utils.Const.EMAIL_REGEXP, message = Msg.Annotation.PATTERN)
     private String email;
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Size(min = Utils.Const.MIN_PW, max = Utils.Const.MAX_PW)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Size(min = Utils.Const.MIN_PW, max = Utils.Const.MAX_PW, message = Msg.Annotation.SIZE)
     private String password;
 
 }

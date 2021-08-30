@@ -46,13 +46,13 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     public Result add(CandidateSchoolAddDto candidateSchoolAddDto) {
         Map<String, String> errors = new HashMap<>();
         if (!candidateDao.existsById(candidateSchoolAddDto.getCandidateId()))
-            errors.put("candidateId", Msg.NOT_EXIST.get());
+            errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
         if (check.notExistsById(schoolDao, candidateSchoolAddDto.getSchoolId()))
-            errors.put("school.id", Msg.NOT_EXIST.get());
+            errors.put("schoolId", Msg.NOT_EXIST.get("School"));
         if (check.notExistsById(departmentDao, candidateSchoolAddDto.getDepartmentId()))
-            errors.put("department.id", Msg.NOT_EXIST.get());
+            errors.put("departmentId", Msg.NOT_EXIST.get("Department"));
         if (check.startEndConflict(candidateSchoolAddDto.getStartYear(), candidateSchoolAddDto.getGraduationYear()))
-            errors.put("start year - graduation year", Msg.START_END_YEAR_CONFLICT.get());
+            errors.put("startGradYear", Msg.START_END_YEAR_CONFLICT.get());
         if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
 
         CandidateSchool candidateSchool = modelMapper.map(candidateSchoolAddDto, CandidateSchool.class);
@@ -70,9 +70,12 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     @Override
     public Result updateSchool(int schoolId, int candSchId) {
         if (check.notExistsById(candidateSchoolDao, candSchId)) return new ErrorResult(Msg.NOT_EXIST.get("candSchId"));
-        if (check.notExistsById(schoolDao, schoolId)) return new ErrorResult(Msg.NOT_EXIST.get("schoolId"));
+        if (check.notExistsById(schoolDao, schoolId)) return new ErrorResult(Msg.NOT_EXIST.get("School"));
 
         CandidateSchool candSch = candidateSchoolDao.getById(candSchId);
+        if (candSch.getSchool().getId() == schoolId)
+            return new ErrorResult(Msg.IS_THE_SAME.get("School"));
+
         candSch.setSchool(schoolDao.getById(schoolId));
         CandidateSchool savedCandSch = candidateSchoolDao.save(candSch);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandSch);
@@ -81,9 +84,12 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     @Override
     public Result updateDepartment(short departmentId, int candSchId) {
         if (check.notExistsById(candidateSchoolDao, candSchId)) return new ErrorResult(Msg.NOT_EXIST.get("candSchId"));
-        if (check.notExistsById(departmentDao, departmentId)) return new ErrorResult(Msg.NOT_EXIST.get("department"));
+        if (check.notExistsById(departmentDao, departmentId)) return new ErrorResult(Msg.NOT_EXIST.get("Department"));
 
         CandidateSchool candSch = candidateSchoolDao.getById(candSchId);
+        if (candSch.getDepartment().getId() == departmentId)
+            return new ErrorResult(Msg.IS_THE_SAME.get("Department"));
+
         candSch.setDepartment(departmentDao.getById(departmentId));
         CandidateSchool savedCandSch = candidateSchoolDao.save(candSch);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandSch);
@@ -95,7 +101,7 @@ public class CandidateSchoolManager implements CandidateSchoolService {
 
         CandidateSchool candidateSchool = candidateSchoolDao.getById(candSchId);
         if (candidateSchool.getStartYear() == startYear)
-            return new ErrorResult(Msg.THE_SAME.get("Start year"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Start year"));
         if (check.startEndConflict(candidateSchool.getGraduationYear(), startYear))
             return new ErrorResult(Msg.START_END_YEAR_CONFLICT.get());
 
@@ -111,7 +117,7 @@ public class CandidateSchoolManager implements CandidateSchoolService {
 
         CandidateSchool candidateSchool = candidateSchoolDao.getById(candSchId);
         if (check.equals(candidateSchool.getGraduationYear(), graduationYear))
-            return new ErrorResult(Msg.THE_SAME.get("Graduation year"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Graduation year"));
         if (check.startEndConflict(candidateSchool.getStartYear(), graduationYear))
             return new ErrorResult(Msg.START_END_YEAR_CONFLICT.get());
 

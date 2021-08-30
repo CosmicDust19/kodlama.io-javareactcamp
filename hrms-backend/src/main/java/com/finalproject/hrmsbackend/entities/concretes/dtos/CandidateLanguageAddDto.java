@@ -14,14 +14,14 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 public class CandidateLanguageAddDto {
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Integer candidateId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Short languageId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
-    @Pattern(regexp = Utils.Const.LANG_LVL_REGEXP, message = Msg.ForAnnotation.INVALID_LANG_LVL)
+    @NotNull(message = Msg.Annotation.REQUIRED)
+    @Pattern(regexp = Utils.Const.LANG_LVL_REGEXP, message = Msg.Annotation.PATTERN)
     private String languageLevel;
 
 }

@@ -15,15 +15,17 @@ public enum Msg {
     UPLOADED("Uploaded"),
     UPLOAD_ERROR("An error has occurred during upload"),
     RESULT_SUM("Result summary"),
+    LOGGED_IN("Logged in"),
 
     //customizable
     INVALID("invalid"),
     INVALID_DATE("invalid date format (should be yyyy-mm-dd)"),
     USED("used before"),
-    IN_USE("in use"),
+    IS_IN_USE("is in use"),
     NOT_HAVE("does not have this"),
     NOT_EXIST("does not exist"),
     NOT_FOUND("not found"),
+    IS_THE_SAME("is the same as before"),
     THE_SAME("the same as before"),
     ALREADY_CONTAINS("already contains this"),
     DIFF_DOMAIN("have different domain"),
@@ -34,6 +36,8 @@ public enum Msg {
     EMPTY("Empty"),
     NO_ID_FOUND("No ids were found, nothing executed"),
     NO_UPDATE("There are no updates available"),
+    UK_JOB_ADV_ADD("You already have an advert in this city, position and description"),
+    UK_JOB_ADV_UPD("You already have an advert or update request in this city, position and description"),
     START_END_YEAR_CONFLICT("The end year cannot be a date before the start year"),
     MIN_MAX_CONFLICT("Min value cannot be greater than max value"),
     INVALID_LANG_LVL("Not a language level according to the common european framework (A1, A2 etc.)"),
@@ -41,7 +45,8 @@ public enum Msg {
     SORT_DIRECTION("Negative & Null -> Desc, Positive & Zero -> Asc"),
     NOT_AN_IMAGE("Not an image"),
     IMG_VALIDATION_ERR("An error has occurred while validating image"),
-    MALFORMED_JSON_REQUEST("Malformed JSON request");
+    MALFORMED_JSON_REQUEST("Malformed JSON request"),
+    LOGIN_FAIL("Please check your email and password");
 
     private final String MSG;
 
@@ -63,15 +68,15 @@ public enum Msg {
 
     //messages for annotations
     @UtilityClass
-    public class ForAnnotation {
+    public class Annotation {
 
-        public static final String INVALID_FORMAT = "Invalid Format";
-        public static final String EMPTY = "Empty";
-        public static final String REQUIRED = "Required";
-        public static final String NOT_POSITIVE = "Not positive";
-        public static final String PAST_OR_PRESENT = "Past or Present";
-        public static final String INVALID_LANG_LVL = "Should be A1, A2 etc.";
-        public static final String INVALID_NAT_ID = "Nationality id must consist of 11 digits";
+        public static final String REQUIRED = "required";
+        public static final String SIZE = "size must be between {min} and {max}";
+        public static final String MIN = "must be greater than {value}";
+        public static final String MAX = "must be less than {value}";
+        public static final String POSITIVE = "should be positive";
+        public static final String FUTURE = "should be in the future";
+        public static final String PATTERN = "is not in correct format";
 
     }
 

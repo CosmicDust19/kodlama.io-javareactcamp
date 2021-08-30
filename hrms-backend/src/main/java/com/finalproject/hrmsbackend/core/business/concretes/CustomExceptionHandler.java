@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.core.business.concretes;
 
 import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -25,11 +26,11 @@ import java.util.*;
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException exceptions, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        exceptions.printStackTrace();
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ex.printStackTrace();
         Map<String, String> errors = new LinkedHashMap<>();
-        for (FieldError fieldError : exceptions.getBindingResult().getFieldErrors()) {
-            errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            errors.put(fieldError.getField(), Utils.getViolationMsg(fieldError.getField(), fieldError.getDefaultMessage()));
         }
         ApiError apiError = new ApiError(Msg.INVALID.getCustom("%s input(s)"), errors, null);
         return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
@@ -45,13 +46,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler({ConstraintViolationException.class})
-    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException exceptions, WebRequest request) {
-        exceptions.printStackTrace();
+    public ResponseEntity<Object> handleConstraintViolation(ConstraintViolationException ex, WebRequest request) {
+        ex.printStackTrace();
         Map<String, String> errors = new LinkedHashMap<>();
-        for (ConstraintViolation<?> violation : exceptions.getConstraintViolations()) {
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             String propPath = violation.getPropertyPath().toString();
-            String invalidProp = propPath.substring(propPath.lastIndexOf('.') + 1);
-            errors.put(invalidProp, violation.getMessage());
+            String camelCaseProp = propPath.substring(propPath.lastIndexOf('.') + 1);
+            errors.put(camelCaseProp, Utils.getViolationMsg(camelCaseProp, violation.getMessage()));
         }
         ApiError apiError = new ApiError(Msg.INVALID.getCustom("%s input(s)"), errors, null);
         return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));

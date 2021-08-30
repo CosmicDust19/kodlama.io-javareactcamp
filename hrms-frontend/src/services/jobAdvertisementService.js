@@ -7,7 +7,7 @@ export default class JobAdvertisementService {
     }
 
     getAllByEmployerId(employerId) {
-        return axios.get("http://localhost:8080/api/jobAdvertisements/get/all");
+        return axios.get(`http://localhost:8080/api/jobAdvertisements/get/byEmployer?employerId=${employerId}`);
     }
 
     getPublic(sortDirection) {

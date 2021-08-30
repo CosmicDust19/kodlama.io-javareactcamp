@@ -5,12 +5,10 @@ import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
 import com.finalproject.hrmsbackend.core.business.abstracts.UserCheckService;
 import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
-import com.finalproject.hrmsbackend.core.utilities.results.ErrorResult;
-import com.finalproject.hrmsbackend.core.utilities.results.Result;
-import com.finalproject.hrmsbackend.core.utilities.results.SuccessDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerUpdateDao;
 import com.finalproject.hrmsbackend.entities.concretes.Employer;
@@ -21,7 +19,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -72,8 +73,16 @@ public class EmployerManager implements EmployerService {
 
     @Override
     public Result add(EmployerAddDto employerAddDto) {
+        Map<String, String> errors = new LinkedHashMap<>();
+        if (userDao.existsByEmail(employerAddDto.getEmail()))
+            errors.put("email", Msg.IS_IN_USE.get("Email"));
+        if (employerDao.existsByCompanyName(employerAddDto.getCompanyName()))
+            errors.put("companyName", Msg.IS_IN_USE.get("Company Name"));
+        if (employerDao.existsByWebsite(employerAddDto.getWebsite()))
+            errors.put("website", Msg.IS_IN_USE.get("Website"));
         if (userCheck.emailWebsiteDiffDomain(employerAddDto.getEmail(), employerAddDto.getWebsite()))
-            return new ErrorResult(Msg.DIFF_DOMAIN.get("Email and website"));
+            errors.put("domain", Msg.DIFF_DOMAIN.get("Email and website"));
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(null, errors, null));
 
         employerAddDto.setPhoneNumber(Utils.getEditedPhoneNumber(employerAddDto.getPhoneNumber()));
 
@@ -87,6 +96,7 @@ public class EmployerManager implements EmployerService {
         savedEmployer.setEmployerUpdate(savedEmployerUpdate);
 
         emailService.sendVerificationMail(employerAddDto.getEmail());
+        savedEmployer.setJobAdvertisements(new ArrayList<>());
         return new SuccessDataResult<>(Msg.SAVED.get(), savedEmployer);
     }
 
@@ -98,7 +108,7 @@ public class EmployerManager implements EmployerService {
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
         if (employerUpdate.getCompanyName().equals(companyName))
-            return new ErrorResult(Msg.THE_SAME.get("Company name is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Company name"));
 
         employerUpdate.setCompanyName(companyName);
 
@@ -113,18 +123,17 @@ public class EmployerManager implements EmployerService {
         if (check.notExistsById(employerDao, emplId))
             return new ErrorResult(Msg.NOT_EXIST.get("emplId"));
         if (userCheck.emailWebsiteDiffDomain(email, website))
-            return new ErrorResult(Msg.DIFF_DOMAIN.get("Email and website"));
+            return new ErrorResult(Msg.DIFF_DOMAIN.get("Email and website are"));
 
         Employer employer = employerDao.getById(emplId);
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
         if (employerUpdate.getEmail().equals(email) && employerUpdate.getWebsite().equals(website))
             return new ErrorResult(Msg.THE_SAME.get("Email and website are"));
-
         if (!employer.getEmail().equals(email) && userDao.existsByEmail(email))
-            return new ErrorResult(Msg.IN_USE.get("Email is"));
+            return new ErrorResult(Msg.IS_IN_USE.get("Email"));
         if (!employer.getWebsite().equals(website) && employerDao.existsByWebsite(website))
-            return new ErrorResult(Msg.IN_USE.get("Website is"));
+            return new ErrorResult(Msg.IS_IN_USE.get("Website"));
 
         employerUpdate.setEmail(email);
         employerUpdate.setWebsite(website);
@@ -139,7 +148,7 @@ public class EmployerManager implements EmployerService {
         EmployerUpdate employerUpdate = employer.getEmployerUpdate();
 
         if (employerUpdate.getPhoneNumber().equals(phoneNumber))
-            return new ErrorResult(Msg.THE_SAME.get("Phone number is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Phone number"));
 
         employerUpdate.setPhoneNumber(Utils.getEditedPhoneNumber(phoneNumber));
         return execLastUpdAct(employer);
@@ -174,6 +183,7 @@ public class EmployerManager implements EmployerService {
         employer.setEmployerUpdate(savedEmplUpdate);
         employer.setUpdateVerified(false);
         employer.setLastModifiedAt(LocalDateTime.now());
+        employer.setPassword(null);
         return new SuccessDataResult<>(Msg.SUCCESS_UPDATE_REQUEST.get(), employer);
     }
 

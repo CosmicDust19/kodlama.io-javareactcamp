@@ -43,15 +43,15 @@ public class SystemEmployeesController {
     }
 
     @PutMapping(value = "/update/firstName")
-    public ResponseEntity<?> updateFirstName(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                             @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN) String firstName,
+    public ResponseEntity<?> updateFirstName(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                             @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN, message = Msg.Annotation.SIZE) String firstName,
                                              @RequestParam int sysEmplId) {
         return Utils.getResponseEntity(systemEmployeeService.updateFirstName(firstName, sysEmplId));
     }
 
     @PutMapping(value = "/update/lastName")
-    public ResponseEntity<?> updateLastName(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                            @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN) String lastName,
+    public ResponseEntity<?> updateLastName(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                            @Size(min = Utils.Const.MIN_LN, max = Utils.Const.MAX_LN, message = Msg.Annotation.SIZE) String lastName,
                                             @RequestParam int sysEmplId) {
         return Utils.getResponseEntity(systemEmployeeService.updateLastName(lastName, sysEmplId));
     }

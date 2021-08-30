@@ -85,6 +85,9 @@ public class CvManager implements CvService {
             return new ErrorResult(Msg.USED.get("Title"));
 
         Cv cv = cvDao.getById(cvId);
+        if (cv.getTitle().equals(title))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Title"));
+
         cv.setTitle(title);
         return execLastUpdAct(cv);
     }
@@ -94,6 +97,9 @@ public class CvManager implements CvService {
         if (check.notExistsById(cvDao, cvId)) return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
 
         Cv cv = cvDao.getById(cvId);
+        if (check.equals(cv.getCoverLetter(), coverLetter))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Cover letter"));
+
         cv.setCoverLetter(coverLetter);
         return execLastUpdAct(cv);
     }
@@ -163,7 +169,7 @@ public class CvManager implements CvService {
             return getPropUpdateResults(success, fail, errors, cvId);
         }
 
-        //simple delete
+        //delete simply
         cvPropIds.forEach((propId) -> removePropFromCv(propType, propId, cvId));
         cvDao.updateLastModifiedAt(LocalDateTime.now(), cvId);
         Cv cv = cvDao.getById(cvId);
@@ -189,8 +195,7 @@ public class CvManager implements CvService {
 
         if (fail == 0) {
             return new SuccessDataResult<>(Msg.SUCCESS.getCustom("Completely %s ✅"), cv);
-        }
-        else if (success == 0) {
+        } else if (success == 0) {
             results.put("cv", cv);
             return new ErrorDataResult<>(Msg.FAILED.getCustom("Completely %s ❌"), results);
         }

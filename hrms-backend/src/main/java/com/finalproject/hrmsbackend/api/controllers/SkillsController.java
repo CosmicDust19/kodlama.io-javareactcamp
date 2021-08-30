@@ -26,8 +26,8 @@ public class SkillsController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.ForAnnotation.EMPTY)
-                                 @Size(max = Utils.Const.MAX_SKILL_NAME) String skillName) {
+    public ResponseEntity<?> add(@RequestParam @NotBlank(message = Msg.Annotation.REQUIRED)
+                                 @Size(max = Utils.Const.MAX_SKILL_NAME, message = Msg.Annotation.SIZE) String skillName) {
         return Utils.getResponseEntity(skillService.add(skillName));
     }
 

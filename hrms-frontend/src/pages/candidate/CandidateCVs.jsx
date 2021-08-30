@@ -1,35 +1,20 @@
 import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {
-    addCv,
-    changeCoverLetter,
-    changeCvJobExp,
-    changeCvLang,
-    changeCvSchool,
-    changeCvSkill,
-    changeTitle,
-    deleteCv
+    addCv, changeCoverLetter, changeCvJobExp, changeCvLang,
+    changeCvSchool, changeCvSkill, changeTitle, deleteCv
 } from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import {useFormik} from "formik";
 import {
-    Button,
-    Card,
-    Dropdown,
-    Form,
-    Grid,
-    Header,
-    Icon,
-    Input,
-    Menu,
-    Modal,
-    Popup,
-    Segment,
+    Button, Card, Dropdown, Form, Grid, Header,
+    Icon, Input, Menu, Modal, Popup, Segment,
     Table
 } from "semantic-ui-react";
 import CandidateCvService from "../../services/candidateCvService";
+import {handleCatch} from "../../utilities/Utils";
 
-export function CandidateManageCvs() {
+export function CandidateCVs() {
 
     const colors = ['red', 'orange', 'yellow', 'olive', 'green',
         'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
@@ -39,20 +24,20 @@ export function CandidateManageCvs() {
 
     let color = colors[Math.floor(Math.random() * 12)]
 
-    let candidateCvService = new CandidateCvService()
+    const candidateCvService = new CandidateCvService()
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps?.user)
     const userProps = useSelector(state => state?.user?.userProps)
 
-    const [isCvAddPopupOpen, setIsCvAddPopupOpen] = useState(false);
-    const [isCvDeletePopupOpen, setIsCvDeletePopupOpen] = useState(false);
-    const [isJobExpAddPopupOpen, setIsJobExpAddPopupOpen] = useState(false);
-    const [isLangAddPopupOpen, setIsLangAddPopupOpen] = useState(false);
-    const [isSchoolAddPopupOpen, setIsSchoolAddPopupOpen] = useState(false);
-    const [isSkillAddPopupOpen, setIsSkillAddPopupOpen] = useState(false);
-    const [isCoverLetterPopupOpen, setIsCoverLetterPopupOpen] = useState(false);
-    const [isTitlePopupOpen, setIsTitlePopupOpen] = useState(false);
+    const [cvAddPopupOpen, setCvAddPopupOpen] = useState(false);
+    const [cvDeletePopupOpen, setCvDeletePopupOpen] = useState(false);
+    const [jobExpAddPopupOpen, setJobExpAddPopupOpen] = useState(false);
+    const [langAddPopupOpen, setLangAddPopupOpen] = useState(false);
+    const [schoolAddPopupOpen, setSchoolAddPopupOpen] = useState(false);
+    const [skillAddPopupOpen, setSkillAddPopupOpen] = useState(false);
+    const [coverLetterPopupOpen, setCoverLetterPopupOpen] = useState(false);
+    const [titlePopupOpen, setTitlePopupOpen] = useState(false);
     const [index, setIndex] = useState(0)
     const [selectedCv, setSelectedCv] = useState({});
     const [activeItem, setActiveItem] = useState()
@@ -72,12 +57,6 @@ export function CandidateManageCvs() {
     const refreshComp = () => {
         if (refresh === 0) setRefresh(1);
         else setRefresh(0)
-    }
-
-    const handleCatch = (error) => {
-        toast.warning("An error has occurred")
-        console.log(error.response)
-        refreshComp()
     }
 
     const candidateJobExperienceOption = user.candidateJobExperiences?.filter((candJobExp) => {
@@ -276,59 +255,53 @@ export function CandidateManageCvs() {
 
     function editTitle() {
         return (
-            <Grid centered>
-                <Grid.Column width="8" textAlign="right">
-                    <Popup
-                        trigger={
-                            <Button icon={"signup"} size={"big"} basic circular compact
-                                    style={{marginTop: -20, marginRight: 40}}
-                                    onClick={() => {
-                                        if (isTitlePopupOpen) setIsTitlePopupOpen(false)
-                                        if (!isTitlePopupOpen) setIsTitlePopupOpen(true)
-                                    }}/>}
-                        content={
-                            <Form>
-                                <Input placeholder="Title" value={formik.values.title} name="title"
-                                       onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                       actionPosition={"left"} transparent size="large"/>
-                                <Button content={"Save"} circular style={{marginTop: 10}} onClick={() => {
-                                    handleTitleSubmit()
-                                    setIsTitlePopupOpen(false)
-                                }} secondary compact fluid type="submit"/>
-                            </Form>}
-                        on='focus' open={isTitlePopupOpen} position='left center' pinned
-                        style={{opacity: 0.8}}
-                    />
-                </Grid.Column>
-                <Grid.Column width="8" textAlign={"left"}>
-                    <Header>
-                        <font color="black" style={{fontStyle: "italic", marginLeft: -50}}>
-                            Title: {selectedCv?.title}</font>
-                    </Header>
-                </Grid.Column>
-            </Grid>
+            <div>
+                <Popup
+                    trigger={
+                        <Button icon={"signup"} size={"big"} basic circular compact style={{}}
+                                onClick={() => setTitlePopupOpen(!titlePopupOpen)}
+                        />
+                    }
+                    content={
+                        <Form>
+                            <Input placeholder="Title" value={formik.values.title} name="title"
+                                   onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                   actionPosition={"left"} transparent size="large"
+                            />
+                            <Button content={"Save"} circular style={{marginTop: 10}} onClick={() => {
+                                handleTitleSubmit()
+                                setTitlePopupOpen(false)
+                            }} secondary compact fluid type="submit"
+                            />
+                        </Form>
+                    }
+                    on='focus' open={titlePopupOpen} position='bottom left' pinned
+                    style={{opacity: 0.9}}
+                />
+                <Header as="font" color="black" style={{fontStyle: "italic"}} content={`Title: ${selectedCv?.title}`}/>
+            </div>
         )
     }
 
     function coverLetterPopup() {
         return (
-            <Modal basic onClose={() => setIsCoverLetterPopupOpen(false)} onOpen={() => setIsCoverLetterPopupOpen(true)}
-                   open={isCoverLetterPopupOpen} size='small'>
-                <Form size="large" style={{marginLeft: "3em", marginBottom: 50}}>
-                    <label><b>Cover Letter</b></label>
+            <Modal basic onClose={() => setCoverLetterPopupOpen(false)}
+                   open={coverLetterPopupOpen} size='small'>
+                <Form size="large" as={Segment} basic>
+                    <Header content={"Cover Letter"} size={"small"} dividing inverted icon={"write"}/>
                     <Form.TextArea
-                        placeholder="Cover Letter (Max. 200 character)"
-                        type="text"
-                        value={formik.values.coverLetter}
-                        name="coverLetter"
-                        onChange={formik.handleChange}
+                        placeholder="Cover Letter (Max. 200 character)" type="text" name="coverLetter"
+                        value={formik.values.coverLetter} onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
-                        style={{minHeight: 200, marginTop: 15, borderRadius: 10}}
+                        style={{minHeight: 250, borderRadius: 8}}
                     />
-                    <Button color="blue" size="large" onClick={() => {
-                        handleCoverLetterSubmit()
-                        setIsCoverLetterPopupOpen(false)
-                    }} content="Save"/>
+                    <Button
+                        color="blue" size="large" style={{borderRadius: 8}} content="Save"
+                        onClick={() => {
+                            handleCoverLetterSubmit()
+                            setCoverLetterPopupOpen(false)
+                        }}
+                    />
                 </Form>
             </Modal>
         )
@@ -336,8 +309,8 @@ export function CandidateManageCvs() {
 
     function addJobExperiencePopup() {
         return (
-            <Modal basic onClose={() => setIsJobExpAddPopupOpen(false)} onOpen={() => setIsJobExpAddPopupOpen(true)}
-                   open={isJobExpAddPopupOpen} size='mini'>
+            <Modal basic onClose={() => setJobExpAddPopupOpen(false)} onOpen={() => setJobExpAddPopupOpen(true)}
+                   open={jobExpAddPopupOpen} size='mini'>
                 <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Job Experiences
@@ -353,7 +326,7 @@ export function CandidateManageCvs() {
                 </Segment>
                 <Button onClick={() => {
                     handleCvJobExperiencesAdd()
-                    setIsJobExpAddPopupOpen(false)
+                    setJobExpAddPopupOpen(false)
                 }} primary attached="bottom">Add To CV</Button>
             </Modal>
         )
@@ -361,8 +334,8 @@ export function CandidateManageCvs() {
 
     function addSchoolPopup() {
         return (
-            <Modal basic onClose={() => setIsSchoolAddPopupOpen(false)} onOpen={() => setIsSchoolAddPopupOpen(true)}
-                   open={isSchoolAddPopupOpen} size='mini'>
+            <Modal basic onClose={() => setSchoolAddPopupOpen(false)} onOpen={() => setSchoolAddPopupOpen(true)}
+                   open={schoolAddPopupOpen} size='mini'>
                 <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Schools
@@ -377,7 +350,7 @@ export function CandidateManageCvs() {
                 </Segment>
                 <Button onClick={() => {
                     handleCvSchoolAdd()
-                    setIsSchoolAddPopupOpen(false)
+                    setSchoolAddPopupOpen(false)
                 }} primary attached>Add To CV</Button>
             </Modal>
         )
@@ -385,8 +358,8 @@ export function CandidateManageCvs() {
 
     function addLanguagePopup() {
         return (
-            <Modal basic onClose={() => setIsLangAddPopupOpen(false)} onOpen={() => setIsLangAddPopupOpen(true)}
-                   open={isLangAddPopupOpen} size='mini'>
+            <Modal basic onClose={() => setLangAddPopupOpen(false)} onOpen={() => setLangAddPopupOpen(true)}
+                   open={langAddPopupOpen} size='mini'>
                 <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Languages
@@ -401,7 +374,7 @@ export function CandidateManageCvs() {
                 </Segment>
                 <Button onClick={() => {
                     handleCvLanguageAdd()
-                    setIsLangAddPopupOpen(false)
+                    setLangAddPopupOpen(false)
                 }} primary attached>Add To CV</Button>
             </Modal>
         )
@@ -409,8 +382,8 @@ export function CandidateManageCvs() {
 
     function addSkillPopup() {
         return (
-            <Modal basic onClose={() => setIsSkillAddPopupOpen(false)} onOpen={() => setIsSkillAddPopupOpen(true)}
-                   open={isSkillAddPopupOpen} size='mini'>
+            <Modal basic onClose={() => setSkillAddPopupOpen(false)} onOpen={() => setSkillAddPopupOpen(true)}
+                   open={skillAddPopupOpen} size='mini'>
                 <Segment placeholder secondary attached="bottom" style={{borderRadius: 15}}>
                     <Header textAlign={"center"} dividing>
                         Your Skills
@@ -425,7 +398,7 @@ export function CandidateManageCvs() {
                 </Segment>
                 <Button onClick={() => {
                     handleCvSkillAdd()
-                    setIsSkillAddPopupOpen(false)
+                    setSkillAddPopupOpen(false)
                 }} primary attached>Add To CV</Button>
             </Modal>
         )
@@ -449,7 +422,7 @@ export function CandidateManageCvs() {
                             <Button icon={"edit"} size={"big"} circular compact
                                     style={{marginLeft: 10}}
                                     onClick={() => {
-                                        setIsCoverLetterPopupOpen(true)
+                                        setCoverLetterPopupOpen(true)
                                     }} content="Edit"/>
                         </Card.Header>
                     </Card.Content>
@@ -489,7 +462,7 @@ export function CandidateManageCvs() {
                         </Table.Body>
                     </Table>
                     <Button circular icon="plus" color="blue" content={"Add New"} onClick={() => {
-                        setIsJobExpAddPopupOpen(true)
+                        setJobExpAddPopupOpen(true)
                     }}/>
                 </Segment>
 
@@ -522,11 +495,11 @@ export function CandidateManageCvs() {
                         </Table.Body>
                     </Table>
                     <Button circular icon="plus" color="blue" content={"Add New"} onClick={() => {
-                        setIsSchoolAddPopupOpen(true)
+                        setSchoolAddPopupOpen(true)
                     }}/>
                 </Segment>
 
-                <Grid columns={"equal"}>
+                <Grid stackable columns={"equal"}>
                     <Grid.Column>
                         <Segment basic>
                             <Header textAlign={"center"} dividing color="violet">
@@ -553,7 +526,7 @@ export function CandidateManageCvs() {
                                 </Table.Body>
                             </Table>
                             <Button circular icon="plus" color="blue" content={"Add New"} onClick={() => {
-                                setIsLangAddPopupOpen(true)
+                                setLangAddPopupOpen(true)
                             }}/>
                         </Segment>
                     </Grid.Column>
@@ -573,7 +546,7 @@ export function CandidateManageCvs() {
                             ))}
                             <Button color={"blue"} icon="plus" content={"Add New"}
                                     circular style={{marginTop: 5}} onClick={() => {
-                                setIsSkillAddPopupOpen(true)
+                                setSkillAddPopupOpen(true)
                             }}/>
                         </Segment>
                     </Grid.Column>
@@ -596,15 +569,15 @@ export function CandidateManageCvs() {
                                 <Popup
                                     trigger={
                                         <Button icon={"x"} content={"Delete CV"} negative onClick={() => {
-                                            if (isCvDeletePopupOpen) setIsCvDeletePopupOpen(false)
-                                            if (!isCvDeletePopupOpen) setIsCvDeletePopupOpen(true)
+                                            if (cvDeletePopupOpen) setCvDeletePopupOpen(false)
+                                            if (!cvDeletePopupOpen) setCvDeletePopupOpen(true)
                                         }}/>}
                                     content={
                                         <Button icon={"x"} content={"Delete CV"} negative onClick={() => {
                                             handleCvDelete()
-                                            setIsCvDeletePopupOpen(false)
+                                            setCvDeletePopupOpen(false)
                                         }}/>}
-                                    on='focus' position='bottom center' size={"mini"} open={isCvDeletePopupOpen}
+                                    on='focus' position='bottom center' size={"mini"} open={cvDeletePopupOpen}
                                     style={{opacity: 0.9}}
                                 />
                             </Table.Cell>
@@ -625,7 +598,7 @@ export function CandidateManageCvs() {
 
     return (
         <div>
-            <Grid padded>
+            <Grid stackable padded>
                 <Grid.Column width={4}>
                     <strong>Manage Your CVs</strong>
                     <Menu fluid vertical secondary>
@@ -642,10 +615,10 @@ export function CandidateManageCvs() {
                                 <Menu.Item
                                     name={"Add New"} color={"green"} header icon={"plus"}
                                     onClick={() => {
-                                        if (isCvAddPopupOpen) setIsCvAddPopupOpen(false)
-                                        if (!isCvAddPopupOpen) setIsCvAddPopupOpen(true)
+                                        if (cvAddPopupOpen) setCvAddPopupOpen(false)
+                                        if (!cvAddPopupOpen) setCvAddPopupOpen(true)
                                     }}
-                                    active={isCvAddPopupOpen}
+                                    active={cvAddPopupOpen}
                                 />}
                             content={
                                 <Form>
@@ -654,10 +627,10 @@ export function CandidateManageCvs() {
                                            actionPosition={"left"} transparent size="large"/>
                                     <Button content={"Save"} circular style={{marginTop: 10}} onClick={() => {
                                         handleCvAdd()
-                                        setIsCvAddPopupOpen(false)
+                                        setCvAddPopupOpen(false)
                                     }} secondary compact fluid type="submit"/>
                                 </Form>}
-                            on='focus' open={isCvAddPopupOpen} position='bottom center' pinned
+                            on='focus' open={cvAddPopupOpen} position='bottom center' pinned
                             style={{opacity: 0.8}}
                         />
                     </Menu>

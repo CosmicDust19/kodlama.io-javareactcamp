@@ -12,10 +12,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class CandidateSkillAddDto {
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Integer candidateId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Short skillId;
 
 }

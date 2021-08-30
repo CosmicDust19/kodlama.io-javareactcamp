@@ -1,42 +1,93 @@
-import JobAdvertisementService from "../../services/jobAdvertisementService";
+import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
+import {
+    Button, Dropdown, Form, Grid, Header, Icon,
+    Label, Menu, Popup, Segment, TextArea
+} from "semantic-ui-react";
+import JobAdvertisementService from "../../services/jobAdvertisementService";
 import CityService from "../../services/cityService";
 import PositionService from "../../services/positionService";
 import * as Yup from "yup";
+import {syncEmplJobAdvert, syncEmplJobAdverts} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import {useFormik} from "formik";
-import {Button, Dropdown, Form, Grid, Icon, Input, Label, Popup, Segment, TextArea} from "semantic-ui-react";
-import {useDispatch, useSelector} from "react-redux";
-import {syncEmplJobAdvert, syncEmplJobAdverts} from "../../store/actions/userActions";
+import SPopupDropdown from "../../utilities/customFormControls/SPopupDropdown";
+import SPopupInput from "../../utilities/customFormControls/SPopupInput";
+import {handleCatch} from "../../utilities/Utils";
 
-export function EmplJobAdvManage(props) {
+export function EmployerJobAdverts() {
+
+    const user = useSelector(state => state?.user?.userProps?.user)
+    const userProps = useSelector(state => state?.user?.userProps)
+
+    const [jobAdverts, setJobAdverts] = useState(user.jobAdvertisements);
+    const [selectedJobAdv, setSelectedJobAdv] = useState(undefined);
+    const [activeItem, setActiveItem] = useState(-1);
+    const [refresh, setRefresh] = useState(true);
+
+    useEffect(() => {
+        setJobAdverts(user.jobAdvertisements)
+    }, [user.jobAdvertisements]);
+
+    const handleMenuItemClick = (activeItem) => {
+        setActiveItem(activeItem)
+        const index = jobAdverts.findIndex(jobAdv => jobAdv.id === activeItem)
+        setSelectedJobAdv(jobAdverts[index]);
+    }
+
+    const refreshComponent = () => {
+        if (refresh === true) setRefresh(false);
+        else setRefresh(true)
+    }
+
+    if (String(userProps.userType) !== "employer") return <Header>Sorry You Do Not Have Access Here</Header>
+
+    return (
+        <div>
+            <strong style={{marginLeft: 35, color: "rgba(79,2,84,0.61)"}}>Manage Advertisements</strong>
+            <Grid padded stackable centered>
+                <Grid.Column width={5}>
+                    <Menu fluid vertical tabular size={"small"}>
+                        {jobAdverts?.map((jobAdvertisement) => (
+                            <Menu.Item
+                                key={jobAdvertisement?.id} color={"blue"}
+                                content={`${jobAdvertisement?.position.title} | ${jobAdvertisement?.city.name}`}
+                                name={String(jobAdvertisement?.id)} active={activeItem === jobAdvertisement?.id}
+                                onClick={() => handleMenuItemClick(jobAdvertisement?.id)}
+                            />
+                        ))}
+                        <Menu.Item
+                            name={"Post New"} color={"green"} header icon={"plus"}
+                            onClick={() => handleMenuItemClick(-1, undefined)}
+                            active={activeItem === -1}
+                        />
+                    </Menu>
+                </Grid.Column>
+                <Grid.Column stretched width={11}>
+                    {JobAdvertsMenuSegment({jobAdvert: selectedJobAdv, refresh: refreshComponent})}
+                </Grid.Column>
+            </Grid>
+        </div>
+    )
+}
+
+function JobAdvertsMenuSegment(props) {
 
     const jobAdvertisementService = new JobAdvertisementService()
 
     const errPopupStyle = {
-        borderRadius: 10,
-        color: "rgba(227,7,7)",
-        backgroundColor: "rgba(250,250,250, 0.7)",
-        marginTop: -5
+        borderRadius: 10, color: "rgba(227,7,7)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10
     }
     const infoPopupStyle = {
-        borderRadius: 10,
-        color: "rgb(0,0,0)",
-        backgroundColor: "rgba(250,250,250, 0.7)",
-        marginTop: -5
+        borderRadius: 10, color: "rgb(0,0,0)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10
     }
     const jobAdvAddDropdownStyle = {
-        marginLeft: 20, marginRight: 20,
-        marginTop: 15, marginBottom: 15,
-        width: 200, height: 35
+        marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 35
     }
     const jobAdvAddInputStyle = {
-        marginLeft: 20, marginRight: 20,
-        marginTop: 15, marginBottom: 15,
-        width: 200, height: 40
+        marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 40
     }
-
-    const jobAdvAddPopupPosition = "bottom center"
+    const popupSize = "small"
 
     const workTimes = ["Part Time", "Full Time"]
     const workModels = ["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]
@@ -107,7 +158,6 @@ export function EmplJobAdvManage(props) {
 
     const update = (values) => {
         jobAdvertisementService.update(values).then((result) => {
-            console.log(result)
             dispatch(syncEmplJobAdvert(values.id, result.data.data))
             setJobAdvert(result.data.data)
             toast("Your update request received. It will be visible after confirmation")
@@ -116,7 +166,6 @@ export function EmplJobAdvManage(props) {
 
     const changeActivation = (jobAdv, status) => {
         jobAdvertisementService.updateActivation(jobAdv.id, status).then((result) => {
-            console.log(result)
             dispatch(syncEmplJobAdvert(jobAdv.id, result.data.data))
             setJobAdvert(result.data.data)
             if (status === true) toast("Activated")
@@ -155,46 +204,6 @@ export function EmplJobAdvManage(props) {
         value: position.id,
     }));
 
-    const errPopupOnOpen = (field) => {
-        setTimeout(() => {
-            formik.setFieldTouched(field, false)
-        }, 1500)
-    }
-
-    const handleCatch = (error) => {
-        const resp = error.response
-        console.log(error)
-        console.log(resp)
-        if (resp.data?.data?.errors) {
-            Object.entries(resp.data.data.errors).forEach((invalidProp) => {
-                invalidProp[1] = invalidProp[1].toLowerCase()
-                const message = `${invalidProp[1].charAt(0).toUpperCase()}${invalidProp[1].substr(1)}`
-                const propName = `${invalidProp[0].charAt(0).toUpperCase()}${invalidProp[0].substr(1)}`
-                toast.warning(`${message} (${propName})`)
-            })
-            return
-        }
-        if (resp.data?.data?.details) {
-            for (let i = 0; i < resp.data.data.details.length; i++) {
-                const detail = resp.data.data.details[i]
-                if (detail.includes("uk_job_advertisements_emp_pos_desc_city")) {
-                    toast.warning("You already have an advert in this city, position and description")
-                    return
-                } else if (detail.includes("uk_job_advertisement_updates_emp_pos_desc_city")) {
-                    toast.warning("You already have an advert update request or an advert in this city, position and description")
-                    return
-                }
-            }
-        }
-        if (resp.data?.message) {
-            toast.warning(resp.data.message)
-        }
-    }
-
-    const handleChange = (fieldName, value) => {
-        formik.setFieldValue(fieldName, value);
-    }
-
     return (
         <Segment raised style={{borderRadius: 10, centered: true}} textAlign={"center"}>
             {adding === false ?
@@ -223,7 +232,7 @@ export function EmplJobAdvManage(props) {
                             <Icon name="minus circle" color="brown"/>Inactive
                         </Label>}
                     <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>}
-                              simple labeled>
+                              simple labeled direction={"left"}>
                         <Dropdown.Menu
                             style={{
                                 marginTop: 0,
@@ -247,107 +256,36 @@ export function EmplJobAdvManage(props) {
 
                 <Grid padded="vertically">
                     <Grid.Column>
-                        <Popup
-                            trigger={
-                                <Dropdown clearable item placeholder="City" search selection
-                                          options={cityOption} value={formik.values.cityId}
-                                          style={jobAdvAddDropdownStyle} selectOnBlur={false}
-                                          onChange={(event, data) => handleChange("cityId", data.value)}/>
-                            }
-                            content={formik.errors.cityId ? formik.errors.cityId : "City"}
-                            position={jobAdvAddPopupPosition}
-                            style={formik.errors.cityId ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.cityId && formik.touched.cityId}
-                            onOpen={() => errPopupOnOpen("cityId")}
-                        />
-                        <Popup
-                            trigger={
-                                <Dropdown clearable item placeholder="Position" search selection
-                                          options={positionOption} value={formik.values.positionId}
-                                          style={jobAdvAddDropdownStyle} selectOnBlur={false}
-                                          onChange={(event, data) => handleChange("positionId", data.value)}/>
-                            }
-                            content={formik.errors.positionId ? formik.errors.positionId : "Position"}
-                            position={"bottom center"} style={formik.errors.positionId ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.positionId && formik.touched.positionId}
-                            onOpen={() => errPopupOnOpen("positionId")}
-                        />
-                        <Popup
-                            trigger={
-                                <Dropdown clearable item placeholder="Work Model" search selection
-                                          options={workModelOption} value={formik.values.workModel}
-                                          style={jobAdvAddDropdownStyle} selectOnBlur={false}
-                                          onChange={(event, data) => handleChange("workModel", data.value)}/>
-                            }
-                            content={formik.errors.workModel ? formik.errors.workModel : "Work Model"}
-                            position={"bottom center"} style={formik.errors.workModel ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.workModel && formik.touched.workModel}
-                            onOpen={() => errPopupOnOpen("workModel")}
-                        />
-                        <Popup
-                            trigger={
-                                <Dropdown clearable item placeholder="Work Time" search selection
-                                          options={workTimeOption} value={formik.values.workTime}
-                                          style={jobAdvAddDropdownStyle} selectOnBlur={false}
-                                          onChange={(event, data) => handleChange("workTime", data.value)}/>
-                            }
-                            content={formik.errors.workTime ? formik.errors.workTime : "Work Time"}
-                            position={"bottom center"} style={formik.errors.workTime ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.workTime && formik.touched.workTime}
-                            onOpen={() => errPopupOnOpen("workTime")}
-                        />
-                        <Popup
-                            trigger={
-                                <Input placeholder="Min Salary" value={formik.values.minSalary}
-                                       name="minSalary" type="number" style={jobAdvAddInputStyle}
-                                       onChange={formik.handleChange} icon={"money bill alternate"}/>
-                            }
-                            content={formik.errors.minSalary ? formik.errors.minSalary : "Min Salary (Optional)"}
-                            position={"bottom center"} style={formik.errors.minSalary ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.minSalary && formik.touched.minSalary}
-                            onOpen={() => errPopupOnOpen("minSalary")}
-                        />
-                        <Popup
-                            trigger={
-                                <Input placeholder="Max Salary" value={formik.values.maxSalary}
-                                       name="maxSalary" type="number" style={jobAdvAddInputStyle}
-                                       onChange={formik.handleChange} icon={"money bill alternate"}/>
-                            }
-                            content={formik.errors.maxSalary ? formik.errors.maxSalary : "Max Salary (Optional)"}
-                            position={"bottom center"} style={formik.errors.maxSalary ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.maxSalary && formik.touched.maxSalary}
-                            onOpen={() => errPopupOnOpen("maxSalary")}
-                        />
-                        <Popup
-                            trigger={
-                                <Input placeholder="Open Positions" value={formik.values.openPositions}
-                                       name="openPositions" type="number" style={jobAdvAddInputStyle}
-                                       onChange={formik.handleChange} icon={"users"}/>
-                            }
-                            content={formik.errors.openPositions ? formik.errors.openPositions : "Open Positions"}
-                            position={"bottom center"}
-                            style={formik.errors.openPositions ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.openPositions && formik.touched.openPositions}
-                            onOpen={() => errPopupOnOpen("openPositions")}
-                        />
-                        <Popup
-                            trigger={
-                                <Input value={formik.values.deadline} type="date" name="deadline"
-                                       style={jobAdvAddInputStyle} onChange={formik.handleChange}/>
-                            }
-                            content={formik.errors.deadline ? formik.errors.deadline : "Deadline"}
-                            position={"bottom center"} style={formik.errors.deadline ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.deadline && formik.touched.deadline}
-                            onOpen={() => errPopupOnOpen("deadline")}
-                        />
+                        <SPopupDropdown name={"cityId"} placeholder={"City"} formik={formik} popupSize={popupSize}
+                                        customDropdownStyle={jobAdvAddDropdownStyle} options={cityOption}/>
+                        <SPopupDropdown name={"positionId"} placeholder={"Position"} formik={formik}
+                                        popupSize={popupSize} customDropdownStyle={jobAdvAddDropdownStyle}
+                                        options={positionOption}/>
+                        <SPopupDropdown name={"workModel"} placeholder={"Work Model"} formik={formik}
+                                        popupSize={popupSize} customDropdownStyle={jobAdvAddDropdownStyle}
+                                        options={workModelOption}/>
+                        <SPopupDropdown name={"workTime"} placeholder={"Work Time"} formik={formik} popupSize={popupSize}
+                                        customDropdownStyle={jobAdvAddDropdownStyle} options={workTimeOption}/>
+                        <SPopupInput icon="money bill alternate" placeholder="Min Salary" name="minSalary"
+                                     type={"number"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
+                                     formik={formik}/>
+                        <SPopupInput icon="money bill alternate" placeholder="Max Salary" name="maxSalary"
+                                     type={"number"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
+                                     formik={formik}/>
+                        <SPopupInput icon="users" placeholder="Open Positions" name="openPositions"
+                                     type={"number"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
+                                     formik={formik}/>
+                        <SPopupInput placeholder="Deadline" name="deadline"
+                                     type={"date"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
+                                     formik={formik}/>
                     </Grid.Column>
                 </Grid>
 
                 <Grid style={{opacity: 0.9}} padded>
                     <Grid.Column>
                         <Button attached={"top"} basic size={"mini"} color={"teal"} compact active
-                                style={{marginLeft: 12, width: 100, marginBottom: -1, borderRadius: 7}}>
-                            <strong style={{color: "rgba(37,37,37,0.94)", fontSize: "x-small"}}>
+                                style={{marginLeft: 12, width: 130, marginBottom: -1, borderRadius: 7}}>
+                            <strong style={{color: "rgba(37,37,37,0.94)", fontSize: "small"}}>
                                 Job Description
                             </strong>
                         </Button>
@@ -362,8 +300,7 @@ export function EmplJobAdvManage(props) {
                             content={formik.errors.jobDescription ? formik.errors.jobDescription : "Job Description"}
                             position={"bottom center"}
                             style={formik.errors.jobDescription ? errPopupStyle : infoPopupStyle}
-                            size={"mini"} open={formik.errors.jobDescription && formik.touched.jobDescription}
-                            onOpen={() => errPopupOnOpen("jobDescription")}
+                            size={popupSize} open={formik.errors.jobDescription && formik.touched.jobDescription}
                         />
                     </Grid.Column>
                 </Grid>
@@ -382,7 +319,6 @@ export function EmplJobAdvManage(props) {
                                 <Button.Content visible>Save <Icon name='save'/></Button.Content>
                             </Button>
                         }
-
                     </Grid.Column>
                 </Grid>
 

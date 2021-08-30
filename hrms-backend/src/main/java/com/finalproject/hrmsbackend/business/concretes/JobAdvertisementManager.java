@@ -81,14 +81,16 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     }
 
     @Override
-    public Result add(JobAdvertisementDto jobAdvertisementDto) {
-        if (check.notExistsById(employerDao, jobAdvertisementDto.getEmployerId()))
-            return new ErrorResult(Msg.NOT_EXIST.get("employerId"));
-        ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvertisementDto);
+    public Result add(JobAdvertisementDto jobAdvDto) {
+        if (check.notExistsById(employerDao, jobAdvDto.getEmployerId()))
+            return new ErrorResult(Msg.NOT_EXIST.get("Employer"));
+        if (jobAdvertisementDao.existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription(jobAdvDto.getCityId(), jobAdvDto.getPositionId(), jobAdvDto.getEmployerId(), jobAdvDto.getJobDescription()))
+            return new ErrorResult(Msg.UK_JOB_ADV_ADD.get());
+        ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvDto);
         if (errors != null) return errors;
 
-        jobAdvertisementDto.setId(null);
-        JobAdvertisement jobAdv = modelMapper.map(jobAdvertisementDto, JobAdvertisement.class);
+        jobAdvDto.setId(null);
+        JobAdvertisement jobAdv = modelMapper.map(jobAdvDto, JobAdvertisement.class);
         JobAdvertisement savedJobAdv = jobAdvertisementDao.save(jobAdv);
 
         JobAdvertisementUpdate jobAdvUpd = modelMapper.map(savedJobAdv, JobAdvertisementUpdate.class);
@@ -112,6 +114,8 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     public Result update(JobAdvertisementDto jobAdvDto) {
         if (check.notExistsById(jobAdvertisementDao, jobAdvDto.getId()))
             return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
+        if (jobAdvertisementUpdateDao.existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription(jobAdvDto.getCityId(), jobAdvDto.getPositionId(), jobAdvDto.getEmployerId(), jobAdvDto.getJobDescription()))
+            return new ErrorResult(Msg.UK_JOB_ADV_UPD.get());
         ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvDto);
         if (errors != null) return errors;
 
@@ -119,7 +123,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate oldJobAdvUpd = jobAdv.getJobAdvertisementUpdate();
 
         if (noChange(oldJobAdvUpd, jobAdvDto))
-            return new ErrorResult(Msg.THE_SAME.getCustom("All fields are %s"));
+            return new ErrorResult(Msg.THE_SAME.get("All fields are"));
 
         JobAdvertisementUpdate newJobAdvUpd = modelMapper.map(jobAdvDto, JobAdvertisementUpdate.class);
         newJobAdvUpd.setUpdateId(oldJobAdvUpd.getUpdateId());
@@ -132,13 +136,13 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public Result updatePosition(short positionId, int jobAdvId) {
         if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
-        if (check.notExistsById(positionDao, positionId)) return new ErrorResult(Msg.NOT_EXIST.get("positionId"));
+        if (check.notExistsById(positionDao, positionId)) return new ErrorResult(Msg.NOT_EXIST.get("Position"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (jobAdvUpdate.getPosition().getId() == positionId)
-            return new ErrorResult(Msg.THE_SAME.get("Position is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Position"));
 
         jobAdvUpdate.setPosition(positionDao.getById(positionId));
         return execLastUpdAct(jobAdv);
@@ -152,7 +156,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (jobAdvUpdate.getJobDescription().equals(jobDescription))
-            return new ErrorResult(Msg.THE_SAME.get("Job description is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Job description"));
 
         jobAdvUpdate.setJobDescription(jobDescription);
         return execLastUpdAct(jobAdv);
@@ -161,13 +165,13 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     @Override
     public Result updateCity(short cityId, int jobAdvId) {
         if (check.notExistsById(jobAdvertisementDao, jobAdvId)) return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
-        if (check.notExistsById(cityDao, cityId)) return new ErrorResult(Msg.NOT_EXIST.get("cityId"));
+        if (check.notExistsById(cityDao, cityId)) return new ErrorResult(Msg.NOT_EXIST.get("City"));
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvId);
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (jobAdvUpdate.getCity().getId() == cityId)
-            return new ErrorResult(Msg.THE_SAME.get("cityId is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("City"));
 
         jobAdvUpdate.setCity(cityDao.getById(cityId));
         return execLastUpdAct(jobAdv);
@@ -181,7 +185,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (check.equals(jobAdvUpdate.getMinSalary(), minSalary))
-            return new ErrorResult(Msg.THE_SAME.get("Minimum salary is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Minimum salary"));
         if (check.greater(minSalary, jobAdv.getMaxSalary()))
             return new ErrorResult(Msg.MIN_MAX_CONFLICT.get());
 
@@ -197,7 +201,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (check.equals(jobAdvUpdate.getMaxSalary(), maxSalary))
-            return new ErrorResult(Msg.THE_SAME.get("Maximum salary is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Maximum salary"));
         if (check.greater(jobAdv.getMinSalary(), maxSalary))
             return new ErrorResult(Msg.MIN_MAX_CONFLICT.get());
 
@@ -213,7 +217,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (jobAdvUpdate.getWorkModel().equals(workModel))
-            return new ErrorResult(Msg.THE_SAME.get("Work model is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Work model"));
 
         jobAdvUpdate.setWorkModel(workModel);
         return execLastUpdAct(jobAdv);
@@ -227,7 +231,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (jobAdvUpdate.getWorkTime().equals(workTime))
-            return new ErrorResult(Msg.THE_SAME.get("Work time is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Work time"));
 
         jobAdvUpdate.setWorkTime(workTime);
         return execLastUpdAct(jobAdv);
@@ -241,7 +245,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (jobAdvUpdate.getOpenPositions() == openPositions)
-            return new ErrorResult(Msg.THE_SAME.get("Open positions is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Open positions"));
 
         jobAdvUpdate.setOpenPositions(openPositions);
         return execLastUpdAct(jobAdv);
@@ -255,7 +259,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         JobAdvertisementUpdate jobAdvUpdate = jobAdv.getJobAdvertisementUpdate();
 
         if (check.equals(jobAdvUpdate.getDeadline(), deadLine))
-            return new ErrorResult(Msg.THE_SAME.get("Deadline is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Deadline"));
 
         jobAdvUpdate.setDeadline(deadLine);
         return execLastUpdAct(jobAdv);
@@ -302,7 +306,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         if (check.notExistsById(cityDao, jobAdvDto.getCityId()))
             errors.put("cityId", Msg.NOT_EXIST.get());
         if (check.greater(jobAdvDto.getMinSalary(), jobAdvDto.getMaxSalary()))
-            errors.put("minSalary - maxSalary", Msg.MIN_MAX_CONFLICT.get());
+            errors.put("minMaxSalary", Msg.MIN_MAX_CONFLICT.get());
         if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
         return null;
     }

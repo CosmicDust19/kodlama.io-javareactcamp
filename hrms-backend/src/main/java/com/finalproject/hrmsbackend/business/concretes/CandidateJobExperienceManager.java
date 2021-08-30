@@ -44,11 +44,11 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
     public Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto) {
         Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(candidateDao, candidateJobExperienceAddDto.getCandidateId()))
-            errors.put("candidateId", Msg.NOT_EXIST.get());
+            errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
         if (check.notExistsById(positionDao, candidateJobExperienceAddDto.getPositionId()))
-            errors.put("positionId", Msg.NOT_EXIST.get());
+            errors.put("positionId", Msg.NOT_EXIST.get("Position"));
         if (check.startEndConflict(candidateJobExperienceAddDto.getStartYear(), candidateJobExperienceAddDto.getQuitYear()))
-            errors.put("startYear - quitYear", Msg.START_END_YEAR_CONFLICT.get());
+            errors.put("startQuitYear", Msg.START_END_YEAR_CONFLICT.get());
         if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
 
         CandidateJobExperience candJobExp = modelMapper.map(candidateJobExperienceAddDto, CandidateJobExperience.class);
@@ -69,6 +69,9 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
             return new ErrorResult(Msg.NOT_EXIST.get("candJobExpId"));
 
         CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
+        if (candJobExp.getWorkPlace().equals(workPlace))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Work place"));
+
         candJobExp.setWorkPlace(workPlace);
         CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
@@ -79,9 +82,12 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
         if (check.notExistsById(candidateJobExpDao, candJobExpId))
             return new ErrorResult(Msg.NOT_EXIST.get("candJobExpId"));
         if (check.notExistsById(positionDao, positionId))
-            return new ErrorResult(Msg.NOT_EXIST.get("positionId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("Position"));
 
         CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
+        if (candJobExp.getPosition().getId() == positionId)
+            return new ErrorResult(Msg.IS_THE_SAME.get("Position"));
+
         candJobExp.setPosition(positionDao.getById(positionId));
         CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
@@ -94,7 +100,7 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
 
         CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
         if (candJobExp.getStartYear() == startYear)
-            return new ErrorResult(Msg.THE_SAME.get("Start year is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Start year"));
         if (check.startEndConflict(startYear, candJobExp.getQuitYear()))
             return new ErrorResult(Msg.START_END_YEAR_CONFLICT.get());
 
@@ -110,7 +116,7 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
 
         CandidateJobExperience candJobExp = candidateJobExpDao.getById(candJobExpId);
         if (check.equals(candJobExp.getQuitYear(), quitYear))
-            return new ErrorResult(Msg.THE_SAME.get("QuitYear is"));
+            return new ErrorResult(Msg.IS_THE_SAME.get("Quit year"));
         if (check.startEndConflict(candJobExp.getStartYear(), quitYear))
             return new ErrorResult(Msg.START_END_YEAR_CONFLICT.get());
 

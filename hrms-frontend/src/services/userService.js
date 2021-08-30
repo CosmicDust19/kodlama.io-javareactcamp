@@ -14,6 +14,10 @@ export default class UserService {
         return axios.delete(`http://localhost:8080/api/users/delete/byId?userId=${userId}`)
     }
 
+    login(email, password) {
+        return axios.get(`http://localhost:8080/api/users/login?email=${email}&password=${password}`)
+    }
+
     updateEmail(userId, email){
         return axios.put(`http://localhost:8080/api/users/update/email?email=${email}&userId=${userId}`)
     }

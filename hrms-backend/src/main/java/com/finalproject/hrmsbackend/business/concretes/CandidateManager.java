@@ -1,9 +1,11 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateService;
+import com.finalproject.hrmsbackend.core.adapters.abstracts.MernisService;
 import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
-import com.finalproject.hrmsbackend.core.adapters.concretes.MernisServiceAdapter;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -16,14 +18,18 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class CandidateManager implements CandidateService {
 
+    private final UserDao userDao;
     private final CandidateDao candidateDao;
-    private final MernisServiceAdapter mernisServiceAdapter;
+    private final MernisService mernisService;
     private final CheckService check;
     private final EmailService emailService;
     private final ModelMapper modelMapper;
@@ -51,13 +57,17 @@ public class CandidateManager implements CandidateService {
 
     @Override
     public Result add(CandidateAddDto candidateAddDto) {
-        if (!mernisServiceAdapter.realPerson(candidateAddDto)) return new ErrorResult(Msg.MERNIS_FAIL.get());
+        Map<String, String> errors = new LinkedHashMap<>();
+        if (userDao.existsByEmail(candidateAddDto.getEmail()))
+            errors.put("email", Msg.IS_IN_USE.get("Email"));
+        if (!mernisService.realPerson(candidateAddDto))
+            errors.put("mernis", Msg.MERNIS_FAIL.get());
+        if (candidateDao.existsByNationalityId(candidateAddDto.getNationalityId()))
+            errors.put("nationalityId", Msg.IS_IN_USE.get("Nationality ID"));
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(null, errors, null));
 
         Candidate candidate = modelMapper.map(candidateAddDto, Candidate.class);
-
-        Candidate savedCandidate = candidateDao.save(candidate);
-        emailService.sendVerificationMail(candidateAddDto.getEmail());
-        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandidate);
+        return execLastAddAct(candidate);
     }
 
     @Override
@@ -65,6 +75,9 @@ public class CandidateManager implements CandidateService {
         if (check.notExistsById(candidateDao, candId)) return new ErrorResult(Msg.NOT_EXIST.get("candId"));
 
         Candidate candidate = candidateDao.getById(candId);
+        if (check.equals(candidate.getGithubAccount(), githubAccount))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Github account"));
+
         candidate.setGithubAccount(githubAccount);
         return execLastUpdAct(candidate);
     }
@@ -74,6 +87,9 @@ public class CandidateManager implements CandidateService {
         if (check.notExistsById(candidateDao, candId)) return new ErrorResult(Msg.NOT_EXIST.get("candId"));
 
         Candidate candidate = candidateDao.getById(candId);
+        if (check.equals(candidate.getLinkedinAccount(), linkedinAccount))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Linkedin account"));
+
         candidate.setLinkedinAccount(linkedinAccount);
         return execLastUpdAct(candidate);
     }
@@ -83,7 +99,7 @@ public class CandidateManager implements CandidateService {
         if (check.notExistsById(candidateDao, candId))
             return new ErrorResult(Msg.NOT_EXIST.get("candId"));
         if (check.notExistsById(jobAdvertisementDao, jobAdvertisementId))
-            return new ErrorResult(Msg.NOT_EXIST.get("jobAdvertisementId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("Job advertisement"));
 
         if (updateType.equals(Utils.UpdateType.DEL)) candidateDao.deleteJobAdvFromFavorites(jobAdvertisementId, candId);
         else candidateDao.addJobAdvToFavorites(jobAdvertisementId, candId);
@@ -94,7 +110,20 @@ public class CandidateManager implements CandidateService {
     private Result execLastUpdAct(Candidate candidate) {
         candidate.setLastModifiedAt(LocalDateTime.now());
         Candidate savedCand = candidateDao.save(candidate);
+        savedCand.setPassword(null);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCand);
+    }
+
+    private Result execLastAddAct(Candidate candidate) {
+        Candidate savedCandidate = candidateDao.save(candidate);
+        emailService.sendVerificationMail(savedCandidate.getEmail());
+        savedCandidate.setCvs(new ArrayList<>());
+        savedCandidate.setCandidateJobExperiences(new ArrayList<>());
+        savedCandidate.setCandidateSchools(new ArrayList<>());
+        savedCandidate.setCandidateLanguages(new ArrayList<>());
+        savedCandidate.setCandidateSkills(new ArrayList<>());
+        savedCandidate.setFavoriteJobAdvertisements(new ArrayList<>());
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandidate);
     }
 
 }

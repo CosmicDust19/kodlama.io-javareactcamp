@@ -36,9 +36,9 @@ public class CandidateLanguageManager implements CandidateLanguageService {
     public Result add(CandidateLanguageAddDto candidateLanguageAddDto) {
         Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(candidateDao, candidateLanguageAddDto.getCandidateId()))
-            errors.put("candidateId", Msg.NOT_EXIST.get());
+            errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
         if (check.notExistsById(languageDao, candidateLanguageAddDto.getLanguageId()))
-            errors.put("languageId", Msg.NOT_EXIST.get());
+            errors.put("languageId", Msg.NOT_EXIST.get("Language"));
         if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
 
         CandidateLanguage candidateLanguage = modelMapper.map(candidateLanguageAddDto, CandidateLanguage.class);
@@ -58,9 +58,12 @@ public class CandidateLanguageManager implements CandidateLanguageService {
         if (check.notExistsById(candidateLanguageDao, candLangId))
             return new ErrorResult(Msg.NOT_EXIST.get("candLangId"));
         if (check.notExistsById(languageDao, languageId))
-            return new ErrorResult(Msg.NOT_EXIST.get("languageId"));
+            return new ErrorResult(Msg.NOT_EXIST.get("Language"));
 
         CandidateLanguage candLang = candidateLanguageDao.getById(candLangId);
+        if (candLang.getLanguage().getId() == languageId)
+            return new ErrorResult(Msg.IS_THE_SAME.get("Language"));
+
         candLang.setLanguage(languageDao.getById(languageId));
         CandidateLanguage savedCandLang = candidateLanguageDao.save(candLang);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandLang);
@@ -72,6 +75,9 @@ public class CandidateLanguageManager implements CandidateLanguageService {
             return new ErrorResult(Msg.NOT_EXIST.get("candLangId"));
 
         CandidateLanguage candLang = candidateLanguageDao.getById(candLangId);
+        if (candLang.getLanguageLevel().equals(languageLevel))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Language level"));
+
         candLang.setLanguageLevel(languageLevel);
         CandidateLanguage savedCandLang = candidateLanguageDao.save(candLang);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandLang);

@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.api.controllers;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSchoolService;
+import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateSchoolAddDto;
 import lombok.RequiredArgsConstructor;
@@ -52,15 +53,15 @@ public class CandidateSchoolsController {
     }
 
     @PutMapping(value = "/update/startYear")
-    public ResponseEntity<?> updateStartYear(@RequestParam @Min(value = Utils.Const.MIN_YEAR)
-                                             @Max(value = Utils.Const.THIS_YEAR) short startYear,
+    public ResponseEntity<?> updateStartYear(@RequestParam @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+                                             @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX) short startYear,
                                              @RequestParam int candSchId) {
         return Utils.getResponseEntity(candidateSchoolService.updateStartYear(startYear, candSchId));
     }
 
     @PutMapping(value = "/update/gradYear")
-    public ResponseEntity<?> updateGradYear(@RequestParam(required = false) @Min(value = Utils.Const.MIN_YEAR)
-                                            @Max(value = Utils.Const.THIS_YEAR) Short graduationYear,
+    public ResponseEntity<?> updateGradYear(@RequestParam(required = false) @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+                                            @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX) Short graduationYear,
                                             @RequestParam int candSchId) {
         return Utils.getResponseEntity(candidateSchoolService.updateGradYear(graduationYear, candSchId));
     }

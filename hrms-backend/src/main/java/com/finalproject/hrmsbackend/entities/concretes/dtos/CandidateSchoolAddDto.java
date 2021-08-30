@@ -15,22 +15,22 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class CandidateSchoolAddDto {
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Integer candidateId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Integer schoolId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Short departmentId;
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
-    @Min(value = Utils.Const.MIN_YEAR)
-    @Max(value = Utils.Const.THIS_YEAR)
+    @NotNull(message = Msg.Annotation.REQUIRED)
+    @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+    @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX)
     private Short startYear;
 
-    @Min(value = Utils.Const.MIN_YEAR)
-    @Max(value = Utils.Const.THIS_YEAR)
+    @Min(value = Utils.Const.MIN_YEAR, message = Msg.Annotation.MIN)
+    @Max(value = Utils.Const.THIS_YEAR, message = Msg.Annotation.MAX)
     private Short graduationYear;
 
 }

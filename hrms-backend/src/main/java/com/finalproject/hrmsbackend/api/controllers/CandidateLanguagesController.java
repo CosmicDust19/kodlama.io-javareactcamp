@@ -43,7 +43,8 @@ public class CandidateLanguagesController {
 
     @PutMapping(value = "/update/langLevel")
     public ResponseEntity<?> updateLangLevel(@RequestParam
-                                             @Pattern(regexp = Utils.Const.LANG_LVL_REGEXP, message = Msg.ForAnnotation.INVALID_LANG_LVL) String languageLevel,
+                                             @Pattern(regexp = Utils.Const.LANG_LVL_REGEXP,
+                                                      message = Msg.Annotation.PATTERN + " (It should be A1, A2 etc.)") String languageLevel,
                                              @RequestParam int CandLangId) {
         return Utils.getResponseEntity(candidateLanguageService.updateLangLevel(languageLevel, CandLangId));
     }

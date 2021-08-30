@@ -6,11 +6,7 @@ export const SYNC_USER = "SYNC_USER"
 export const SYNC_EMPL_JOB_ADVERTS = "SYNC_EMPL_JOB_ADVERTS"
 export const SYNC_EMPL_JOB_ADVERT = "SYNC_EMPL_JOB_ADVERT"
 export const SYNC_CAND_CVS = "SYNC_CAND_CVS"
-export const CHANGE_FIRSTNAME = "CHANGE_FIRSTNAME"
-export const CHANGE_LASTNAME = "CHANGE_LASTNAME"
 export const CHANGE_EMAIl = "CHANGE_EMAIl"
-export const CHANGE_GITHUB = "CHANGE_GITHUB"
-export const CHANGE_LINKEDIN = "CHANGE_LINKEDIN"
 export const CHANGE_JOB_EXP = "CHANGE_JOB_EXP"
 export const CHANGE_LANG = "CHANGE_LANG"
 export const CHANGE_SCHOOL = "CHANGE_SCHOOL"
@@ -49,10 +45,10 @@ export function syncUser(user) {
     }
 }
 
-export function syncEmplJobAdverts(adverts) {
+export function syncEmplJobAdverts(jobAdverts) {
     return {
         type: SYNC_EMPL_JOB_ADVERTS,
-        payload: {adverts}
+        payload: {jobAdverts: jobAdverts}
     }
 }
 
@@ -70,38 +66,10 @@ export function syncCandCVs(CVs) {
     }
 }
 
-export function changeFirstName(firstName) {
-    return {
-        type: CHANGE_FIRSTNAME,
-        payload: {firstName}
-    }
-}
-
-export function changeLastName(lastName) {
-    return {
-        type: CHANGE_LASTNAME,
-        payload: {lastName}
-    }
-}
-
 export function changeEmail(email) {
     return {
         type: CHANGE_EMAIl,
         payload: {email}
-    }
-}
-
-export function changeGithub(link) {
-    return {
-        type: CHANGE_GITHUB,
-        payload: {link}
-    }
-}
-
-export function changeLinkedin(link) {
-    return {
-        type: CHANGE_LINKEDIN,
-        payload: {link}
     }
 }
 
@@ -179,13 +147,6 @@ export function changeCvSkill(cvId, cvSkills) {
     return {
         type: CHANGE_CV_SKILL,
         payload: {cvId, cvSkills}
-    }
-}
-
-export function changeEmployerUpdate (employerUpdate){
-    return {
-        type: CHANGE_EMPLOYER_UPDATE,
-        payload: {employerUpdate}
     }
 }
 

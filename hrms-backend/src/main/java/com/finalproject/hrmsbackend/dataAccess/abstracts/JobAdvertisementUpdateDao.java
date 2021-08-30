@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @Repository
 public interface JobAdvertisementUpdateDao extends JpaRepository<JobAdvertisementUpdate, Integer> {
 
+    boolean existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription(Short cityId, Short positionId, Integer employerId, String jobDescription);
+
     @Modifying
     @Query("update JobAdvertisementUpdate j set j.position = :position where j.updateId = :updateId")
     void updatePosition(@Param(value = "position") Position position, @Param(value = "updateId") Integer updateId);

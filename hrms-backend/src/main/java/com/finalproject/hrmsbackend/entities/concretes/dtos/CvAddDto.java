@@ -16,14 +16,14 @@ import java.util.Set;
 @NoArgsConstructor
 public class CvAddDto {
 
-    @NotNull(message = Msg.ForAnnotation.REQUIRED)
+    @NotNull(message = Msg.Annotation.REQUIRED)
     private Integer candidateId;
 
-    @NotBlank(message = Msg.ForAnnotation.EMPTY)
-    @Size(max = Utils.Const.MAX_CV_TITLE)
+    @NotBlank(message = Msg.Annotation.REQUIRED)
+    @Size(max = Utils.Const.MAX_CV_TITLE, message = Msg.Annotation.SIZE)
     private String title;
 
-    @Size(max = Utils.Const.MAX_CV_COVER_LETTER)
+    @Size(max = Utils.Const.MAX_CV_COVER_LETTER, message = Msg.Annotation.SIZE)
     private String coverLetter;
 
     private Set<@NotNull Integer> candidateJobExperienceIds;
