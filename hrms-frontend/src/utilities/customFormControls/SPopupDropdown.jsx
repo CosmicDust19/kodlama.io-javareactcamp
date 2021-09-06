@@ -1,30 +1,27 @@
-import {errorPopupStyle, getValueByFieldName, infoPopupStyle} from "../Utils";
+import {defErrPopupStyle, defInfoPopupStyle} from "../Utils";
 import {Dropdown, Popup} from "semantic-ui-react";
 import React from "react";
 
-export default function SPopupDropdown(
-    {
-        name, formik,
-        error = getValueByFieldName(formik.errors, name),
-        touched = getValueByFieldName(formik.touched, name),
-        value = getValueByFieldName(formik.values, name),
-        placeholder, options, onChange, selectOnBlur = false, onBlur, dropdownClassName, as, icon, loading, disabled, fluid,
-        popupPosition = "bottom center", popupSize, mouseEnterDelay, mouseLeaveDelay, popupBasic, popupClassName,
-        customDropdownStyle, customErrPopupStyle = errorPopupStyle, customInfoPopupStyle = infoPopupStyle
-    }
-) {
+function SPopupDropdown({name, formik, ...props}) {
+
+    const meta = formik.getFieldMeta(name);
+    const content = meta.error ? meta.error :  props.placeholder
+
     return (
         <Popup
             trigger={
-                <Dropdown clearable item search selection loading={loading} disabled={disabled} fluid={fluid} selectOnBlur={selectOnBlur}
-                          placeholder={placeholder} options={options} value={value} icon={icon}
-                          style={customDropdownStyle} as={as} className={dropdownClassName} onBlur={onBlur}
-                          onChange={onChange ? onChange : (event, data) => formik.setFieldValue(name, data.value)}
+                <Dropdown clearable item search selection selectOnBlur={false} value={meta.value} style ={props.dropdownstyle}
+                          onChange={(event, data) => formik.setFieldValue(name, data.value)}
+                          {...props}
                 />
             }
-            position={popupPosition} content={error ? error : placeholder} size={popupSize} open={error && touched}
-            style={error ? customErrPopupStyle : customInfoPopupStyle} basic={popupBasic} className={popupClassName}
-            mouseEnterDelay={mouseEnterDelay} mouseLeaveDelay={mouseLeaveDelay}
+            open={meta.error && meta.touched}
+            position={"bottom center"}
+            content={content}
+            style={meta.error ? defErrPopupStyle : defInfoPopupStyle}
+            {...props}
         />
     )
 }
+
+export default SPopupDropdown;

@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.JobAdvertisementService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -86,7 +87,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
             return new ErrorResult(Msg.NOT_EXIST.get("Employer"));
         if (jobAdvertisementDao.existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription(jobAdvDto.getCityId(), jobAdvDto.getPositionId(), jobAdvDto.getEmployerId(), jobAdvDto.getJobDescription()))
             return new ErrorResult(Msg.UK_JOB_ADV_ADD.get());
-        ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvDto);
+        ErrorDataResult<ApiError> errors = execCommonChecks(jobAdvDto);
         if (errors != null) return errors;
 
         jobAdvDto.setId(null);
@@ -114,9 +115,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
     public Result update(JobAdvertisementDto jobAdvDto) {
         if (check.notExistsById(jobAdvertisementDao, jobAdvDto.getId()))
             return new ErrorResult(Msg.NOT_EXIST.get("jobAdvId"));
-        if (jobAdvertisementUpdateDao.existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription(jobAdvDto.getCityId(), jobAdvDto.getPositionId(), jobAdvDto.getEmployerId(), jobAdvDto.getJobDescription()))
-            return new ErrorResult(Msg.UK_JOB_ADV_UPD.get());
-        ErrorDataResult<Map<String, String>> errors = execCommonChecks(jobAdvDto);
+        ErrorDataResult<ApiError> errors = execCommonChecks(jobAdvDto);
         if (errors != null) return errors;
 
         JobAdvertisement jobAdv = jobAdvertisementDao.getById(jobAdvDto.getId());
@@ -124,6 +123,8 @@ public class JobAdvertisementManager implements JobAdvertisementService {
 
         if (noChange(oldJobAdvUpd, jobAdvDto))
             return new ErrorResult(Msg.THE_SAME.get("All fields are"));
+        if (violatesUk(oldJobAdvUpd, jobAdvDto))
+            return new ErrorResult(Msg.UK_JOB_ADV_UPD.get());
 
         JobAdvertisementUpdate newJobAdvUpd = modelMapper.map(jobAdvDto, JobAdvertisementUpdate.class);
         newJobAdvUpd.setUpdateId(oldJobAdvUpd.getUpdateId());
@@ -299,7 +300,7 @@ public class JobAdvertisementManager implements JobAdvertisementService {
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedJobAdv);
     }
 
-    private ErrorDataResult<Map<String, String>> execCommonChecks(JobAdvertisementDto jobAdvDto) {
+    private ErrorDataResult<ApiError> execCommonChecks(JobAdvertisementDto jobAdvDto) {
         Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(positionDao, jobAdvDto.getPositionId()))
             errors.put("positionId", Msg.NOT_EXIST.get());
@@ -307,20 +308,21 @@ public class JobAdvertisementManager implements JobAdvertisementService {
             errors.put("cityId", Msg.NOT_EXIST.get());
         if (check.greater(jobAdvDto.getMinSalary(), jobAdvDto.getMaxSalary()))
             errors.put("minMaxSalary", Msg.MIN_MAX_CONFLICT.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
         return null;
     }
 
     private Result execLastUpdAct(JobAdvertisement jobAdv) {
         JobAdvertisementUpdate savedJobAdvUpdate = jobAdvertisementUpdateDao.save(jobAdv.getJobAdvertisementUpdate());
         jobAdvertisementDao.updateUpdateVerification(false, jobAdv.getId());
+        jobAdv.setUpdateVerified(false);
         jobAdvertisementDao.updateLastModifiedAt(jobAdv.getId(), LocalDateTime.now());
         jobAdv.setJobAdvertisementUpdate(savedJobAdvUpdate);
         return new SuccessDataResult<>(Msg.SUCCESS_UPDATE_REQUEST.get(), jobAdv);
     }
 
     private boolean noChange(JobAdvertisementUpdate jobAdvUpd, JobAdvertisementDto jobAdvDto) {
-        return  check.equals(jobAdvUpd.getPosition().getId(), jobAdvDto.getPositionId()) &&
+        return check.equals(jobAdvUpd.getPosition().getId(), jobAdvDto.getPositionId()) &&
                 check.equals(jobAdvUpd.getCity().getId(), jobAdvDto.getCityId()) &&
                 check.equals(jobAdvUpd.getMinSalary(), jobAdvDto.getMinSalary()) &&
                 check.equals(jobAdvUpd.getMaxSalary(), jobAdvDto.getMaxSalary()) &&
@@ -329,6 +331,16 @@ public class JobAdvertisementManager implements JobAdvertisementService {
                 check.equals(jobAdvUpd.getOpenPositions(), jobAdvDto.getOpenPositions()) &&
                 check.equals(jobAdvUpd.getDeadline(), jobAdvDto.getDeadline()) &&
                 jobAdvUpd.getJobDescription().equals(jobAdvDto.getJobDescription());
+    }
+
+    private boolean violatesUk(JobAdvertisementUpdate jobAdvUpd, JobAdvertisementDto jobAdvDto) {
+        return !(check.equals(jobAdvUpd.getPosition().getId(), jobAdvDto.getPositionId()) &&
+                check.equals(jobAdvUpd.getCity().getId(), jobAdvDto.getCityId()) &&
+                jobAdvUpd.getJobDescription().equals(jobAdvDto.getJobDescription()) &&
+                check.equals(jobAdvUpd.getEmployer().getId(), jobAdvDto.getEmployerId()))
+                &&
+                jobAdvertisementUpdateDao.existsByCity_IdAndPosition_IdAndEmployer_IdAndJobDescription
+                        (jobAdvDto.getCityId(), jobAdvDto.getPositionId(), jobAdvDto.getEmployerId(), jobAdvDto.getJobDescription());
     }
 
 }

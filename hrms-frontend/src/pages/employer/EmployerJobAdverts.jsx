@@ -1,19 +1,18 @@
 import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
-import {
-    Button, Dropdown, Form, Grid, Header, Icon,
-    Label, Menu, Popup, Segment, TextArea
-} from "semantic-ui-react";
+import {Button, Dropdown, Form, Grid, Header, Icon, Menu, Popup, Segment, TextArea} from "semantic-ui-react";
 import JobAdvertisementService from "../../services/jobAdvertisementService";
 import CityService from "../../services/cityService";
 import PositionService from "../../services/positionService";
 import * as Yup from "yup";
-import {syncEmplJobAdvert, syncEmplJobAdverts} from "../../store/actions/userActions";
+import {syncEmplJobAdverts} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import {useFormik} from "formik";
 import SPopupDropdown from "../../utilities/customFormControls/SPopupDropdown";
 import SPopupInput from "../../utilities/customFormControls/SPopupInput";
-import {handleCatch} from "../../utilities/Utils";
+import {changePropInList, handleCatch} from "../../utilities/Utils";
+import SInfoLabel from "../../utilities/customFormControls/SInfoLabel";
+import {useHistory} from "react-router-dom";
 
 export function EmployerJobAdverts() {
 
@@ -23,11 +22,27 @@ export function EmployerJobAdverts() {
     const [jobAdverts, setJobAdverts] = useState(user.jobAdvertisements);
     const [selectedJobAdv, setSelectedJobAdv] = useState(undefined);
     const [activeItem, setActiveItem] = useState(-1);
-    const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
         setJobAdverts(user.jobAdvertisements)
     }, [user.jobAdvertisements]);
+
+    const getJobAdvColor = (jobAdvert) => {
+        if (jobAdvert.rejected === null && jobAdvert.verified === false)
+            return "blue"
+        else if (jobAdvert.rejected === true)
+            return "red"
+        else if (jobAdvert.updateVerified === false)
+            return "orange"
+        else if (Math.floor((new Date(jobAdvert.deadline).getTime() - new Date().getTime()) / 86400000) + 1 <= 0)
+            return "purple"
+        else if (jobAdvert.active === false)
+            return "grey"
+        else if (jobAdvert.verified === true)
+            return "green"
+        else
+            return undefined
+    }
 
     const handleMenuItemClick = (activeItem) => {
         setActiveItem(activeItem)
@@ -35,64 +50,51 @@ export function EmployerJobAdverts() {
         setSelectedJobAdv(jobAdverts[index]);
     }
 
-    const refreshComponent = () => {
-        if (refresh === true) setRefresh(false);
-        else setRefresh(true)
-    }
-
-    if (String(userProps.userType) !== "employer") return <Header>Sorry You Do Not Have Access Here</Header>
+    if (String(userProps.userType) !== "employer") return <Header content={"Sorry You Do Not Have Access Here"}/>
 
     return (
         <div>
             <strong style={{marginLeft: 35, color: "rgba(79,2,84,0.61)"}}>Manage Advertisements</strong>
             <Grid padded stackable centered>
                 <Grid.Column width={5}>
-                    <Menu fluid vertical tabular size={"small"}>
-                        {jobAdverts?.map((jobAdvertisement) => (
+                    <Menu fluid vertical tabular pointing secondary size={"small"}>
+                        {jobAdverts?.map((jobAdvert) => (
                             <Menu.Item
-                                key={jobAdvertisement?.id} color={"blue"}
-                                content={`${jobAdvertisement?.position.title} | ${jobAdvertisement?.city.name}`}
-                                name={String(jobAdvertisement?.id)} active={activeItem === jobAdvertisement?.id}
-                                onClick={() => handleMenuItemClick(jobAdvertisement?.id)}
+                                key={jobAdvert?.id} color={getJobAdvColor(jobAdvert)}
+                                content={`${jobAdvert?.position.title} | ${jobAdvert?.city.name}`}
+                                name={String(jobAdvert?.id)} active={activeItem === jobAdvert?.id}
+                                onClick={() => handleMenuItemClick(jobAdvert?.id)}
                             />
                         ))}
                         <Menu.Item
-                            name={"Post New"} color={"green"} header icon={"plus"}
-                            onClick={() => handleMenuItemClick(-1, undefined)}
-                            active={activeItem === -1}
+                            name={"-1"} content={"Post New"} color={"blue"} header icon={"plus"} active={activeItem === -1}
+                            onClick={() => handleMenuItemClick(-1)}
                         />
                     </Menu>
                 </Grid.Column>
                 <Grid.Column stretched width={11}>
-                    {JobAdvertsMenuSegment({jobAdvert: selectedJobAdv, refresh: refreshComponent})}
+                    {EmplJobAdvertManageSegment({jobAdvert: selectedJobAdv})}
                 </Grid.Column>
             </Grid>
         </div>
     )
 }
 
-function JobAdvertsMenuSegment(props) {
+function EmplJobAdvertManageSegment(props) {
 
     const jobAdvertisementService = new JobAdvertisementService()
 
-    const errPopupStyle = {
-        borderRadius: 10, color: "rgba(227,7,7)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10
-    }
-    const infoPopupStyle = {
-        borderRadius: 10, color: "rgb(0,0,0)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10
-    }
-    const jobAdvAddDropdownStyle = {
-        marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 35
-    }
-    const jobAdvAddInputStyle = {
-        marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 40
-    }
+    const errPopupStyle = {borderRadius: 10, color: "rgba(227,7,7)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10}
+    const infoPopupStyle = {borderRadius: 10, color: "rgb(0,0,0)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10}
+    const jobAdvAddDropdownStyle = {marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 35}
+    const jobAdvAddInputStyle = {marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 40}
     const popupSize = "small"
 
     const workTimes = ["Part Time", "Full Time"]
     const workModels = ["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]
 
     const dispatch = useDispatch();
+    const history = useHistory();
 
     const user = useSelector(state => state?.user?.userProps.user)
     const userProps = useSelector(state => state?.user?.userProps)
@@ -146,19 +148,23 @@ function JobAdvertsMenuSegment(props) {
         jobDescription: Yup.string().required("Required")
     });
 
+    const handleDetailClick = (jobAdvertId) => {
+        history.push(`/jobAdverts/${jobAdvertId}`);
+        window.scrollTo(0, 0);
+    }
+
     const add = (values) => {
         jobAdvertisementService.add(values).then((result) => {
-            console.log(result)
             user.jobAdvertisements.push(result.data.data)
             dispatch(syncEmplJobAdverts(user.jobAdvertisements))
-            props.refresh()
             toast("Your advert received. It will be published after verification")
         }).catch(handleCatch)
     }
 
     const update = (values) => {
         jobAdvertisementService.update(values).then((result) => {
-            dispatch(syncEmplJobAdvert(values.id, result.data.data))
+            const jobAdverts = changePropInList(values.id, result.data.data, user.jobAdvertisements)
+            dispatch(syncEmplJobAdverts(jobAdverts))
             setJobAdvert(result.data.data)
             toast("Your update request received. It will be visible after confirmation")
         }).catch(handleCatch)
@@ -166,10 +172,10 @@ function JobAdvertsMenuSegment(props) {
 
     const changeActivation = (jobAdv, status) => {
         jobAdvertisementService.updateActivation(jobAdv.id, status).then((result) => {
-            dispatch(syncEmplJobAdvert(jobAdv.id, result.data.data))
+            const jobAdverts = changePropInList(jobAdv.id, result.data.data, user.jobAdvertisements)
+            dispatch(syncEmplJobAdverts(jobAdverts))
             setJobAdvert(result.data.data)
-            if (status === true) toast("Activated")
-            else toast("Deactivated")
+            status === true ? toast("Activated") : toast("Deactivated")
         }).catch(handleCatch)
     }
 
@@ -208,47 +214,35 @@ function JobAdvertsMenuSegment(props) {
         <Segment raised style={{borderRadius: 10, centered: true}} textAlign={"center"}>
             {adding === false ?
                 <div align={"right"}>
-                    {!jobAdvert.verified && jobAdvert.rejected === null ?
-                        <Label style={{marginTop: 4, backgroundColor: "rgba(0,94,255,0.1)"}}>
-                            <Icon name="bullhorn" color="blue"/>Release Approval
-                        </Label> : null}
-                    {jobAdvert.updateVerified === false ?
-                        <Label style={{marginTop: 4, backgroundColor: "rgba(255,113,0,0.1)"}}>
-                            <Icon name="redo alternate" color="orange"/>Update Approval
-                        </Label> : null}
-                    {jobAdvert.verified === true ?
-                        <Label style={{marginTop: 4, backgroundColor: "rgba(58,255,0,0.1)"}}>
-                            <Icon name="check circle outline" color="green"/>Verified
-                        </Label> : null}
-                    {jobAdvert.rejected === true ?
-                        <Label style={{marginTop: 4, backgroundColor: "rgba(226,14,14,0.1)"}}>
-                            <Icon name="ban" color="red"/>Rejected
-                        </Label> : null}
-                    {jobAdvert.active === true ?
-                        <Label style={{marginTop: 4, backgroundColor: "rgba(57,255,0,0.1)"}}>
-                            <Icon name="checkmark" color="green"/>Active
-                        </Label> :
-                        <Label style={{marginTop: 4, backgroundColor: "rgba(76,16,11,0.1)"}}>
-                            <Icon name="minus circle" color="brown"/>Inactive
-                        </Label>}
+                    <SInfoLabel content={<div><Icon name="bullhorn" color="blue"/>Release Approval</div>}
+                                visible={jobAdvert.verified === false && jobAdvert.rejected === null}
+                                backgroundColor={"rgba(0,94,255,0.1)"}/>
+                    <SInfoLabel content={<div><Icon name="redo alternate" color="orange"/>Update Approval</div>}
+                                visible={jobAdvert.updateVerified === false} backgroundColor={"rgba(255,113,0,0.1)"}/>
+                    <SInfoLabel content={<div><Icon name="check circle outline" color="green"/>Verified</div>}
+                                visible={jobAdvert.verified === true} backgroundColor={"rgba(58,255,0,0.1)"}/>
+                    <SInfoLabel content={<div><Icon name="ban" color="red"/>Rejected</div>}
+                                visible={jobAdvert.rejected === true} backgroundColor={"rgba(226,14,14,0.1)"}/>
+                    <SInfoLabel content={<div><Icon name="checkmark" color="green"/>Active</div>}
+                                visible={jobAdvert.active === true} backgroundColor={"rgba(57,255,0,0.1)"}/>
+                    <SInfoLabel content={<div><Icon name="minus circle" color="brown"/>Inactive</div>}
+                                visible={jobAdvert.active === false} backgroundColor={"rgba(76,16,11,0.1)"}/>
                     <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>}
                               simple labeled direction={"left"}>
-                        <Dropdown.Menu
-                            style={{
-                                marginTop: 0,
-                                marginLeft: -6,
-                                backgroundColor: "rgba(250,250,250, 0.7)",
-                                borderRadius: 10
-                            }}>
+                        <Dropdown.Menu style={{marginTop: 0, marginLeft: -6, backgroundColor: "rgba(250,250,250, 0.7)", borderRadius: 10}}>
                             {jobAdvert.active === false ?
                                 <Dropdown.Item
                                     onClick={() => changeActivation(jobAdvert, true)}>
-                                    <Icon name="check circle outline" color="green"/>Activate
+                                    <Icon name="check" color="green"/>Activate
                                 </Dropdown.Item> :
                                 <Dropdown.Item
                                     onClick={() => changeActivation(jobAdvert, false)}>
                                     <Icon name="minus circle" color="brown"/>Deactivate
                                 </Dropdown.Item>}
+                            <Dropdown.Item
+                                onClick={() => handleDetailClick(jobAdvert.id)}>
+                                <Icon name="eye" color="blue"/>See
+                            </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div> : null}
@@ -256,28 +250,22 @@ function JobAdvertsMenuSegment(props) {
 
                 <Grid padded="vertically">
                     <Grid.Column>
-                        <SPopupDropdown name={"cityId"} placeholder={"City"} formik={formik} popupSize={popupSize}
-                                        customDropdownStyle={jobAdvAddDropdownStyle} options={cityOption}/>
-                        <SPopupDropdown name={"positionId"} placeholder={"Position"} formik={formik}
-                                        popupSize={popupSize} customDropdownStyle={jobAdvAddDropdownStyle}
-                                        options={positionOption}/>
-                        <SPopupDropdown name={"workModel"} placeholder={"Work Model"} formik={formik}
-                                        popupSize={popupSize} customDropdownStyle={jobAdvAddDropdownStyle}
-                                        options={workModelOption}/>
-                        <SPopupDropdown name={"workTime"} placeholder={"Work Time"} formik={formik} popupSize={popupSize}
-                                        customDropdownStyle={jobAdvAddDropdownStyle} options={workTimeOption}/>
-                        <SPopupInput icon="money bill alternate" placeholder="Min Salary" name="minSalary"
-                                     type={"number"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
-                                     formik={formik}/>
-                        <SPopupInput icon="money bill alternate" placeholder="Max Salary" name="maxSalary"
-                                     type={"number"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
-                                     formik={formik}/>
-                        <SPopupInput icon="users" placeholder="Open Positions" name="openPositions"
-                                     type={"number"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
-                                     formik={formik}/>
-                        <SPopupInput placeholder="Deadline" name="deadline"
-                                     type={"date"} popupSize={popupSize} customInputStyle={jobAdvAddInputStyle}
-                                     formik={formik}/>
+                        <SPopupDropdown name={"cityId"} placeholder={"City"} formik={formik} popupsize={popupSize}
+                                        dropdownstyle={jobAdvAddDropdownStyle} options={cityOption}/>
+                        <SPopupDropdown name={"positionId"} placeholder={"Position"} formik={formik} popupsize={popupSize}
+                                        dropdownstyle={jobAdvAddDropdownStyle} options={positionOption}/>
+                        <SPopupDropdown name={"workModel"} placeholder={"Work Model"} formik={formik} popupsize={popupSize}
+                                        dropdownstyle={jobAdvAddDropdownStyle} options={workModelOption}/>
+                        <SPopupDropdown name={"workTime"} placeholder={"Work Time"} formik={formik} popupsize={popupSize}
+                                        dropdownstyle={jobAdvAddDropdownStyle} options={workTimeOption}/>
+                        <SPopupInput icon="dollar sign" placeholder="Min Salary (Optional)" name="minSalary" type={"number"}
+                                     popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
+                        <SPopupInput icon="dollar sign" placeholder="Max Salary (Optional)" name="maxSalary" type={"number"}
+                                     popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
+                        <SPopupInput icon="users" placeholder="Open Positions" name="openPositions" type={"number"}
+                                     popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
+                        <SPopupInput placeholder="Deadline" name="deadline" type={"date"}
+                                     popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
                     </Grid.Column>
                 </Grid>
 
@@ -285,20 +273,17 @@ function JobAdvertsMenuSegment(props) {
                     <Grid.Column>
                         <Button attached={"top"} basic size={"mini"} color={"teal"} compact active
                                 style={{marginLeft: 12, width: 130, marginBottom: -1, borderRadius: 7}}>
-                            <strong style={{color: "rgba(37,37,37,0.94)", fontSize: "small"}}>
-                                Job Description
-                            </strong>
+                            <strong style={{color: "rgba(37,37,37,0.94)", fontSize: "small"}}>Job Description</strong>
                         </Button>
                         <Popup
                             trigger={
                                 <TextArea
-                                    style={{minHeight: 120, borderRadius: 10}}
-                                    name="jobDescription" value={formik.values.jobDescription}
-                                    onChange={formik.handleChange}
+                                    style={{minHeight: 120, borderRadius: 10}} name="jobDescription"
+                                    value={formik.values.jobDescription} onChange={formik.handleChange}
                                 />
                             }
-                            content={formik.errors.jobDescription ? formik.errors.jobDescription : "Job Description"}
                             position={"bottom center"}
+                            content={formik.errors.jobDescription ? formik.errors.jobDescription : "Job Description"}
                             style={formik.errors.jobDescription ? errPopupStyle : infoPopupStyle}
                             size={popupSize} open={formik.errors.jobDescription && formik.touched.jobDescription}
                         />
@@ -308,13 +293,11 @@ function JobAdvertsMenuSegment(props) {
                 <Grid padded>
                     <Grid.Column>
                         {adding ?
-                            <Button animated="fade" positive type="submit" compact floated={"left"}
-                                    style={{borderRadius: 10}}>
+                            <Button animated="fade" positive type="submit" compact floated={"left"} style={{borderRadius: 10}}>
                                 <Button.Content hidden><Icon name='checkmark'/></Button.Content>
                                 <Button.Content visible>Post <Icon name={"plus"}/></Button.Content>
                             </Button> :
-                            <Button animated="fade" primary type="submit" compact floated={"left"}
-                                    style={{borderRadius: 10}}>
+                            <Button animated="fade" primary type="submit" compact floated={"left"} style={{borderRadius: 10}}>
                                 <Button.Content hidden><Icon name='checkmark'/></Button.Content>
                                 <Button.Content visible>Save <Icon name='save'/></Button.Content>
                             </Button>

@@ -63,11 +63,11 @@ public class CvManager implements CvService {
         Cv savedCv = cvDao.save(cv);
 
         Map<String, Result> results = new LinkedHashMap<>();
-        results.put("CV", new SuccessDataResult<>(Msg.SAVED.getCustom("%s (data: new cvId)"), savedCv.getId()));
         results.put("candidateJobExperiences", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateJobExperienceIds(), candidateJobExpDao, Utils.CheckType.PARTLY, CandidateJobExperience.class));
         results.put("candidateLanguages", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateLanguageIds(), candidateLangDao, Utils.CheckType.PARTLY, CandidateLanguage.class));
         results.put("candidateSchools", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateSchoolIds(), candidateSchoolDao, Utils.CheckType.PARTLY, CandidateSchool.class));
         results.put("candidateSkills", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateSkillIds(), candidateSkillDao, Utils.CheckType.PARTLY, CandidateSkill.class));
+        results.put("CV", new SuccessDataResult<>(Msg.SAVED.getCustom("%s"), cvDao.getById(savedCv.getId())));
         return new SuccessDataResult<>(Msg.SUCCESS.get(), results);
     }
 

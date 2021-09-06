@@ -38,7 +38,7 @@ export default function Login() {
         }
     });
 
-    const popupPosition = verticalScreen ? undefined : "right center"
+    const popupPosition = verticalScreen ? "top center" : "right center"
     const popupSize = !verticalScreen ? undefined : "small"
 
     return (
@@ -51,10 +51,10 @@ export default function Login() {
 
                             <Grid padded>
                                 <Grid.Column>
-                                    <SPopupInput icon="mail" iconPosition={"left"} placeholder="Email" name="email"
-                                                 formik={formik} popupPosition={popupPosition} popupSize={popupSize}/>
-                                    <SPopupInput icon="lock" iconPosition={"left"} placeholder="Password" name="password"
-                                                 type={"password"} formik={formik} popupPosition={popupPosition} popupSize={popupSize}/>
+                                    <SPopupInput icon="at" iconposition={"left"} placeholder="Email" name="email"
+                                                 formik={formik} popupposition={popupPosition} popupsize={popupSize}/>
+                                    <SPopupInput icon="lock" iconposition={"left"} placeholder="Password" name="password"
+                                                 type={"password"} formik={formik} popupposition={popupPosition} popupsize={popupSize}/>
                                 </Grid.Column>
                             </Grid>
 

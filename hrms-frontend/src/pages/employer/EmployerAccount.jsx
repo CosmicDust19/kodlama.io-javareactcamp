@@ -7,6 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {signOut, syncUser} from "../../store/actions/userActions";
 import {useHistory} from "react-router-dom";
 import EmployerService from "../../services/employerService";
+import {handleCatch} from "../../utilities/Utils";
 
 export function EmployerAccount() {
 
@@ -33,19 +34,6 @@ export function EmployerAccount() {
             companyName: "", phoneNumber: "",
         }
     });
-
-    const handleCatch = (error) => {
-        const resp = error.response
-        console.log(error)
-        console.log(resp)
-        if (resp.data.data?.errors) {
-            Object.entries(resp.data.data.errors).forEach((prop) => toast.warning(String(prop[1])))
-            return
-        }
-        if (resp.data.message) {
-            toast.warning(resp.data.message)
-        }
-    }
 
     const lastUpdAct = (response, msg, fieldName1, fieldValue1, fieldName2, fieldValue2) => {
         dispatch(syncUser(response.data.data));
@@ -252,16 +240,9 @@ export function EmployerAccount() {
                                 </Label> : null
                         }
                         content={"Updates are being checked"}
-                        style={{
-                            borderRadius: 15,
-                            opacity: 0.8,
-                            color: "rgb(17,17,17)"
-                        }}
-                        position={"bottom center"}
-                        on={"hover"}
-
-                        mouseEnterDelay={300}
-                        mouseLeaveDelay={150}
+                        style={{borderRadius: 15, opacity: 0.8, color: "rgb(17,17,17)"}}
+                        position={"bottom center"} on={"hover"}
+                        mouseEnterDelay={300} mouseLeaveDelay={150}
                     />
 
                     <Item.Group>
@@ -270,17 +251,10 @@ export function EmployerAccount() {
                                 src={"https://www.linkpicture.com/q/pngkey.com-black-building-icon-png-3232548.png"}
                                 size={"small"}/>
                             <Item.Content verticalAlign={"middle"}>
-                                <Item.Header as='a'>
-                                    <Header>
-                                        {employer?.companyName}
-                                    </Header></Item.Header>
+                                <Item.Header as='a' content={<Header content={employer?.companyName}/>}/>
                                 <Item.Meta><Icon name={"phone"}/> {employer.phoneNumber}</Item.Meta>
-                                <Item.Description>
-                                    <Icon name={"envelope"}/> {employer?.email}
-                                </Item.Description>
-                                <Item.Description>
-                                    <Icon name={"world"}/> {employer?.website}
-                                </Item.Description>
+                                <Item.Description><Icon name={"envelope"}/> {employer?.email}</Item.Description>
+                                <Item.Description><Icon name={"world"}/> {employer?.website}</Item.Description>
                             </Item.Content>
                         </Item>
                     </Item.Group>
@@ -289,13 +263,7 @@ export function EmployerAccount() {
         )
     }
 
-    if (String(userProps.userType) !== "employer") {
-        return (
-            <Header>
-                Sorry, You Do Not Have Access Here
-            </Header>
-        )
-    }
+    if (String(userProps.userType) !== "employer") return <Header content={"Sorry, You Do Not Have Access Here"}/>
 
     return (
         <div>
@@ -326,8 +294,7 @@ export function EmployerAccount() {
                             onClick={() => handleMenuItemClick("phone")}
                         />
                         <Menu.Item
-                            color={"red"} icon={"warning sign"}
-                            name='Danger Zone'
+                            color={"red"} icon={"warning sign"} name='Danger Zone'
                             active={activeItem === 'danger'}
                             onClick={() => handleMenuItemClick("danger")}
                         />

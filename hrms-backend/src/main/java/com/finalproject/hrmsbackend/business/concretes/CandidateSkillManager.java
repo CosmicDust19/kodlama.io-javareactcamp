@@ -31,13 +31,15 @@ public class CandidateSkillManager implements CandidateSkillService {
     }
 
     @Override
-    public Result add(CandidateSkillAddDto candidateSkillAddDto) {
-        if (check.notExistsById(candidateDao, candidateSkillAddDto.getCandidateId()))
+    public Result add(CandidateSkillAddDto candSkillAddDto) {
+        if (check.notExistsById(candidateDao, candSkillAddDto.getCandidateId()))
             return new ErrorResult(Msg.NOT_EXIST.get("candidateId"));
-        if (check.notExistsById(skillDao, candidateSkillAddDto.getSkillId()))
+        if (check.notExistsById(skillDao, candSkillAddDto.getSkillId()))
             return new ErrorResult(Msg.NOT_EXIST.get("skillId"));
+        if (violatesUk(candSkillAddDto))
+            return new ErrorResult(Msg.UK_CAND_SKILL.get());
 
-        CandidateSkill candidateSkill = modelMapper.map(candidateSkillAddDto, CandidateSkill.class);
+        CandidateSkill candidateSkill = modelMapper.map(candSkillAddDto, CandidateSkill.class);
 
         CandidateSkill savedCandSkill = candidateSkillDao.save(candidateSkill);
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandSkill);
@@ -47,6 +49,11 @@ public class CandidateSkillManager implements CandidateSkillService {
     public Result deleteById(int candSkillId) {
         candidateSkillDao.deleteById(candSkillId);
         return new SuccessResult(Msg.DELETED.get());
+    }
+
+    private boolean violatesUk(CandidateSkillAddDto candSkillAddDto) {
+        return candidateSkillDao.existsBySkill_IdAndCandidate_Id
+                (candSkillAddDto.getSkillId(), candSkillAddDto.getCandidateId());
     }
 
 }

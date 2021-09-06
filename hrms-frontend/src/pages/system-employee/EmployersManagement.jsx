@@ -1,36 +1,44 @@
 import React, {useEffect, useState} from "react";
 import {
-    Button, Dropdown, Grid, Header, Icon, Label,
-    Loader, Menu, Modal, Pagination, Popup,
-    Segment, Table
+    Button, Dropdown, Grid, Header, Icon, Loader, Menu, Pagination, Segment,
+    Table
 } from "semantic-ui-react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmployer, changeEmployersFilters, filterEmployers} from "../../store/actions/filterActions"
+import {changeEmployersFilters, changeFilteredEmployers} from "../../store/actions/filterActions"
 import EmployerService from "../../services/employerService";
 import {toast} from "react-toastify";
 import {useHistory} from "react-router-dom";
+import {changePropInList, defDropdownStyle, filterEmployers, handleCatch} from "../../utilities/Utils";
+import SInfoLabel from "../../utilities/customFormControls/SInfoLabel";
+import SDropdown from "../../utilities/customFormControls/SDropdown";
 
 const employerService = new EmployerService();
 export default function EmployersManagement() {
 
+    const statuses = ["Sign Up Approval", "Update Approval", "Verified", "Rejected"]
+
     const dispatch = useDispatch();
     const filters = useSelector(state => state?.filter.filter.employersFilters)
-    const filteredEmployers = useSelector(state => state?.filter.filter.filteredEmployers)
     const history = useHistory();
     const userProps = useSelector(state => state?.user?.userProps)
 
-    const [infoPopUpOpen, setInfoPopUpOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [filteredEmployers, setFilteredEmployers] = useState(useSelector(state => state?.filter.filter.filteredEmployers));
+    const [noEmplFound, setNoEmplFound] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [employersPerPage, setEmployersPerPage] = useState(20);
     const [employers, setEmployers] = useState([]);
     const [refresh, setRefresh] = useState(true);
 
     useEffect(() => {
-        let employerService = new EmployerService();
-        employerService.getAll().then((result) => setEmployers(result.data.data));
-    }, []);
+        const employerService = new EmployerService();
+        employerService.getAll().then((result) => {
+            setEmployers(result.data.data)
+            if (filteredEmployers.length === 0) setFilteredEmployers(result.data.data)
+        });
+    }, [filteredEmployers]);
+
+    const employersLoading = employers.length === 0;
 
     const indexOfLastEmployer = currentPage * employersPerPage
     const indexOfFirstEmployer = indexOfLastEmployer - employersPerPage
@@ -62,49 +70,52 @@ export default function EmployersManagement() {
         value: employer.id,
     }));
 
-    employerOption = employerCompanyNameOption.concat(employersPhoneOption).concat(employerEmailOption).concat(employersWebsiteOption)
+    employerOption = employerCompanyNameOption
+        .concat(employersPhoneOption)
+        .concat(employerEmailOption)
+        .concat(employersWebsiteOption)
+
+    const statusOption = statuses.map((status, index) => ({
+        key: index,
+        text: status,
+        value: status,
+    }));
 
     const formik = useFormik({
-        initialValues: {
-            pending: filters.pending,
-            verification: filters.verification,
-            employerId: 0
-        }
+        initialValues: {statuses: filters.statuses, employerId: filters.employerId}
     });
 
-    const refreshPage = () => {
-        if (refresh === true) setRefresh(false);
-        else setRefresh(true)
-    }
-
-    const handleCatch = (error) => {
-        toast.warning("A problem has occurred")
-        console.log(error.response)
-        refreshPage()
-    }
-
     const getRowColor = (employer) => {
-        if ((employer.rejected === null && employer.verified === false)) return "rgba(0,94,255,0.07)"
-        else if (employer.rejected === true) return "rgba(255,0,0,0.07)"
-        else if (employer.updateVerified === false) return "rgba(253,93,2,0.13)"
-        else if (employer.verified) return "rgba(27,252,3,0.05)"
-        else return "rgba(255,255,255,0.1)"
+        if (employer.rejected === null && employer.verified === false)
+            return "rgba(0,94,255,0.1)"
+        else if (employer.rejected === true)
+            return "rgba(255,0,0,0.1)"
+        else if (employer.updateVerified === false)
+            return "rgba(253,93,2,0.1)"
+        else if (employer.verified === true)
+            return "rgba(27,252,3,0.1)"
+        else
+            return "rgba(255,255,255,0.1)"
     }
 
     const changeVerification = (employer, status) => {
-        employerService.updateVerification(employer.id, status).then(r => {
-            dispatch(changeEmployer(employer.id, r.data.data))
-            toast("Successful")
-            refreshPage()
-        }).catch(handleCatch)
+        employerService.updateVerification(employer.id, status)
+            .then(r => syncEmployer(r.data.data, status ? "Verified" : "Rejected"))
+            .catch(handleCatch)
     }
 
     const verifyUpdate = (employer) => {
-        employerService.applyChanges(employer.id).then(r => {
-            dispatch(changeEmployer(employer.id, r.data.data))
-            toast("Successful")
-            refreshPage()
-        }).catch(handleCatch)
+        employerService.applyChanges(employer.id)
+            .then(r => syncEmployer(r.data.data, "Update verified"))
+            .catch(handleCatch)
+    }
+
+    const syncEmployer = (employer, msg) => {
+        const newEmployers = changePropInList(employer.id, employer, filteredEmployers)
+        dispatch(changeFilteredEmployers(newEmployers))
+        setEmployers(changePropInList(employer.id, employer, employers))
+        setRefresh(!refresh)
+        toast(msg)
     }
 
     const handleEmployerInfoClick = id => {
@@ -112,12 +123,18 @@ export default function EmployersManagement() {
         window.scrollTo(0, 0)
     };
 
-    const handleChangeFilter = (fieldName, value) => {
-        formik.setFieldValue(fieldName, value);
-        if (fieldName === "employerId") {
-            formik.values.employerId = value
-            handleFilter()
-        }
+    const changeStatuses = (value) => {
+        if (value.length !== 0) formik.values.employerId = 0
+        formik.setFieldValue("statuses", value);
+        formik.values.statuses = value
+        handleFilter()
+    }
+
+    const search = (value) => {
+        if (value !== 0) formik.values.statuses = []
+        formik.setFieldValue("employerId", value);
+        formik.values.employerId = value
+        handleFilter()
     }
 
     const handlePagePerEmployerMenuClick = (number) => {
@@ -125,246 +142,45 @@ export default function EmployersManagement() {
         setEmployersPerPage(number)
     }
 
-    const handlePendingMenuClick = (activeItem) => {
-        if (activeItem === formik.values.pending) {
-            formik.values.pending = ""
-            handleChangeFilter("pending", "")
-        } else {
-            formik.values.pending = activeItem
-            handleChangeFilter("pending", activeItem)
-            if (activeItem === "updateApproval") toast("Update is not supported for now, it won't affect the filtering process")
-        }
-        dispatch(changeEmployersFilters(formik.values))
-    }
-
-    const handleVerificationMenuClick = (activeItem) => {
-        if (activeItem === formik.values.verification) {
-            formik.values.verification = ""
-            handleChangeFilter("verification", "")
-        } else {
-            formik.values.verification = activeItem
-            handleChangeFilter("verification", activeItem)
-        }
-        dispatch(changeEmployersFilters(formik.values))
-    }
-
     const handlePaginationChange = (e, {activePage}) => setCurrentPage(activePage)
-
-    const handleResetFilters = () => {
-        handleChangeFilter("pending", "")
-        handleChangeFilter("verification", "")
-        handleChangeFilter("employerId", 0)
-        formik.values = {
-            pending: "", verification: "", employerId: 0
-        }
-        handleFilter()
-    }
 
     const handleFilter = () => {
         dispatch(changeEmployersFilters(formik.values))
-        dispatch(filterEmployers(employers, formik.values))
+        const filteredEmployers = filterEmployers(employers, formik.values)
+        dispatch(changeFilteredEmployers(filteredEmployers))
+        setFilteredEmployers(filteredEmployers)
+        setNoEmplFound(filteredEmployers.length === 0)
         setCurrentPage(1)
     }
 
-    function infoPopUp() {
-        return (
-            <Modal basic onClose={() => setInfoPopUpOpen(false)} onOpen={() => setInfoPopUpOpen(true)}
-                   open={infoPopUpOpen} size='small'>
-
-                <Segment placeholder inverted style={{backgroundColor: "rgba(10,10,10,0.5)", borderRadius: 20}}>
-                    <Grid padded>
-                        <Grid.Row>
-                            <Header size={"small"} style={{color: "rgba(185,108,253,0.61)", marginTop: -3}}>
-                                <Header.Content>
-                                    <Icon name="wait"/> Pending
-                                </Header.Content>
-                            </Header>&nbsp;:&nbsp;Pending you to
-                            &nbsp;<font color="green">verify</font>&nbsp;or
-                            &nbsp;<font color="red">reject</font>&nbsp;
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Header size={"small"} style={{color: "rgba(250,212,98,0.73)", marginTop: -3}}>
-                                <Header.Content>
-                                    <Icon name="check circle outline"/> Verification
-                                </Header.Content>
-                            </Header>&nbsp;:
-                            &nbsp;<font color="green">Verification</font>&nbsp;and
-                            &nbsp;<font color="red">rejection</font>&nbsp;status
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Header style={{marginTop: -7}}>
-                                <Button basic animated="fade" size="mini" color={"green"} style={{borderRadius: 10}}>
-                                    <Button.Content visible>Apply</Button.Content>
-                                    <Button.Content hidden><Icon name='filter'
-                                                                 style={{marginLeft: 10}}/></Button.Content>
-                                </Button>
-                            </Header>&nbsp;:&nbsp;Executes the filters<Icon name='filter'/> and syncs job adverts with
-                            the database<Icon name='database'/>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Header style={{marginTop: -7}}>
-                                <Button animated="fade" basic size="mini" color="grey" style={{borderRadius: 10}}>
-                                    <Button.Content visible>Reset Filters</Button.Content>
-                                    <Button.Content hidden><Icon name='sync alternate'
-                                                                 style={{marginLeft: 10}}/></Button.Content>
-                                </Button>
-                            </Header>&nbsp;:&nbsp;Resets<Icon name='sync alternate'/> the filters
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Header size={"small"} style={{color: "rgba(252,0,0,0.87)", marginTop: -3}}>
-                                <Header.Content>Tip</Header.Content>
-                            </Header>&nbsp;:&nbsp;If you have a problem, you can refresh the page and click the
-                            &nbsp;<font color="grey">reset</font>&nbsp;or
-                            &nbsp;<font color="green">apply</font>&nbsp;button
-                        </Grid.Row>
-                    </Grid>
-                </Segment>
-            </Modal>
-        )
-    }
-
-    function filtersSegment() {
-        return (
-            <div>
-                <Segment style={{borderRadius: 20}} disabled={employers.length === 0} raised>
-                    <Label attached={"top right"} style={{marginTop: 5, marginRight: 5}} color="blue" circular
-                           onClick={() => setInfoPopUpOpen(true)}>
-                        <Icon name="help" style={{marginRight: 0}}/>
-                    </Label>
-                    <Grid stackable>
-                        <Grid.Column width="6">
-                            <Segment basic>
-                                <Header size={"small"} style={{color: "rgba(20,23,182,0.63)", marginLeft: 10}}>
-                                    <Header.Content>
-                                        <Icon name="wait"/> Pending
-                                    </Header.Content>
-                                </Header>
-                                <Menu secondary style={{borderRadius: 10}}>
-                                    <Menu.Item active={filters.pending === "signUpApproval"} color={"blue"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handlePendingMenuClick("signUpApproval")
-                                    }}><Icon name="add user"/>Sign Up Approval</Menu.Item>
-                                    <Menu.Item active={filters.pending === "updateApproval"} color={"orange"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handlePendingMenuClick("updateApproval")
-                                    }}><Icon name="redo alternate"/>Update Approval</Menu.Item>
-                                </Menu>
-                            </Segment>
-                        </Grid.Column>
-                        <Grid.Column width="6">
-                            <Segment basic>
-                                <Header size={"small"} style={{color: "rgba(250,180,2,0.73)", marginLeft: 10}}>
-                                    <Header.Content>
-                                        <Icon name="check circle outline"/> Verification
-                                    </Header.Content>
-                                </Header>
-                                <Menu secondary style={{borderRadius: 10}}>
-                                    <Menu.Item active={filters.verification === "verified"} color={"green"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleVerificationMenuClick("verified")
-                                    }}><Icon name="check circle outline"/>Verified</Menu.Item>
-                                    <Menu.Item active={filters.verification === "rejected"} color={"red"}
-                                               style={{borderRadius: 10}} onClick={() => {
-                                        handleVerificationMenuClick("rejected")
-                                    }}><Icon name="ban"/>Rejected</Menu.Item>
-                                </Menu>
-                            </Segment>
-                        </Grid.Column>
-                    </Grid>
-                </Segment>
-                <Grid padded>
-                    <Grid.Column width="10">
-                        <Button basic animated="fade" fluid color={"green"} style={{borderRadius: 10}} loading={loading}
-                                disabled={employers.length === 0 || loading} active onClick={() => {
-                            setLoading(true)
-                            setTimeout(() => {
-                                formik.values.employerId = 0
-                                handleFilter()
-                                setLoading(false)
-                            }, 500)
-                        }}>
-                            <Button.Content visible>Apply</Button.Content>
-                            <Button.Content hidden><Icon name='filter'/></Button.Content>
-                        </Button>
-                    </Grid.Column>
-                    <Grid.Column width="6">
-                        <Button animated="fade" basic fluid color={"grey"} style={{borderRadius: 10}} loading={loading}
-                                disabled={employers.length === 0 || loading} active onClick={() => {
-                            setLoading(true)
-                            setTimeout(() => {
-                                handleResetFilters()
-                                setLoading(false)
-                            }, 500)
-                        }}>
-                            <Button.Content visible>Reset Filters</Button.Content>
-                            <Button.Content hidden><Icon name='sync alternate'/></Button.Content>
-                        </Button>
-                    </Grid.Column>
-                </Grid>
-            </div>
-        )
-    }
-
     function listEmployers(currentEmployers) {
-        if (employers.length === 0) {
-            return (
-                <Segment basic size={"large"}>
-                    <Loader active inline='centered' size={"large"}/>
-                </Segment>
-            )
-        } else if (currentEmployers.length === 0) {
-            return (
-                <Header style={{marginTop: "2em", marginLeft: "2em"}}>
-                    <font style={{fontStyle: "italic"}} color="black">No results were found</font>
-                </Header>
-            )
-        }
+        if (noEmplFound)
+            return <Header style={{marginLeft: "2em"}} as="font" className="handWriting" content={"No results found"}/>
 
         return (
-            <Table>
+            <Table style={{borderRadius: 0}}>
                 <Table.Body>
                     {currentEmployers.map((employer) => (
                         <Table.Row style={{backgroundColor: getRowColor(employer)}} key={employer.id}>
-                            <Table.Cell>
-                                {employer.companyName}
-                            </Table.Cell>
-                            <Table.Cell>
-                                {employer.phoneNumber}
-                            </Table.Cell>
-                            <Table.Cell>
-                                {employer.email}
-                            </Table.Cell>
-                            <Table.Cell>
-                                {employer.website}
-                            </Table.Cell>
+                            <Table.Cell content={employer.companyName}/>
+                            <Table.Cell content={employer.phoneNumber}/>
+                            <Table.Cell content={employer.email}/>
+                            <Table.Cell content={employer.website}/>
                             <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
-                                {!employer.verified && employer.rejected === null ?
-                                    <Label style={{marginTop: 10, backgroundColor: "rgba(0,94,255,0.1)"}}>
-                                        <Icon name="add user" color="blue"/>Sign Up Approval
-                                    </Label> : null}
-                                {employer.updateVerified === null || !!employer.updateVerified ? null :
-                                    <Label style={{marginTop: 10, backgroundColor: "rgba(255,113,0,0.1)"}}>
-                                        <Icon name="redo alternate" color="orange"/>Update Approval
-                                    </Label>}
-                                {!employer.verified ? null :
-                                    <Label style={{marginTop: 10, backgroundColor: "rgba(58,255,0,0.1)"}}>
-                                        <Icon name="check circle outline" color="green"/>Verified
-                                    </Label>}
-                                {(employer.verified || !employer.rejected) ? null :
-                                    <Label style={{marginTop: 10, backgroundColor: "rgba(226,14,14,0.1)"}}>
-                                        <Icon name="ban" color="red"/>Rejected
-                                    </Label>}
+                                <SInfoLabel content={<div><Icon name="add user" color="blue"/>Sign Up Approval</div>}
+                                            visible={employer.verified === false && employer.rejected === null}
+                                            backgroundColor={"rgba(0,94,255,0.1)"}/>
+                                <SInfoLabel content={<div><Icon name="redo alternate" color="orange"/>Update Approval</div>}
+                                            visible={employer.updateVerified === false} backgroundColor={"rgba(255,113,0,0.1)"}/>
+                                <SInfoLabel content={<div><Icon name="check circle outline" color="green"/>Verified</div>}
+                                            visible={employer.verified === true} backgroundColor={"rgba(58,255,0,0.1)"}/>
+                                <SInfoLabel content={<div><Icon name="ban" color="red"/>Rejected</div>}
+                                            visible={employer.rejected === true} backgroundColor={"rgba(226,14,14,0.1)"}/>
                             </Table.Cell>
                             <Table.Cell>
-                                <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>}
-                                          simple labeled>
+                                <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>} simple labeled fluid>
                                     <Dropdown.Menu
-                                        style={{
-                                            marginTop: 0,
-                                            marginLeft: -6,
-                                            backgroundColor: "rgba(250,250,250, 0.7)",
-                                            borderRadius: 10
-                                        }}>
+                                        style={{marginTop: 0, marginLeft: -6, backgroundColor: "rgba(250,250,250, 0.7)", borderRadius: 5}}>
                                         {employer.updateVerified === false ?
                                             <Dropdown.Item
                                                 onClick={() => verifyUpdate(employer)}>
@@ -400,103 +216,56 @@ export default function EmployersManagement() {
 
     function itemsPerPageBar() {
         return (
-            <div>
-                <Menu secondary icon={"labeled"} vertical pagination
-                      style={{marginRight: "3em", marginTop: "16em"}} fixed={"right"}>
-                    <Menu.Item name='5' active={employersPerPage === 5}
-                               disabled={filteredEmployers.length === 0}
-                               onClick={() => handlePagePerEmployerMenuClick(5)}>5</Menu.Item>
-                    <Menu.Item name='10' active={employersPerPage === 10}
-                               disabled={filteredEmployers.length === 0}
-                               onClick={() => handlePagePerEmployerMenuClick(10)}>10</Menu.Item>
-                    <Menu.Item name='20' active={employersPerPage === 20}
-                               disabled={filteredEmployers.length === 0}
-                               onClick={() => handlePagePerEmployerMenuClick(20)}>20</Menu.Item>
-                    <Menu.Item name='50' active={employersPerPage === 50}
-                               disabled={filteredEmployers.length === 0}
-                               onClick={() => handlePagePerEmployerMenuClick(50)}>50</Menu.Item>
-                    <Menu.Item>
-                        <Button animated="vertical" fluid color={"violet"} size="small"
-                                style={{borderRadius: 10}}
-                                onClick={() => window.scrollTo(0, 55)}>
-                            <Button.Content visible>
-                                <Icon name='arrow up' style={{marginRight: -5, marginLeft: -5}}/>
-                            </Button.Content>
-                            <Button.Content hidden>
-                                <Icon name='arrow up' style={{marginRight: -5, marginLeft: -5}}/>
-                            </Button.Content>
-                        </Button>
-                    </Menu.Item>
-                </Menu>
-            </div>
+            <Menu pointing compact color={"blue"} secondary style={{marginLeft: 0}}>
+                <Menu.Item name='5' active={employersPerPage === 5} disabled={noEmplFound}
+                           onClick={() => handlePagePerEmployerMenuClick(5)} content={"5"}/>
+                <Menu.Item name='10' active={employersPerPage === 10} disabled={noEmplFound}
+                           onClick={() => handlePagePerEmployerMenuClick(10)} content={"10"}/>
+                <Menu.Item name='20' active={employersPerPage === 20} disabled={noEmplFound}
+                           onClick={() => handlePagePerEmployerMenuClick(20)} content={"20"}/>
+                <Menu.Item name='50' active={employersPerPage === 50} disabled={noEmplFound}
+                           onClick={() => handlePagePerEmployerMenuClick(50)} content={"50"}/>
+                <Menu.Item name='100' active={employersPerPage === 100} disabled={noEmplFound}
+                           onClick={() => handlePagePerEmployerMenuClick(100)} content={"100"} style={{borderRadius: 0}}/>
+            </Menu>
         )
     }
 
     function paginationBar() {
         return (
-            <Popup
-                trigger={
-                    <Pagination
-                        totalPages={Math.ceil(filteredEmployers.length / employersPerPage)}
-                        onPageChange={handlePaginationChange}
-                        activePage={currentPage}
-                        secondary
-                        pointing
-                        firstItem={null}
-                        lastItem={null}
-                        siblingRange={2}
-                        disabled={filteredEmployers.length === 0}
-                    />
-                }
-                disabled={filteredEmployers.length === 0}
-                content={"Page number"}
-                style={{
-                    borderRadius: 15,
-                    opacity: 0.9,
-                    color: "rgb(18,18,18)"
-                }}
-                position={"top center"}
-                on={"hover"}
-                mouseEnterDelay={1000}
-                mouseLeaveDelay={150}
+            <Pagination
+                totalPages={Math.ceil(filteredEmployers.length / employersPerPage)} onPageChange={handlePaginationChange}
+                activePage={currentPage} secondary pointing firstItem={null} lastItem={null} siblingRange={2} disabled={noEmplFound}
             />
         )
     }
 
-    if (String(userProps.userType) !== "systemEmployee")
-        return (
-            <Header>
-                Nice Try !
-            </Header>
-        )
+    if (String(userProps.userType) !== "systemEmployee") return <Header content={"Nice Try !"}/>
 
     return (
         <div>
-            {infoPopUp()}
-            {itemsPerPageBar()}
-            {filtersSegment()}
-            <Grid padded>
-                <Grid.Column width={8}>
-                    <Dropdown placeholder="Search employers" search className="icon" selectOnBlur={false}
-                              label={formik.values.employerId === 0 ? null :
-                                  <Button icon="x" circular disabled={employers.length === 0 || loading}
-                                          loading={loading}
-                                          onClick={() => handleChangeFilter("employerId", 0)}/>}
-                              loading={employers.length === 0} button labeled icon="search"
-                              options={employerOption} value={formik.values.employerId}
-                              style={{borderRadius: 10}} basic
-                              onChange={(event, data) => {
-                                  handleChangeFilter("employerId", data.value)
-                              }}/>
-                    {formik.values.employerId === 0 ? null :
-                        <Button icon="x" circular disabled={employers.length === 0 || loading} loading={loading}
-                                onClick={() => handleChangeFilter("employerId", 0)}/>}
-                </Grid.Column>
-                <Grid.Column width={8}>
-                    {paginationBar()}
-                </Grid.Column>
-            </Grid>
-            {listEmployers(currentEmployers)}
+            <Segment basic textAlign={"center"}>
+                <Dropdown placeholder="Search" search className="icon" selectOnBlur={false} loading={employersLoading} button labeled
+                          icon="search" options={employerOption} value={formik.values.employerId} basic
+                          style={{borderRadius: 5, height: 38, width: 196, marginLeft: 4}}
+                          onChange={(event, data) => search(data.value)}/>
+                {formik.values.employerId === 0 ? null : <Button icon="x" circular onClick={() => search(0)}/>}
+                <SDropdown name={"statuses"} placeholder="Statuses" options={statusOption} formik={formik}
+                           onChange={(event, data) => changeStatuses(data.value)}
+                           style={{...defDropdownStyle}}/>
+            </Segment>
+
+            {employersLoading ?
+                <Loader active inline='centered' size={"big"}/> :
+                <div>
+                    <Grid padded={"vertically"} textAlign={"center"}>
+                        <Grid.Row>
+                            {itemsPerPageBar()}
+                            {paginationBar()}
+                        </Grid.Row>
+                    </Grid>
+                    {listEmployers(currentEmployers)}
+                </div>}
         </div>
     );
 }

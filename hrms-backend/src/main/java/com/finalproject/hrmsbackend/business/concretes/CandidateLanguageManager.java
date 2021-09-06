@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateLanguageService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
@@ -33,15 +34,17 @@ public class CandidateLanguageManager implements CandidateLanguageService {
     }
 
     @Override
-    public Result add(CandidateLanguageAddDto candidateLanguageAddDto) {
+    public Result add(CandidateLanguageAddDto candLangAddDto) {
         Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(candidateDao, candidateLanguageAddDto.getCandidateId()))
+        if (check.notExistsById(candidateDao, candLangAddDto.getCandidateId()))
             errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
-        if (check.notExistsById(languageDao, candidateLanguageAddDto.getLanguageId()))
+        if (check.notExistsById(languageDao, candLangAddDto.getLanguageId()))
             errors.put("languageId", Msg.NOT_EXIST.get("Language"));
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
+        if (violatesUk(candLangAddDto))
+            errors.put("uk", Msg.UK_CAND_LANG.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
 
-        CandidateLanguage candidateLanguage = modelMapper.map(candidateLanguageAddDto, CandidateLanguage.class);
+        CandidateLanguage candidateLanguage = modelMapper.map(candLangAddDto, CandidateLanguage.class);
 
         CandidateLanguage savedCandLang = candidateLanguageDao.save(candidateLanguage);
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandLang);
@@ -81,6 +84,11 @@ public class CandidateLanguageManager implements CandidateLanguageService {
         candLang.setLanguageLevel(languageLevel);
         CandidateLanguage savedCandLang = candidateLanguageDao.save(candLang);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandLang);
+    }
+
+    private boolean violatesUk(CandidateLanguageAddDto candLangAddDto) {
+        return candidateLanguageDao.existsByLanguage_IdAndCandidate_Id
+                (candLangAddDto.getLanguageId(), candLangAddDto.getCandidateId());
     }
 
 }

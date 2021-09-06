@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateJobExperienceService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -13,6 +14,7 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateJobExperien
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -41,17 +43,18 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
     }
 
     @Override
-    public Result add(CandidateJobExperienceAddDto candidateJobExperienceAddDto) {
+    public Result add(CandidateJobExperienceAddDto candJobExpAddDto) {
         Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(candidateDao, candidateJobExperienceAddDto.getCandidateId()))
+        if (check.notExistsById(candidateDao, candJobExpAddDto.getCandidateId()))
             errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
-        if (check.notExistsById(positionDao, candidateJobExperienceAddDto.getPositionId()))
+        if (check.notExistsById(positionDao, candJobExpAddDto.getPositionId()))
             errors.put("positionId", Msg.NOT_EXIST.get("Position"));
-        if (check.startEndConflict(candidateJobExperienceAddDto.getStartYear(), candidateJobExperienceAddDto.getQuitYear()))
+        if (check.startEndConflict(candJobExpAddDto.getStartYear(), candJobExpAddDto.getQuitYear()))
             errors.put("startQuitYear", Msg.START_END_YEAR_CONFLICT.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
-
-        CandidateJobExperience candJobExp = modelMapper.map(candidateJobExperienceAddDto, CandidateJobExperience.class);
+        if (violatesUk(candJobExpAddDto))
+            errors.put("uk", Msg.UK_CAND_JOB_EXP.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
+        CandidateJobExperience candJobExp = modelMapper.map(candJobExpAddDto, CandidateJobExperience.class);
 
         CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandJobExp);
@@ -123,6 +126,11 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
         candJobExp.setQuitYear(quitYear);
         CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandJobExp);
+    }
+
+    private boolean violatesUk(CandidateJobExperienceAddDto candJobExpAddDto) {
+        return candidateJobExpDao.existsByWorkPlaceAndPosition_IdAndCandidate_Id
+                (candJobExpAddDto.getWorkPlace(), candJobExpAddDto.getPositionId(), candJobExpAddDto.getCandidateId());
     }
 
 }

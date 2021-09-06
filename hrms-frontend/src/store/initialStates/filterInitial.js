@@ -5,22 +5,20 @@ export const filter = {
         employerIds: [],
         workTimes: [],
         workModels: [],
+        statuses: [],
         minSalaryLessThan: "",
         maxSalaryLessThan: "",
         minSalaryMoreThan: "",
         maxSalaryMoreThan: "",
-        applicationDeadLineBefore: "",
-        applicationDeadLineAfter: "",
+        deadLineBefore: "",
+        deadLineAfter: "",
         today: false,
-        thisWeek: false,
-        pending: "",
-        verification: "",
-        activation: ""
+        thisWeek: false
     },
     filteredJobAdverts: [],
     employersFilters: {
-        pending: "",
-        verification: "",
+        statuses: [],
+        employerId: 0
     },
     filteredEmployers: [],
 }

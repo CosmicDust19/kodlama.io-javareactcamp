@@ -104,44 +104,44 @@ export function SignUp() {
     });
 
     if (userType !== "candidate" && userType !== "employer" && userType !== "systemEmployee")
-        return <Header content={"Invalid Input"}/>
+        return <Header content={"Invalid User Type"}/>
 
     //inputs according to userType
     const popupSize = !verticalScreen ? undefined : "small"
     const popupPosition = !verticalScreen ? "right center" : undefined
     const iconPosition = "left"
     const commonInputs = () => [
-        <SPopupInput icon="mail" placeholder="Email" name="email" type={"email"} popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} formik={formik} key={1}/>,
-        <SPopupInput icon="lock" placeholder="Password" name="password" type={"password"} popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} formik={formik} key={2}/>,
-        <SPopupInput icon="lock" placeholder="Password Repeat" name="passwordRepeat" popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} type={"password"} formik={formik} key={3}/>
+        <SPopupInput icon="at" placeholder="Email" name="email" type={"email"} popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} formik={formik} key={1}/>,
+        <SPopupInput icon="lock" placeholder="Password" name="password" type={"password"} popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} formik={formik} key={2}/>,
+        <SPopupInput icon="lock" placeholder="Password Repeat" name="passwordRepeat" popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} type={"password"} formik={formik} key={3}/>
     ]
 
     const sysEmplInputs = () => [
-        <SPopupInput icon="user" placeholder="First Name" name="firstName" popupPosition={popupPosition} formik={formik}
-                     popupSize={popupSize} iconPosition={iconPosition} key={4}/>,
-        <SPopupInput icon="user" placeholder="Last Name" name="lastName" popupPosition={popupPosition} formik={formik}
-                     popupSize={popupSize} iconPosition={iconPosition} key={5}/>,
+        <SPopupInput icon="user" placeholder="First Name" name="firstName" popupposition={popupPosition} formik={formik}
+                     popupsize={popupSize} iconposition={iconPosition} key={4}/>,
+        <SPopupInput icon="user" placeholder="Last Name" name="lastName" popupposition={popupPosition} formik={formik}
+                     popupsize={popupSize} iconposition={iconPosition} key={5}/>,
         ...commonInputs()
     ]
 
     const candidateInputs = () => [
         ...sysEmplInputs(),
-        <SPopupInput icon="id card" placeholder="Nationality ID" name="nationalityId" popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} type={"number"} formik={formik} key={6}/>,
-        <SPopupInput icon="calendar check" placeholder="Birth Year" name="birthYear" popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} type={"number"} formik={formik} key={7}/>
+        <SPopupInput icon="id card" placeholder="Nationality ID" name="nationalityId" popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} type={"number"} formik={formik} key={6}/>,
+        <SPopupInput icon="calendar check" placeholder="Birth Year" name="birthYear" popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} type={"number"} formik={formik} key={7}/>
     ]
 
     const employerInputs = () => [
-        <SPopupInput icon="building outline" placeholder="Company Name" name="companyName" popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} formik={formik} key={8}/>,
-        <SPopupInput icon="world" placeholder="Website" name="website" popupPosition={popupPosition} formik={formik}
-                     iconPosition={iconPosition} key={9}/>,
-        <SPopupInput icon="phone" placeholder="Phone Number" name="phoneNumber" popupPosition={popupPosition}
-                     popupSize={popupSize} iconPosition={iconPosition} formik={formik} key={10}/>,
+        <SPopupInput icon="building outline" placeholder="Company Name" name="companyName" popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} formik={formik} key={8}/>,
+        <SPopupInput icon="world" placeholder="Website" name="website" popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} formik={formik} key={9}/>,
+        <SPopupInput icon="phone" placeholder="Phone Number" name="phoneNumber" popupposition={popupPosition}
+                     popupsize={popupSize} iconposition={iconPosition} formik={formik} key={10}/>,
         ...commonInputs()
     ]
 

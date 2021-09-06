@@ -15,6 +15,8 @@ import javax.transaction.Transactional;
 @Repository
 public interface CandidateSchoolDao extends JpaRepository<CandidateSchool, Integer> {
 
+    boolean existsBySchool_IdAndDepartment_IdAndCandidate_Id(Integer schoolId, Short departmentId, Integer candidateId);
+
     @Modifying
     @Query("update CandidateSchool cSc set cSc.school = :school where cSc.id = :id")
     void updateSchool(@Param(value = "school") School school, @Param(value = "id") Integer id);

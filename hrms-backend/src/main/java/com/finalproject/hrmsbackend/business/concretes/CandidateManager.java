@@ -64,7 +64,7 @@ public class CandidateManager implements CandidateService {
             errors.put("mernis", Msg.MERNIS_FAIL.get());
         if (candidateDao.existsByNationalityId(candidateAddDto.getNationalityId()))
             errors.put("nationalityId", Msg.IS_IN_USE.get("Nationality ID"));
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(null, errors, null));
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
 
         Candidate candidate = modelMapper.map(candidateAddDto, Candidate.class);
         return execLastAddAct(candidate);

@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CandidateSkillDao extends JpaRepository<CandidateSkill, Integer> {
 
+    boolean existsBySkill_IdAndCandidate_Id(Short skillId, Integer candidateId);
+
 }

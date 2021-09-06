@@ -7,6 +7,7 @@ import CandidateService from "../../services/candidateService";
 import {useDispatch, useSelector} from "react-redux";
 import {changeEmail, signOut, syncUser} from "../../store/actions/userActions";
 import {useHistory} from "react-router-dom";
+import {handleCatch} from "../../utilities/Utils";
 
 export function CandidateAccount() {
 
@@ -38,19 +39,6 @@ export function CandidateAccount() {
     const handleItemClick = (activeItem) => setActiveItem(activeItem)
 
     const age = new Date().getFullYear() - candidate?.birthYear
-
-    const handleCatch = (error) => {
-        const resp = error.response
-        console.log(error)
-        console.log(resp)
-        if (resp.data.data?.errors) {
-            Object.entries(resp.data.data.errors).forEach((prop) => toast.warning(String(prop[1])))
-            return
-        }
-        if (resp.data.message) {
-            toast.warning(resp.data.message)
-        }
-    }
 
     const authenticate = (data) => {
         if (data === true) {
@@ -131,7 +119,7 @@ export function CandidateAccount() {
             .finally(() => setDeletePopupOpen(false))
     }
 
-    function areYouSurePopup() {
+    function deleteAccountPopup() {
         return (
             <Modal basic onClose={() => setDeletePopupOpen(false)} onOpen={() => setDeletePopupOpen(true)}
                    open={deletePopupOpen} size='small'>
@@ -146,7 +134,8 @@ export function CandidateAccount() {
                         <Icon name='remove'/> No
                     </Button>
                 </Modal.Actions>
-            </Modal>)
+            </Modal>
+        )
     }
 
     function menuSegments() {
@@ -296,32 +285,24 @@ export function CandidateAccount() {
 
     return (
         <div>
-            {areYouSurePopup()}
+            {deleteAccountPopup()}
             {mainInfos()}
             <Grid stackable>
                 <Grid.Column width={4}>
                     <strong>Change</strong>
                     <Menu fluid vertical secondary stackable>
                         <Menu.Item
-                            icon={"envelope"} color={"pink"} name='Email'
-                            active={activeItem === 'email'}
-                            onClick={() => handleItemClick("email")}
-                        />
+                            icon={"envelope"} color={"pink"} name='Email' active={activeItem === 'email'}
+                            onClick={() => handleItemClick("email")}/>
                         <Menu.Item
-                            icon={"lock"} color={"blue"} name='Password'
-                            active={activeItem === 'password'}
-                            onClick={() => handleItemClick("password")}
-                        />
+                            icon={"lock"} color={"blue"} name='Password' active={activeItem === 'password'}
+                            onClick={() => handleItemClick("password")}/>
                         <Menu.Item
-                            icon={"linkify"} color={"yellow"} name='Account Links'
-                            active={activeItem === 'links'}
-                            onClick={() => handleItemClick("links")}
-                        />
+                            icon={"linkify"} color={"yellow"} name='Account Links' active={activeItem === 'links'}
+                            onClick={() => handleItemClick("links")}/>
                         <Menu.Item
-                            icon={"warning sign"} color={"red"} name='Danger Zone'
-                            active={activeItem === 'danger'}
-                            onClick={() => handleItemClick("danger")}
-                        />
+                            icon={"warning sign"} color={"red"} name='Danger Zone' active={activeItem === 'danger'}
+                            onClick={() => handleItemClick("danger")}/>
                     </Menu>
                 </Grid.Column>
                 <Grid.Column stretched width={12}>

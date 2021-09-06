@@ -14,6 +14,8 @@ import javax.transaction.Transactional;
 @Repository
 public interface CandidateJobExperienceDao extends JpaRepository<CandidateJobExperience, Integer> {
 
+    boolean existsByWorkPlaceAndPosition_IdAndCandidate_Id(String workplace, Short positionId, Integer candidateId);
+
     @Modifying
     @Query("update CandidateJobExperience cJ set cJ.workPlace = :workPlace where cJ.id = :id")
     void updateWorkPlace(@Param(value = "workPlace") String workPlace, @Param(value = "id") Integer id);

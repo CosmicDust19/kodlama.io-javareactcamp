@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSchoolService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -43,19 +44,21 @@ public class CandidateSchoolManager implements CandidateSchoolService {
     }
 
     @Override
-    public Result add(CandidateSchoolAddDto candidateSchoolAddDto) {
+    public Result add(CandidateSchoolAddDto candSchAddDto) {
         Map<String, String> errors = new HashMap<>();
-        if (!candidateDao.existsById(candidateSchoolAddDto.getCandidateId()))
+        if (!candidateDao.existsById(candSchAddDto.getCandidateId()))
             errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
-        if (check.notExistsById(schoolDao, candidateSchoolAddDto.getSchoolId()))
+        if (check.notExistsById(schoolDao, candSchAddDto.getSchoolId()))
             errors.put("schoolId", Msg.NOT_EXIST.get("School"));
-        if (check.notExistsById(departmentDao, candidateSchoolAddDto.getDepartmentId()))
+        if (check.notExistsById(departmentDao, candSchAddDto.getDepartmentId()))
             errors.put("departmentId", Msg.NOT_EXIST.get("Department"));
-        if (check.startEndConflict(candidateSchoolAddDto.getStartYear(), candidateSchoolAddDto.getGraduationYear()))
+        if (check.startEndConflict(candSchAddDto.getStartYear(), candSchAddDto.getGraduationYear()))
             errors.put("startGradYear", Msg.START_END_YEAR_CONFLICT.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), errors);
+        if (violatesUk(candSchAddDto))
+            errors.put("uk", Msg.UK_CAND_SCH.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
 
-        CandidateSchool candidateSchool = modelMapper.map(candidateSchoolAddDto, CandidateSchool.class);
+        CandidateSchool candidateSchool = modelMapper.map(candSchAddDto, CandidateSchool.class);
 
         CandidateSchool savedCandidateSchool = candidateSchoolDao.save(candidateSchool);
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandidateSchool);
@@ -125,6 +128,11 @@ public class CandidateSchoolManager implements CandidateSchoolService {
         candSch.setStartYear(graduationYear);
         CandidateSchool savedCandSch = candidateSchoolDao.save(candSch);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCandSch);
+    }
+
+    private boolean violatesUk(CandidateSchoolAddDto candSchAddDto) {
+        return candidateSchoolDao.existsBySchool_IdAndDepartment_IdAndCandidate_Id
+                (candSchAddDto.getSchoolId(), candSchAddDto.getDepartmentId(), candSchAddDto.getCandidateId());
     }
 
 }

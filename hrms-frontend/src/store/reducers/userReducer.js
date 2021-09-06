@@ -9,22 +9,14 @@ import {
     CHANGE_SCHOOL,
     CHANGE_SKILL,
     CHANGE_FAVORITE_JOB_ADVS,
-    CHANGE_CV_TITLE,
-    CHANGE_CV_COVER_LETTER,
     CHANGE_CV_JOB_EXP,
     CHANGE_CV_LANG,
     CHANGE_CV_SCHOOL,
     CHANGE_CV_SKILL,
-    ADD_CV,
-    DELETE_CV,
 
-    CHANGE_COMP_NAME,
-    CHANGE_WEBSITE,
-    CHANGE_PHONE,
-    CHANGE_EMPLOYER_UPDATE,
     SYNC_USER,
     SYNC_EMPL_JOB_ADVERTS,
-    SYNC_CAND_CVS, SYNC_EMPL_JOB_ADVERT
+    SYNC_CAND_CVS
 } from "../actions/userActions";
 
 const initialState = {
@@ -68,17 +60,6 @@ export default function userReducer(state = initialState, {type, payload}) {
                 userProps: {
                     ...state.userProps,
                     user: {...state.userProps.user, jobAdvertisements: payload.jobAdverts}
-                }
-            }
-        case SYNC_EMPL_JOB_ADVERT:
-            const jobAdverts = state.userProps.user.jobAdvertisements
-            const jobAdvIndex = jobAdverts.findIndex(jobAdv => jobAdv.id === payload.jobAdvId)
-            jobAdverts[jobAdvIndex] = payload.jobAdvert
-            return {
-                ...state,
-                userProps: {
-                    ...state.userProps,
-                    user: {...state.userProps.user, jobAdvertisements: jobAdverts}
                 }
             }
         case SYNC_CAND_CVS:
@@ -139,76 +120,26 @@ export default function userReducer(state = initialState, {type, payload}) {
                     user: {...state.userProps.user, favoriteJobAdvertisements: payload.jobAdvs}
                 }
             }
-        case CHANGE_CV_TITLE:
-            const cvs = state.userProps.user.cvs;
-            const cvIndex = cvs.findIndex(cv => cv.id === payload.cvId)
-            cvs[cvIndex].title = payload.title
-            return {
-                ...state,
-                userProps: {
-                    ...state.userProps,
-                    user: {...state.userProps.user, cvs: cvs}
-                }
-            }
-        case CHANGE_CV_COVER_LETTER: {
-            const index = state.userProps.user.cvs.findIndex(cv => {
-                return cv.id === payload.cvId
-            })
-            state.userProps.user.cvs[index].coverLetter = payload.coverLetter
-            return {...state}
-        }
         case CHANGE_CV_JOB_EXP: {
-            const index = state.userProps.user.cvs.findIndex(cv => {
-                return cv.id === payload.cvId
-            })
+            const index = state.userProps.user.cvs.findIndex(cv => cv.id === payload.cvId)
             state.userProps.user.cvs[index].candidateJobExperiences = payload.jobExps
             return {...state}
         }
         case CHANGE_CV_LANG: {
-            const index = state.userProps.user.cvs.findIndex(cv => {
-                return cv.id === payload.cvId
-            })
+            const index = state.userProps.user.cvs.findIndex(cv => cv.id === payload.cvId)
             state.userProps.user.cvs[index].candidateLanguages = payload.cvLangs
             return {...state}
         }
         case CHANGE_CV_SCHOOL: {
-            const index = state.userProps.user.cvs.findIndex(cv => {
-                return cv.id === payload.cvId
-            })
+            const index = state.userProps.user.cvs.findIndex(cv => cv.id === payload.cvId)
             state.userProps.user.cvs[index].candidateSchools = payload.cvSchools
             return {...state}
         }
         case CHANGE_CV_SKILL: {
-            const index = state.userProps.user.cvs.findIndex(cv => {
-                return cv.id === payload.cvId
-            })
+            const index = state.userProps.user.cvs.findIndex(cv => cv.id === payload.cvId)
             state.userProps.user.cvs[index].candidateSkills = payload.cvSkills
             return {...state}
         }
-        case ADD_CV: {
-            state.userProps.user.cvs.push(payload.CV)
-            return {...state}
-        }
-        case DELETE_CV: {
-            const index = state.userProps.user.cvs.findIndex(cv => {
-                return cv.id === payload.cvId
-            })
-            state.userProps.user.cvs.splice(index, 1)
-            return {...state}
-        }
-        case CHANGE_EMPLOYER_UPDATE:
-            state.userProps.user.employerUpdate = payload.employerUpdate
-            state.userProps.user.updateVerified = false
-            return {...state}
-        case CHANGE_WEBSITE:
-            state.userProps.user.website = payload.website
-            return {...state}
-        case CHANGE_COMP_NAME:
-            state.userProps.user.companyName = payload.companyName
-            return {...state}
-        case CHANGE_PHONE:
-            state.userProps.user.phone = payload.phone
-            return {...state}
         default:
             return state
     }

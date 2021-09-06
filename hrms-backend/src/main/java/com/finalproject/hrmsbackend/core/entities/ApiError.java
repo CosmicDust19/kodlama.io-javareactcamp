@@ -24,6 +24,14 @@ public class ApiError {
 
     private Set<?> details;
 
+    public ApiError(Map<?, ?> errors) {
+        this.timestamp = LocalDateTime.now();
+        this.status = HttpStatus.BAD_REQUEST;
+        this.message = null;
+        this.errors = errors;
+        this.details = null;
+    }
+
     public ApiError(String message, Map<?, ?> errors, Set<?> details) {
         this.timestamp = LocalDateTime.now();
         this.status = HttpStatus.BAD_REQUEST;

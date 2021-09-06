@@ -19,7 +19,7 @@ export default class CandidateCvService {
     }
 
     updateCoverLetter(cvId, coverLetter) {
-        if (!coverLetter) return axios.put(`http://localhost:8080/api/cvs/update/coverLetter?cvId=${cvId}`)
+        if (!coverLetter || coverLetter === "") return axios.put(`http://localhost:8080/api/cvs/update/coverLetter?cvId=${cvId}`)
         return axios.put(`http://localhost:8080/api/cvs/update/coverLetter?coverLetter=${coverLetter}&cvId=${cvId}`)
     }
 

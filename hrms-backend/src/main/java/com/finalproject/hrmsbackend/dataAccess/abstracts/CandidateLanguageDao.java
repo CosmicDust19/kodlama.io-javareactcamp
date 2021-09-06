@@ -14,6 +14,8 @@ import javax.transaction.Transactional;
 @Repository
 public interface CandidateLanguageDao extends JpaRepository<CandidateLanguage, Integer> {
 
+    boolean existsByLanguage_IdAndCandidate_Id(Short languageId, Integer candidateId);
+
     @Modifying
     @Query("update CandidateLanguage cL set cL.language = :language where cL.id = :id")
     void updateLanguage(@Param(value = "language") Language language, @Param(value = "id") Integer id);

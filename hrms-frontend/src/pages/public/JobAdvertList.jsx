@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {
-    Button, Card, Checkbox, Grid, Header, Icon, Input, Label, Loader, Menu, Pagination, Segment, Sidebar
+    Accordion, Button, Card, Checkbox, Divider, Grid, Header, Icon, Label, Loader, Menu, Pagination, Segment, Sidebar
 } from "semantic-ui-react";
 import {useHistory} from "react-router-dom";
 import CityService from "../../services/cityService";
@@ -13,15 +13,14 @@ import CandidateService from "../../services/candidateService";
 import {syncUser} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import {changeFilteredJobAdverts, changeJobAdvertsFilters} from "../../store/actions/filterActions";
-import {filterJobAdverts, handleCatch, inputStyle} from "../../utilities/Utils";
-import filter from "../../store/initialStates/filterInitial";
+import {defCheckBoxStyle, filterJobAdverts, getRandomColor, handleCatch, initialJobAdvFilters, months} from "../../utilities/Utils";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
+import SInput from "../../utilities/customFormControls/SInput";
 
-const jobAdvertisementService = new JobAdvertisementService();
 export default function JobAdvertList() {
 
-    const colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    const filterInputStyle = {marginBottom: 10, color: "rgb(22,148,6)"}
+    const filterDropdownStyle = {marginTop: 10, marginBottom: 10, marginRight: 10}
 
     const candidateService = new CandidateService();
 
@@ -29,7 +28,10 @@ export default function JobAdvertList() {
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user.userProps.user)
     const filters = useSelector(state => state?.filter.filter.jobAdvertsFilters)
-    const initialFilters = {...filter.jobAdvertsFilters, pending: undefined, verification: undefined, activation: undefined}
+    const initialFilters = initialJobAdvFilters
+
+    const workTimes = ["Part Time", "Full Time"]
+    const workModels = ["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]
 
     const [jobAdvertisements, setJobAdvertisements] = useState([]);
     const [filteredJobAdverts, setFilteredJobAdverts] = useState(useSelector(state => state?.filter.filter.filteredJobAdverts));
@@ -43,15 +45,16 @@ export default function JobAdvertList() {
     const [cities, setCities] = useState([]);
     const [positions, setPositions] = useState([]);
     const [employers, setEmployers] = useState([]);
-    const [workTimes] = useState(["Part Time", "Full Time"]);
-    const [workModels] = useState(["Remote", "Office", "Hybrid", "Seasonal", "Internship", "Freelance"]);
     const [verticalScreen, setVerticalScreen] = useState(window.innerWidth < window.innerHeight)
-    const [visible, setVisible] = useState(false)
+    const [visible, setVisible] = useState(false);
+    const [jobAdvPerPageOpen, setJobAdvPerPageOpen] = useState(true);
+    const [filtersOpen, setFiltersOpen] = useState(true);
 
     useEffect(() => {
         const cityService = new CityService();
         const positionService = new PositionService();
         const employerService = new EmployerService();
+        const jobAdvertisementService = new JobAdvertisementService();
         cityService.getCities().then((result) => setCities(result.data.data));
         positionService.getPositions().then((result) => setPositions(result.data.data));
         employerService.getPublic().then((result) => setEmployers(result.data.data));
@@ -65,7 +68,7 @@ export default function JobAdvertList() {
     useEffect(() => {
         setVerticalScreen(window.innerWidth < window.innerHeight)
         setItemsPerRow(verticalScreen ? 1 : itemsPerRow)
-    }, [itemsPerRow, verticalScreen, visible, currentPage]);
+    }, [itemsPerRow, verticalScreen, visible, currentPage, filtersOpen, jobAdvPerPageOpen]);
 
     const advertsLoading = jobAdvertisements.length === 0
 
@@ -110,12 +113,13 @@ export default function JobAdvertList() {
             employerIds: filters.employerIds,
             workTimes: filters.workTimes,
             workModels: filters.workModels,
+            statuses: [],
             minSalaryLessThan: filters.minSalaryLessThan,
             maxSalaryLessThan: filters.maxSalaryLessThan,
             minSalaryMoreThan: filters.minSalaryMoreThan,
             maxSalaryMoreThan: filters.maxSalaryMoreThan,
-            applicationDeadLineBefore: filters.applicationDeadLineBefore,
-            applicationDeadLineAfter: filters.applicationDeadLineAfter,
+            deadLineBefore: filters.deadLineBefore,
+            deadLineAfter: filters.deadLineAfter,
             today: filters.today,
             thisWeek: filters.thisWeek,
         }
@@ -127,12 +131,13 @@ export default function JobAdvertList() {
         formik.setFieldValue(fieldName, value);
     }
 
-    const handleAdvertisementClick = id => {
-        history.push(`/jobAdverts/${id}`);
+    const handleAdvertisementClick = (jobAdvertId) => {
+        history.push(`/jobAdverts/${jobAdvertId}`);
         window.scrollTo(0, 0);
     };
 
-    const handlePagePerJobAdvMenuClick = (number) => {
+    const handleJobAdvPerPageMenuClick = (number) => {
+        if (number === jobAdvertsPerPage) return
         setCurrentPage(1);
         setJobAdvertsPerPage(number);
     }
@@ -204,7 +209,7 @@ export default function JobAdvertList() {
             handleFilter()
             setLoading(false)
             setVisible(false)
-        }, 500)
+        }, 300)
     }
 
     const resetFiltersClick = () => {
@@ -219,109 +224,102 @@ export default function JobAdvertList() {
         return (
             <div>
                 <Sidebar as={Segment} animation={"push"} direction={"left"} visible={visible} textAlign={"center"} padded
-                         size={verticalScreen ? "large" : undefined} style={{opacity: 0.95}}>
+                         style={{}}>
 
                     <Label attached={"top right"} onClick={toggle} as={Button}
-                           icon={<Icon name={"x"} style={{marginRight: -3, marginLeft: 0, marginTop: -3}} size={"large"}/>}
-                           style={{marginTop: 5, marginRight: 5, borderRadius: 20}}/>
+                           icon={<Icon name={"x"} style={{marginRight: -3, marginLeft: 0, marginTop: -3}} size={"large"} color={"blue"}/>}
+                           style={{marginTop: 6, marginRight: 5, borderRadius: 20, opacity: 0.85}}/>
                     <Segment basic size={"mini"} style={{marginBottom: -10}}/>
 
-                    <Segment size={"mini"} style={{borderRadius: 10}} raised vertical>
-                        <Header dividing disabled={advertsLoading} style={{marginBottom: 10, marginTop: 10}} color={"blue"}
-                                content={"Adverts Per Page"}/>
-                        <Menu secondary icon={"labeled"} pagination size={"small"} vertical>
-                            <Menu.Item name='5' active={jobAdvertsPerPage === 5}
-                                       disabled={filteredJobAdverts.length === 0 || advertsLoading}
-                                       onClick={() => handlePagePerJobAdvMenuClick(5)} content={"5"}/>
-                            <Menu.Item name='10' active={jobAdvertsPerPage === 10}
-                                       disabled={filteredJobAdverts.length === 0 || advertsLoading}
-                                       onClick={() => handlePagePerJobAdvMenuClick(10)} content={"10"}/>
-                            <Menu.Item name='20' active={jobAdvertsPerPage === 20}
-                                       disabled={filteredJobAdverts.length === 0 || advertsLoading}
-                                       onClick={() => handlePagePerJobAdvMenuClick(20)} content={"20"}/>
-                            <Menu.Item name='50' active={jobAdvertsPerPage === 50}
-                                       disabled={filteredJobAdverts.length === 0 || advertsLoading}
-                                       onClick={() => handlePagePerJobAdvMenuClick(50)} content={"50"}/>
-                            <Menu.Item name='100' active={jobAdvertsPerPage === 100}
-                                       disabled={filteredJobAdverts.length === 0 || advertsLoading}
-                                       onClick={() => handlePagePerJobAdvMenuClick(100)} content={"100"}/>
-                        </Menu>
-                    </Segment>
+                    {verticalScreen ?
+                        <Accordion>
+                            <Accordion.Title onClick={() => setJobAdvPerPageOpen(!jobAdvPerPageOpen)} active={jobAdvPerPageOpen}>
+                                <Header dividing disabled={advertsLoading} style={{borderRadius: 8, height: 35, width: 210}} color={"blue"}
+                                        block as={Segment} raised>
+                                    <Header.Content style={{marginTop: -5}}>
+                                        <Icon name={jobAdvPerPageOpen ? "chevron down" : "chevron right"}/>Adverts Per Page
+                                    </Header.Content>
+                                </Header>
+                            </Accordion.Title>
+                            <Accordion.Content active={jobAdvPerPageOpen} content={itemsPerPageBar()}/>
+                            <Divider style={{marginBottom: 20}}/>
+                        </Accordion> : null}
 
-                    <Header dividing disabled={advertsLoading} style={{marginBottom: 10}} color={"purple"}>
-                        <Header.Content content={<div><Icon name="filter"/>Filter</div>}/>
-                    </Header>
-                    {favoriteJobAdverts ?
-                        <div>
-                            {!favoritesMode ?
-                                <Button compact icon labelPosition='right' color="red" fluid disabled={advertsLoading}
-                                        onClick={setFavoriteJobAdvertsMode} style={{borderRadius: 6}}>
-                                    <Icon name='heart'/>See Favorites
-                                </Button> :
-                                <Button compact icon labelPosition='right' color="violet" fluid disabled={advertsLoading}
-                                        onClick={setAllJobAdvertsMode} style={{borderRadius: 6}}>
-                                    <Icon name='arrow left'/>See All
-                                </Button>}
-                            <Header dividing style={{marginTop: 10, marginBottom: 10}}/>
-                        </div> : null
-                    }
+                    <Accordion>
+                        <Accordion.Title onClick={() => setFiltersOpen(!filtersOpen)} active={filtersOpen}>
+                            <Header dividing disabled={advertsLoading} style={{borderRadius: 8, height: 35, width: 210}}
+                                    color={"blue"} block as={Segment} raised>
+                                <Header.Content style={{marginTop: -5}}>
+                                    <Icon name="filter"/>Filter
+                                </Header.Content>
+                            </Header>
+                        </Accordion.Title>
+                        <Accordion.Content active={filtersOpen}>
+                            {favoriteJobAdverts ?
+                                <div>
+                                    {!favoritesMode ?
+                                        <Button compact icon labelPosition='right' color="red" fluid disabled={advertsLoading}
+                                                onClick={setFavoriteJobAdvertsMode} style={{borderRadius: 6}}>
+                                            <Icon name='heart'/>See Favorites
+                                        </Button> :
+                                        <Button compact icon labelPosition='right' color="violet" fluid disabled={advertsLoading}
+                                                onClick={setAllJobAdvertsMode} style={{borderRadius: 6}}>
+                                            <Icon name='arrow left'/>See All
+                                        </Button>}
+                                    <Header dividing style={{marginTop: 10, marginBottom: 10}}/>
+                                </div> : null}
 
-                    <SDropdown options={cityOption} name="cityIds" placeholder="Cities" fluid multiple disabled={advertsLoading}
-                               formik={formik}/>
-                    <SDropdown options={positionOption} name="positionIds" placeholder="Positions" fluid multiple disabled={advertsLoading}
-                               formik={formik}/>
-                    <SDropdown options={employerOption} name="employerIds" placeholder="Employers" fluid multiple disabled={advertsLoading}
-                               formik={formik}/>
-                    <SDropdown options={workModelOption} name="workModels" placeholder="Work models" fluid multiple
-                               disabled={advertsLoading}
-                               formik={formik}/>
-                    <SDropdown options={workTimeOption} name="workTimes" placeholder="Work times" fluid multiple disabled={advertsLoading}
-                               formik={formik}/>
+                            <SDropdown options={cityOption} name="cityIds" placeholder="Cities" fluid multiple
+                                       disabled={advertsLoading} formik={formik} style={filterDropdownStyle}/>
+                            <SDropdown options={positionOption} name="positionIds" placeholder="Positions" fluid multiple
+                                       disabled={advertsLoading} formik={formik} style={filterDropdownStyle}/>
+                            <SDropdown options={employerOption} name="employerIds" placeholder="Employers" fluid multiple
+                                       disabled={advertsLoading} formik={formik} style={filterDropdownStyle}/>
+                            <SDropdown options={workModelOption} name="workModels" placeholder="Work models" fluid multiple
+                                       disabled={advertsLoading} formik={formik} style={filterDropdownStyle}/>
+                            <SDropdown options={workTimeOption} name="workTimes" placeholder="Work times" fluid multiple
+                                       disabled={advertsLoading} formik={formik} style={filterDropdownStyle}/>
 
-                    <Header dividing style={{marginTop: 10, marginBottom: 10}} color={"orange"}/>
-                    <Checkbox label='Today' checked={formik.values.today} style={inputStyle}
-                              disabled={advertsLoading} onChange={() => handleChangeFilter("today", !formik.values.today)}/>
-                    <Checkbox label='This Week' checked={formik.values.thisWeek} style={inputStyle}
-                              disabled={advertsLoading} onChange={() => handleChangeFilter("thisWeek", !formik.values.thisWeek)}/>
-                    <Header dividing style={{marginTop: 10, marginBottom: 0}} color={"teal"}/>
+                            <Checkbox label='Today' checked={formik.values.today} style={defCheckBoxStyle}
+                                      disabled={advertsLoading} onChange={() => handleChangeFilter("today", !formik.values.today)}/>
+                            <Checkbox label='This Week' checked={formik.values.thisWeek} style={defCheckBoxStyle}
+                                      disabled={advertsLoading} onChange={() => handleChangeFilter("thisWeek", !formik.values.thisWeek)}/>
 
-                    <Header size="tiny" disabled={advertsLoading} style={{marginTop: 10, marginBottom: 5}} content={"Minimum Salary"}/>
-                    <Input placeholder="More than" value={formik.values.minSalaryMoreThan} fluid name="minSalaryMoreThan"
-                           type="number" disabled={advertsLoading} size={"small"} onChange={formik.handleChange}/>
-                    <Input placeholder="Less than" value={formik.values.minSalaryLessThan} fluid name="minSalaryLessThan"
-                           type="number" disabled={advertsLoading} size={"small"} onChange={formik.handleChange}
-                           style={{marginTop: 5, marginBottom: 5}}/>
+                            <Header size="tiny" disabled={advertsLoading} style={{marginBottom: 7}} content={"Minimum Salary"} dividing/>
+                            <SInput name="minSalaryMoreThan" placeholder="More than" type="number" icon={"dollar sign"} formik={formik}
+                                    size={"small"} style={filterInputStyle}/>
+                            <SInput name="minSalaryLessThan" placeholder="Less than" type="number" icon={"dollar sign"} formik={formik}
+                                    size={"small"} style={filterInputStyle}/>
 
-                    <Header dividing style={{marginTop: 10, marginBottom: 0}} color={"olive"}/>
-                    <Header size="tiny" disabled={advertsLoading} style={{marginTop: 10, marginBottom: 5}} content={"Maximum Salary"}/>
-                    <Input placeholder="More than" value={formik.values.maxSalaryMoreThan} fluid name="maxSalaryMoreThan"
-                           type="number" disabled={advertsLoading} size={"small"} onChange={formik.handleChange}/>
-                    <Input placeholder="Less than" value={formik.values.maxSalaryLessThan} fluid name="maxSalaryLessThan"
-                           type="number" disabled={advertsLoading} size={"small"} onChange={formik.handleChange}
-                           style={{marginTop: 5}}/>
+                            <Header size="tiny" disabled={advertsLoading} style={{marginBottom: 7}} dividing content={"Maximum Salary"}/>
+                            <SInput name="maxSalaryMoreThan" placeholder="More than" type="number" icon={"dollar sign"} formik={formik}
+                                    size={"small"} style={filterInputStyle}/>
+                            <SInput name="maxSalaryLessThan" placeholder="Less than" type="number" icon={"dollar sign"} formik={formik}
+                                    size={"small"} style={filterInputStyle}/>
 
-                    <Header dividing style={{marginTop: 10, marginBottom: 0}} color={"blue"}/>
-                    <Header size="tiny" disabled={advertsLoading} content={"Application Deadline"}
-                            style={{marginBottom: 5, marginTop: 10}}/>
-                    Before
-                    <Input value={formik.values.applicationDeadLineBefore} fluid name="applicationDeadLineBefore" type="date"
-                           style={{marginBottom: 5}} disabled={advertsLoading} size={"mini"} onChange={formik.handleChange}/>
-                    After
-                    <Input value={formik.values.applicationDeadLineAfter} fluid name="applicationDeadLineAfter" type="date"
-                           disabled={advertsLoading} size={"mini"} onChange={formik.handleChange}/>
+                            <Header size="tiny" disabled={advertsLoading} content={"Application Deadline"} dividing
+                                    style={{marginBottom: 7}}/>
+                            <font style={{fontStyle: "italic"}}>Before</font>&nbsp;&nbsp;&nbsp;
+                            <SInput name="deadLineBefore" placeholder="Before" type="date" formik={formik} style={filterInputStyle}
+                                    size={"mini"}/>
+                            <font style={{fontStyle: "italic", marginLeft: 8}}>After</font>&nbsp;&nbsp;&nbsp;
+                            <SInput name="deadLineAfter" placeholder="After" type="date" formik={formik} style={filterInputStyle}
+                                    size={"mini"}/>
+                            <Header dividing style={{marginBottom: 20}} color={"blue"}/>
+                            <Button basic animated="fade" fluid inverted color={"green"}
+                                    style={{borderRadius: 7, marginTop: 10, marginBottom: 10}}
+                                    loading={loading} active disabled={advertsLoading || loading} onClick={applyFiltersClick}>
+                                <Button.Content visible>Apply</Button.Content>
+                                <Button.Content hidden><Icon name='filter'/></Button.Content>
+                            </Button>
+                            <Button animated="fade" basic fluid color={"vk"} style={{borderRadius: 7}} loading={loading}
+                                    active disabled={advertsLoading || loading} onClick={resetFiltersClick}>
+                                <Button.Content visible>Reset</Button.Content>
+                                <Button.Content hidden><Icon name='sync alternate'/></Button.Content>
+                            </Button>
+                        </Accordion.Content>
+                    </Accordion>
 
-                    <Header dividing style={{marginTop: 10, marginBottom: 20}} color={"yellow"}/>
-                    <Button basic animated="fade" fluid inverted color={"green"}
-                            style={{borderRadius: 7, marginTop: 10, marginBottom: 10}}
-                            loading={loading} active disabled={advertsLoading || loading} onClick={applyFiltersClick}>
-                        <Button.Content visible>Apply</Button.Content>
-                        <Button.Content hidden><Icon name='filter'/></Button.Content>
-                    </Button>
-                    <Button animated="fade" basic fluid color={"vk"} style={{borderRadius: 7}} loading={loading}
-                            active disabled={advertsLoading || loading} onClick={resetFiltersClick}>
-                        <Button.Content visible>Reset</Button.Content>
-                        <Button.Content hidden><Icon name='sync alternate'/></Button.Content>
-                    </Button>
                 </Sidebar>
                 {!visible ?
                     <Menu fixed={"left"} size={"mini"} style={{width: 0}} secondary>
@@ -336,12 +334,12 @@ export default function JobAdvertList() {
 
     function listJobAdverts(currentJobAdvertisements) {
         if (noAdvFound) return <Header style={{marginTop: "2em", marginLeft: "2em"}}
-                                       content={<font class={"handWriting"} color="black">No results were found 🙃</font>}/>
+                                       content={<font className={"handWriting"} color="black">No results were found 🙃</font>}/>
 
         return (
             <Card.Group itemsPerRow={itemsPerRow}>
                 {currentJobAdvertisements.map((jobAdvertisement) => (
-                    <Card color={colors[Math.floor(Math.random() * 12)]}
+                    <Card color={getRandomColor()}
                           key={jobAdvertisement.id} style={{borderRadius: 10}} raised>
                         <Card.Content>
                             <Card.Header>
@@ -352,29 +350,22 @@ export default function JobAdvertList() {
                                     <Grid.Column width={3} textAlign={"right"}>
                                         {favoriteJobAdverts ?
                                             (jobAdvInFavorites(jobAdvertisement.id) ?
-                                                <Icon name={"heart"} color={"red"} onClick={() => {
-                                                    handleDeleteFromFavorites(jobAdvertisement.id)
-                                                }}/> :
-                                                <Icon name={"heart outline"} onClick={() => {
-                                                    handleAddToFavorites(jobAdvertisement.id)
-                                                }}/>) : null}
+                                                <Icon name={"heart"} color={"red"}
+                                                      onClick={() => handleDeleteFromFavorites(jobAdvertisement.id)}/> :
+                                                <Icon name={"heart outline"}
+                                                      onClick={() => handleAddToFavorites(jobAdvertisement.id)}/>) : null}
                                     </Grid.Column>
                                 </Grid>
                             </Card.Header>
 
-                            <Card.Meta>{jobAdvertisement.employer.companyName}</Card.Meta>
+                            <Card.Meta content={jobAdvertisement.employer.companyName}/>
                             <Card.Description>
-                                <Grid stackable>
-                                    <Grid.Column width={8}>
-                                        <Icon name={"map marker"}/> {jobAdvertisement.city.name}
-                                    </Grid.Column>
-                                    <Grid.Column width={8} textAlign="right">
-                                        <Button compact icon labelPosition='right' disabled={loading} onClick={() => {
-                                            handleAdvertisementClick(jobAdvertisement.id);
-                                        }} style={{marginTop: -7, borderRadius: 10}}><Icon name='right arrow'/>
-                                            See detail</Button>
-                                    </Grid.Column>
-                                </Grid>
+                                <Icon name={"map marker"}/> {jobAdvertisement.city.name}
+                                <Button compact icon labelPosition='right' disabled={loading} floated={"right"}
+                                        onClick={() => handleAdvertisementClick(jobAdvertisement.id)}
+                                        style={{borderRadius: 10, marginTop: -5}}>
+                                    <Icon name='right arrow'/>See detail
+                                </Button>
                             </Card.Description>
                         </Card.Content>
                         <Card.Content>
@@ -383,8 +374,8 @@ export default function JobAdvertList() {
                                     <Grid.Column width={8}>
                                         {jobAdvertisement.workTime + " & " + jobAdvertisement.workModel}
                                     </Grid.Column>
-                                    <Grid.Column width={8}
-                                                 textAlign={"right"}>{!verticalScreen && itemsPerRow === 1 ? "Created at" : null}
+                                    <Grid.Column width={8} textAlign={"right"}>
+                                        {!verticalScreen && itemsPerRow === 1 ? "Created at" : null}
                                         {" " + new Date(jobAdvertisement.createdAt).getDate() + " " +
                                         months[new Date(jobAdvertisement.createdAt).getMonth()] + " " +
                                         new Date(jobAdvertisement.createdAt).getFullYear()}
@@ -398,17 +389,28 @@ export default function JobAdvertList() {
         )
     }
 
+    function itemsPerPageBar() {
+        return (
+            <Menu pointing compact={!verticalScreen} color={"blue"} secondary style={{marginLeft: 0}} vertical={verticalScreen}>
+                <Menu.Item name='5' active={jobAdvertsPerPage === 5} disabled={noAdvFound}
+                           onClick={() => handleJobAdvPerPageMenuClick(5)} content={"5"}/>
+                <Menu.Item name='10' active={jobAdvertsPerPage === 10} disabled={noAdvFound}
+                           onClick={() => handleJobAdvPerPageMenuClick(10)} content={"10"}/>
+                <Menu.Item name='20' active={jobAdvertsPerPage === 20} disabled={noAdvFound}
+                           onClick={() => handleJobAdvPerPageMenuClick(20)} content={"20"}/>
+                <Menu.Item name='50' active={jobAdvertsPerPage === 50} disabled={noAdvFound}
+                           onClick={() => handleJobAdvPerPageMenuClick(50)} content={"50"}/>
+                <Menu.Item name='100' active={jobAdvertsPerPage === 100} disabled={noAdvFound}
+                           onClick={() => handleJobAdvPerPageMenuClick(100)} content={"100"} style={{borderRadius: 0}}/>
+            </Menu>
+        )
+    }
+
     function paginationBar() {
         return (
             <Pagination
-                totalPages={Math.ceil(filteredJobAdverts.length / jobAdvertsPerPage)}
-                onPageChange={handlePaginationChange}
-                activePage={currentPage}
-                secondary
-                pointing
-                firstItem={null}
-                lastItem={null}
-                siblingRange={2}
+                totalPages={Math.ceil(filteredJobAdverts.length / jobAdvertsPerPage)} onPageChange={handlePaginationChange}
+                activePage={currentPage} secondary pointing firstItem={null} lastItem={null} siblingRange={2}
                 disabled={filteredJobAdverts.length === 0}
             />
         )
@@ -420,22 +422,28 @@ export default function JobAdvertList() {
             itemsPerRow === 1 ?
                 <Icon name={"th large"} onClick={() =>
                     setItemsPerRow(2)} disabled={filteredJobAdverts.length === 0}
-                      style={{marginLeft: 20, marginTop: 12, color: "rgba(199,39,39,0.78)"}}/> :
-                <Icon name={"bars"} size="large" onClick={() =>
+                      style={{marginLeft: 20, marginRight: 20, marginTop: 12, color: "rgba(199,39,39,0.78)"}}/> :
+                <Icon name={"unordered list"} size="large" onClick={() =>
                     setItemsPerRow(1)} disabled={filteredJobAdverts.length === 0}
-                      style={{marginLeft: 20, marginTop: 12, color: "rgba(20,191,103,0.87)"}}/>
+                      style={{marginLeft: 20, marginRight: 20, marginTop: 12, color: "rgba(20,191,103,0.87)"}}/>
         )
     }
 
     return (
-        <Segment padded style={{marginTop: -40}} basic>
+        <Segment padded style={{marginTop: -40}} basic vertical={verticalScreen}>
             {options()}
             {advertsLoading ?
                 <Loader active inline='centered' size={"big"}/> :
                 <div>
-                    <Segment basic size={"mini"} textAlign={"center"} style={{marginTop: -20}}>
-                        {paginationBar()}
-                        {itemsPerRowIcon()}
+                    <Grid padded={"vertically"} textAlign={"center"} style={{}}>
+                        <Grid.Row style={{marginTop: 20, marginBottom: -10}}>
+                            {verticalScreen ? null : itemsPerPageBar()}
+                            {paginationBar()}
+                            {itemsPerRowIcon()}
+                        </Grid.Row>
+                    </Grid>
+                    <Segment basic size={"mini"} textAlign={"center"}>
+
                     </Segment>
                     {listJobAdverts(currentJobAdverts)}
                 </div>

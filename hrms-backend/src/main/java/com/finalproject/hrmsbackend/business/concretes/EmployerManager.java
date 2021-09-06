@@ -82,7 +82,7 @@ public class EmployerManager implements EmployerService {
             errors.put("website", Msg.IS_IN_USE.get("Website"));
         if (userCheck.emailWebsiteDiffDomain(employerAddDto.getEmail(), employerAddDto.getWebsite()))
             errors.put("domain", Msg.DIFF_DOMAIN.get("Email and website"));
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(null, errors, null));
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
 
         employerAddDto.setPhoneNumber(Utils.getEditedPhoneNumber(employerAddDto.getPhoneNumber()));
 

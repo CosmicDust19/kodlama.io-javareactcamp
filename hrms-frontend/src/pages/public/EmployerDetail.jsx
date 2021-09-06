@@ -6,17 +6,11 @@ import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {useDispatch, useSelector} from "react-redux";
 import {changeEmployer} from "../../store/actions/filterActions";
 import {toast} from "react-toastify";
-import {handleCatch} from "../../utilities/Utils";
+import {getRandomColor, handleCatch, months} from "../../utilities/Utils";
 
 export default function EmployerDetail() {
 
     const employerService = new EmployerService();
-
-    const colors = ['red', 'orange', 'yellow', 'olive', 'green',
-        'teal', 'blue', 'violet', 'purple', 'pink', 'brown', 'grey']
-
-    const months = ["January", "February", "March", "April", "May",
-        "June", "July", "August", "September", "October", "November", "December"]
 
     const dispatch = useDispatch();
     const {id} = useParams()
@@ -34,12 +28,12 @@ export default function EmployerDetail() {
 
     useEffect(() => {
         const employerService = new EmployerService();
-        const jobAdvertisementService = new JobAdvertisementService();
+        const jobAdvertService = new JobAdvertisementService();
         employerService.getById(id).then((result) => setEmployer(result.data.data));
-        if (String(userProps.userType) === "systemEmployee")
-            jobAdvertisementService.getAllByEmployerId(employer.id).then(result => setJobAdvertisements(result.data.data))
-        else
-            jobAdvertisementService.getPublicByEmployerId(employer.id).then(result => setJobAdvertisements(result.data.data))
+        if (String(userProps.userType) === "systemEmployee" && employer.id)
+            jobAdvertService.getAllByEmployerId(employer.id).then(result => setJobAdvertisements(result.data.data))
+        else if (employer.id)
+            jobAdvertService.getPublicByEmployerId(employer.id).then(result => setJobAdvertisements(result.data.data))
     }, [employer.id, id, userProps.userType]);
 
     const systemEmployee = String(userProps.userType) === "systemEmployee";
@@ -60,8 +54,7 @@ export default function EmployerDetail() {
         }).catch(handleCatch)
     }
 
-    if (employer === {})
-        return <Loader active inline='centered' size={"large"} style={{marginTop: 300}}/>
+    if (employer === {}) return <Loader active inline='centered' size={"large"} style={{marginTop: 300}}/>
 
     return (
         <div>
@@ -70,9 +63,7 @@ export default function EmployerDetail() {
                 <Table.Header>
                     <Table.Row>
                         <Table.HeaderCell textAlign={"center"} width={1}>
-                            <Header>
-                                {employer.companyName}
-                            </Header>
+                            <Header content={employer.companyName}/>
                             {systemEmployee && employer.companyName !== employer.employerUpdate?.companyName ?
                                 <Label style={{backgroundColor: "rgba(255,113,0,0.1)"}} size={"large"}>
                                     <Icon name="redo alternate" color="orange"/>{employer.employerUpdate?.companyName}
@@ -98,13 +89,11 @@ export default function EmployerDetail() {
                                             <Icon name="ban" color="red"/>Rejected
                                         </Label> : null}
                                     <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>}
-                                              simple labeled>
+                                              simple labeled direction={"left"}>
                                         <Dropdown.Menu
                                             style={{
-                                                marginTop: 0,
-                                                marginLeft: -6,
-                                                backgroundColor: "rgba(250,250,250, 0.7)",
-                                                borderRadius: 10
+                                                marginTop: 0, marginLeft: -6,
+                                                backgroundColor: "rgba(250,250,250, 0.7)", borderRadius: 10
                                             }}>
                                             {employer.updateVerified === false ?
                                                 <Dropdown.Item
@@ -135,7 +124,7 @@ export default function EmployerDetail() {
                 <Table.Body>
 
                     <Table.Row>
-                        <Table.Cell> <Icon name={"envelope"}/> E-mail </Table.Cell>
+                        <Table.Cell> <Icon name={"envelope"}/> Email </Table.Cell>
                         <Table.Cell>
                             {employer.email} &nbsp;
                             {systemEmployee && employer.email !== employer.employerUpdate?.email ?
@@ -146,7 +135,7 @@ export default function EmployerDetail() {
                     </Table.Row>
 
                     <Table.Row>
-                        <Table.Cell> <Icon name={"phone"}/>Phone </Table.Cell>
+                        <Table.Cell> <Icon name={"phone"}/> Phone </Table.Cell>
                         <Table.Cell>
                             {employer.phoneNumber} &nbsp;
                             {systemEmployee && employer.phoneNumber !== employer.employerUpdate?.phoneNumber ?
@@ -171,19 +160,19 @@ export default function EmployerDetail() {
             </Table>
 
             <Card.Group itemsPerRow={2} stackable style={{marginTop: 50}}>
-                {jobAdvertisements.map((jobAdvertisement) => (
-                    <Card color={colors[Math.floor(Math.random() * 12)]}
+                {jobAdvertisements.map((jobAdvert) => (
+                    <Card color={getRandomColor()}
                           onClick={() => {
-                              handleAdvertisementClick(jobAdvertisement.id);
+                              handleAdvertisementClick(jobAdvert.id);
                           }}
-                          key={jobAdvertisement.id}>
+                          key={jobAdvert.id}>
 
                         <Card.Content>
-                            <Card.Header>{jobAdvertisement.position.title}</Card.Header>
+                            <Card.Header>{jobAdvert.position.title}</Card.Header>
                             <Card.Meta>{employer.companyName}</Card.Meta>
                             <Card.Description>
                                 <div>
-                                    <Icon name={"map marker"}/> {jobAdvertisement.city.name}
+                                    <Icon name={"map marker"}/> {jobAdvert.city.name}
                                 </div>
                             </Card.Description>
                         </Card.Content>
@@ -192,12 +181,12 @@ export default function EmployerDetail() {
                             <Card.Description>
                                 <Grid>
                                     <Grid.Column width={8}>
-                                        {jobAdvertisement.workTime + " & " + jobAdvertisement.workModel}
+                                        {jobAdvert.workTime + " & " + jobAdvert.workModel}
                                     </Grid.Column>
                                     <Grid.Column width={8} textAlign={"right"}>
-                                        {new Date(jobAdvertisement.createdAt).getDate() + " " +
-                                        months[new Date(jobAdvertisement.createdAt).getMonth()] + " " +
-                                        new Date(jobAdvertisement.createdAt).getFullYear()}
+                                        {new Date(jobAdvert.createdAt).getDate() + " " +
+                                        months[new Date(jobAdvert.createdAt).getMonth()] + " " +
+                                        new Date(jobAdvert.createdAt).getFullYear()}
                                     </Grid.Column>
                                 </Grid>
                             </Card.Description>
