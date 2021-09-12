@@ -22,5 +22,3 @@ export const filter = {
     },
     filteredEmployers: [],
 }
-
-export default filter;

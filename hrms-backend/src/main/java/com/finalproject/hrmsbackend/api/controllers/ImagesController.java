@@ -25,7 +25,7 @@ public class ImagesController {
         return Utils.getResponseEntity(imageService.getByPublicId(publicId));
     }
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload")
     public ResponseEntity<?> upload(@RequestParam MultipartFile multipartFile, @RequestParam int userId) {
         return Utils.getResponseEntity(imageService.upload(multipartFile, userId));
     }

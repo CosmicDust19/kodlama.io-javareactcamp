@@ -1,18 +1,20 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 
 @Entity
 @Table(name = "departments")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Department implements BaseEntity<Short> {
 
     @Id

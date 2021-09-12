@@ -2,10 +2,9 @@ import {defErrPopupStyle, defInfoPopupStyle} from "../Utils";
 import {Dropdown, Popup} from "semantic-ui-react";
 import React from "react";
 
-function SPopupDropdown({name, formik, ...props}) {
+function SPopupDropdown({name, formik, popupposition = "bottom center", popupsize, ...props}) {
 
     const meta = formik.getFieldMeta(name);
-    const content = meta.error ? meta.error :  props.placeholder
 
     return (
         <Popup
@@ -16,8 +15,8 @@ function SPopupDropdown({name, formik, ...props}) {
                 />
             }
             open={meta.error && meta.touched}
-            position={"bottom center"}
-            content={content}
+            position={popupposition} size={popupsize}
+            content={meta.error ? meta.error :  props.placeholder}
             style={meta.error ? defErrPopupStyle : defInfoPopupStyle}
             {...props}
         />

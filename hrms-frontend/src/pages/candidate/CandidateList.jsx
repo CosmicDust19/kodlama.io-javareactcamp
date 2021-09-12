@@ -1,13 +1,13 @@
-import React, {useState, useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import CandidateService from "../../services/candidateService";
 import {Card, Image, Loader, Placeholder} from "semantic-ui-react";
 import {useHistory} from "react-router-dom";
+import {getRandomImg, placeholderImageNames} from "../../utilities/Utils";
+import UserAvatar from "../../components/common/UserAvatar";
 
 export default function CandidateList() {
 
-    const imageNames = ["elyse", "kristy", "lena", "lindsay", "mark", "matthew", "molly", "patrick", "rachel"]
-
-    const [candidates, setCandidates] = useState([]);
+    const [candidates, setCandidates] = useState();
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -26,7 +26,7 @@ export default function CandidateList() {
         window.scrollTo(0, 0);
     };
 
-    if (candidates.length === 0) return <Loader active inline='centered' size={"large"}/>
+    if (!candidates) return <Loader active inline='centered' size={"large"}/>
 
     return (
         <div>
@@ -37,8 +37,9 @@ export default function CandidateList() {
                         {loading ?
                             <Placeholder>
                                 <Placeholder.Image square/>
-                            </Placeholder> :
-                            <Image src={`https://semantic-ui.com/images/avatar2/large/${imageNames[Math.floor(Math.random() * 9)]}.png`}/>}
+                            </Placeholder> : candidate.profileImgId ?
+                                <UserAvatar user={candidate} size={"large"} avatar={false} style={{}}/> :
+                                <Image src={getRandomImg("large")}/>}
                         <Card.Content>
                             <Card.Header content={candidate.firstName}/>
                             <Card.Meta content={candidate.lastName}/>
@@ -49,9 +50,9 @@ export default function CandidateList() {
                 ))}
             </Card.Group>
             {loading ?
-                imageNames.map(imgName =>
+                placeholderImageNames.map(imgName =>
                     <Image src={`https://semantic-ui.com/images/avatar2/large/${imgName}.png`} style={{opacity: 0}}
-                           size={"mini"} key={imageNames.indexOf(imgName)}/>
+                           size={"mini"} key={placeholderImageNames.indexOf(imgName)}/>
                 ) : null}
         </div>
     );

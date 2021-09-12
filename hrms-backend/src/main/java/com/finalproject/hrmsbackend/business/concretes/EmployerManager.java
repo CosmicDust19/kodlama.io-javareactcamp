@@ -87,6 +87,7 @@ public class EmployerManager implements EmployerService {
         employerAddDto.setPhoneNumber(Utils.getEditedPhoneNumber(employerAddDto.getPhoneNumber()));
 
         Employer employer = modelMapper.map(employerAddDto, Employer.class);
+        employer.setEmailVerified(true);
         Employer savedEmployer = employerDao.save(employer);
 
         EmployerUpdate employerUpdate = modelMapper.map(savedEmployer, EmployerUpdate.class);
@@ -97,6 +98,7 @@ public class EmployerManager implements EmployerService {
 
         emailService.sendVerificationMail(employerAddDto.getEmail());
         savedEmployer.setJobAdvertisements(new ArrayList<>());
+        savedEmployer.setImages(new ArrayList<>());
         return new SuccessDataResult<>(Msg.SAVED.get(), savedEmployer);
     }
 
@@ -109,6 +111,10 @@ public class EmployerManager implements EmployerService {
 
         if (employerUpdate.getCompanyName().equals(companyName))
             return new ErrorResult(Msg.IS_THE_SAME.get("Company name"));
+        if (!employer.getCompanyName().equals(companyName) && employerDao.existsByCompanyName(companyName))
+            return new ErrorResult(Msg.IS_IN_USE.get("Company name"));
+        if (employerUpdateDao.existsByCompanyName(companyName))
+            return new ErrorResult(Msg.REQUESTED.get("This company name"));
 
         employerUpdate.setCompanyName(companyName);
 
@@ -134,6 +140,10 @@ public class EmployerManager implements EmployerService {
             return new ErrorResult(Msg.IS_IN_USE.get("Email"));
         if (!employer.getWebsite().equals(website) && employerDao.existsByWebsite(website))
             return new ErrorResult(Msg.IS_IN_USE.get("Website"));
+        if (employerUpdateDao.existsByEmail(email))
+            return new ErrorResult(Msg.REQUESTED.get("This email"));
+        if (employerUpdateDao.existsByWebsite(website))
+            return new ErrorResult(Msg.REQUESTED.get("This website"));
 
         employerUpdate.setEmail(email);
         employerUpdate.setWebsite(website);

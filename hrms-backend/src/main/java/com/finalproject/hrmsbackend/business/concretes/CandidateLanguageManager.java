@@ -47,6 +47,7 @@ public class CandidateLanguageManager implements CandidateLanguageService {
         CandidateLanguage candidateLanguage = modelMapper.map(candLangAddDto, CandidateLanguage.class);
 
         CandidateLanguage savedCandLang = candidateLanguageDao.save(candidateLanguage);
+        savedCandLang.setLanguage(languageDao.getById(savedCandLang.getLanguage().getId()));
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandLang);
     }
 

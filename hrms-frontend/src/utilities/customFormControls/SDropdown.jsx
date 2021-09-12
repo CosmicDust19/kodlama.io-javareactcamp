@@ -8,7 +8,7 @@ function SDropdown({name, formik, ...props}) {
 
     return (
         <Dropdown clearable item search selection multiple selectOnBlur={false}
-                  loading={props.options === 0}
+                  loading={props.options?.length === 0}
                   value={meta.value}
                   style={defDropdownStyle}
                   onChange={(event, data) => formik.setFieldValue(name, data.value)}

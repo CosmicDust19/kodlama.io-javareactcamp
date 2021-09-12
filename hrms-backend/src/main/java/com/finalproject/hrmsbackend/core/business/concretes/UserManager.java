@@ -10,6 +10,7 @@ import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.SystemEmployeeDao;
+import com.finalproject.hrmsbackend.entities.concretes.Image;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +79,22 @@ public class UserManager implements UserService {
         User user = userDao.getById(userId);
         user.setPassword(password);
         return execLastUpdAct(user);
+    }
+
+    @Override
+    public Result updateProfileImgId(Integer imgId, int userId) {
+        if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
+
+        User user = userDao.getById(userId);
+        if (check.equals(user.getProfileImgId(), imgId))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Profile photo"));
+        for (Image img : user.getImages())
+            if (imgId == null || check.equals(img.getId(), imgId)) {
+                user.setProfileImgId(imgId);
+                return execLastUpdAct(user);
+            }
+
+        return new ErrorResult(Msg.NOT_HAVE.get("User"));
     }
 
     private Result execLastUpdAct(User user) {

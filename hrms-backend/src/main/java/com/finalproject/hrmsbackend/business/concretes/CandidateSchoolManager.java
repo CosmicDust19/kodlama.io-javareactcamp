@@ -60,8 +60,10 @@ public class CandidateSchoolManager implements CandidateSchoolService {
 
         CandidateSchool candidateSchool = modelMapper.map(candSchAddDto, CandidateSchool.class);
 
-        CandidateSchool savedCandidateSchool = candidateSchoolDao.save(candidateSchool);
-        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandidateSchool);
+        CandidateSchool savedCandSch = candidateSchoolDao.save(candidateSchool);
+        savedCandSch.setSchool(schoolDao.getById(savedCandSch.getSchool().getId()));
+        savedCandSch.setDepartment(departmentDao.getById(savedCandSch.getDepartment().getId()));
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandSch);
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,8 +44,10 @@ public class SystemEmployeeManager implements SystemEmployeeService {
     public Result add(SystemEmployeesAddDto systemEmployeesAddDto) {
         if (userDao.existsByEmail(systemEmployeesAddDto.getEmail())) return new ErrorResult(Msg.IS_IN_USE.get("Email"));
         SystemEmployee systemEmployee = modelMapper.map(systemEmployeesAddDto, SystemEmployee.class);
-        systemEmployeeDao.save(systemEmployee);
-        return new SuccessResult(Msg.SAVED.get());
+        systemEmployee.setEmailVerified(true);
+        SystemEmployee savedSysEml = systemEmployeeDao.save(systemEmployee);
+        savedSysEml.setImages(new ArrayList<>());
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedSysEml);
     }
 
     @Override

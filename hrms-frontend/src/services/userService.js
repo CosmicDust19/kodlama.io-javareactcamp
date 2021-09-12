@@ -26,4 +26,8 @@ export default class UserService {
         return axios.put(`http://localhost:8080/api/users/update/pw?oldPassword=${oldPassword}&password=${password}&userId=${userId}`)
     }
 
+    updateProfileImgId(imgId, userId) {
+        return axios.put(`http://localhost:8080/api/users/update/profileImgId?${imgId ? `imgId=${imgId}&` : ""}userId=${userId}`)
+    }
+
 }

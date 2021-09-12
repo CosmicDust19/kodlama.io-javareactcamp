@@ -2,9 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,7 +11,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -54,6 +54,7 @@ public class Cv implements BaseEntity<Integer> {
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_job_exp_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateJobExperience> candidateJobExperiences;
 
     @ManyToMany
@@ -61,6 +62,7 @@ public class Cv implements BaseEntity<Integer> {
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_language_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateLanguage> candidateLanguages;
 
     @ManyToMany
@@ -68,6 +70,7 @@ public class Cv implements BaseEntity<Integer> {
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_school_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateSchool> candidateSchools;
 
     @ManyToMany
@@ -75,6 +78,7 @@ public class Cv implements BaseEntity<Integer> {
             joinColumns = {@JoinColumn(name = "cv_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "candidate_skill_id", referencedColumnName = "id")})
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateSkill> candidateSkills;
 
 }

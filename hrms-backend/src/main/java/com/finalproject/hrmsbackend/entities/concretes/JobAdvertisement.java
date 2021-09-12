@@ -2,9 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -13,7 +11,9 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -70,7 +70,7 @@ public class JobAdvertisement implements BaseEntity<Integer> {
     private JobAdvertisementUpdate jobAdvertisementUpdate;
 
     @Column(name = "active", nullable = false)
-    private boolean active = true;
+    private boolean active;
 
     @Column(name = "verified", nullable = false)
     private boolean verified;
@@ -82,7 +82,7 @@ public class JobAdvertisement implements BaseEntity<Integer> {
     private Boolean updateVerified;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate

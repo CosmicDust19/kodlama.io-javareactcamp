@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.core.utilities.results;
 
 public class Result {
+
     private final boolean success;
     private String message;
 

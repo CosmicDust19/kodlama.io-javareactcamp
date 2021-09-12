@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 import com.finalproject.hrmsbackend.business.abstracts.ImageService;
 import com.finalproject.hrmsbackend.core.adapters.abstracts.CloudinaryService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
 import com.finalproject.hrmsbackend.core.entities.User;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -18,6 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ImageManager implements ImageService {
 
+    private final UserDao userDao;
     private final ImageDao imageDao;
     private final CloudinaryService cloudinaryService;
     private final CheckService check;
@@ -34,6 +36,8 @@ public class ImageManager implements ImageService {
 
     @Override
     public Result upload(MultipartFile multipartFile, int userId) {
+        if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
+
         Result uploadErr = check.validateImage(multipartFile);
         if (uploadErr != null) return uploadErr;
 

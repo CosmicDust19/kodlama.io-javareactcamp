@@ -68,7 +68,8 @@ public class Utils {
     }
 
     public String getViolationMsg(String camelCaseProp, String rawMsg) {
-        String propName = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(camelCaseProp), " ").toLowerCase(Locale.ENGLISH);
+        String[] sliced = StringUtils.splitByCharacterTypeCamelCase(camelCaseProp);
+        String propName = StringUtils.join(sliced, " ").toLowerCase(Locale.ENGLISH);
         return String.format("%s%s %s", Character.toUpperCase(propName.charAt(0)), propName.substring(1), rawMsg);
     }
 
@@ -87,7 +88,8 @@ public class Utils {
         body.insert(0, " ");
         StringBuilder countryCode = new StringBuilder(rawPhone.substring(0, rawPhone.length() - 10));
         if (countryCode.length() > 0 && countryCode.charAt(0) != '+') countryCode.insert(0, "+");
-        if (countryCode.length() == 2 && countryCode.charAt(0) == '+' && countryCode.charAt(1) == '0') countryCode.deleteCharAt(0);
+        if (countryCode.length() == 2 && countryCode.charAt(0) == '+' && countryCode.charAt(1) == '0')
+            countryCode.deleteCharAt(0);
         if (countryCode.length() == 0) countryCode.insert(0, "0");
         countryCode.append(body);
         return countryCode.toString();

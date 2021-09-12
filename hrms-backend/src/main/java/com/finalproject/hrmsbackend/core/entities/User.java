@@ -3,9 +3,7 @@ package com.finalproject.hrmsbackend.core.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.entities.concretes.Image;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,7 +12,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -38,13 +38,17 @@ public class User implements BaseEntity<Integer> {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
+    @Column(name = "profileImgId")
+    private Integer profileImgId;
+
     @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties(value = {"user"})
+    @ToString.Exclude
     private List<Image> images;
 
     @JsonIgnore
     @Column(name = "email_verified", nullable = false)
-    private boolean emailVerified = true; //temporary
+    private boolean emailVerified;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

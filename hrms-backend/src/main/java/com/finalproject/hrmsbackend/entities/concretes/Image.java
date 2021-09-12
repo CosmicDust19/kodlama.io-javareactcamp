@@ -2,13 +2,13 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import com.finalproject.hrmsbackend.core.entities.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 

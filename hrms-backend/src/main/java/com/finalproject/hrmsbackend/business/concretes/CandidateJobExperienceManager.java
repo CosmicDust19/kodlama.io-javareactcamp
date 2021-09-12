@@ -14,7 +14,6 @@ import com.finalproject.hrmsbackend.entities.concretes.dtos.CandidateJobExperien
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -54,9 +53,11 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
         if (violatesUk(candJobExpAddDto))
             errors.put("uk", Msg.UK_CAND_JOB_EXP.get());
         if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
+
         CandidateJobExperience candJobExp = modelMapper.map(candJobExpAddDto, CandidateJobExperience.class);
 
         CandidateJobExperience savedCandJobExp = candidateJobExpDao.save(candJobExp);
+        savedCandJobExp.setPosition(positionDao.getById(savedCandJobExp.getPosition().getId()));
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandJobExp);
     }
 

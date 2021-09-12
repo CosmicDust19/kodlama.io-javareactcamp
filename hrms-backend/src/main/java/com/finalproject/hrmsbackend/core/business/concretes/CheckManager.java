@@ -86,7 +86,7 @@ public class CheckManager implements CheckService {
 
     @Override
     public Result validateImage(MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(Msg.NOT_FOUND.get("file"));
+        if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(Msg.NOT_FOUND.get("File"));
         try {
             if (ImageIO.read(multipartFile.getInputStream()) == null) return new ErrorResult(Msg.NOT_AN_IMAGE.get());
             //only BMP, GIF, JPG and PNG are recognized

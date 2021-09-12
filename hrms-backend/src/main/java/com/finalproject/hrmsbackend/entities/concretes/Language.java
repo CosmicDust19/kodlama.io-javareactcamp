@@ -1,18 +1,20 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
 @Entity
 @Table(name = "languages")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Language implements BaseEntity<Short> {
 
     @Id
@@ -31,4 +33,5 @@ public class Language implements BaseEntity<Short> {
     public Language(String name) {
         this.name = name;
     }
+
 }

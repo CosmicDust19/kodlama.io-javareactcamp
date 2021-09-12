@@ -23,13 +23,11 @@ export default class CandidateService {
     }
 
     updateGithubAccount(candId, link) {
-        if (!link) return axios.put(`http://localhost:8080/api/candidates/update/githubAccount?candId=${candId}`)
-        return axios.put(`http://localhost:8080/api/candidates/update/githubAccount?candId=${candId}&githubAccount=${link}`)
+        return axios.put(`http://localhost:8080/api/candidates/update/githubAccount?candId=${candId}${link ? `&githubAccount=${link}` : ""}`)
     }
 
     updateLinkedinAccount(candId, link) {
-        if (!link) return axios.put(`http://localhost:8080/api/candidates/update/linkedinAccount?candId=${candId}`)
-        return axios.put(`http://localhost:8080/api/candidates/update/linkedinAccount?candId=${candId}&linkedinAccount=${link}`)
+        return axios.put(`http://localhost:8080/api/candidates/update/linkedinAccount?candId=${candId}${link ? `&linkedinAccount=${link}` : ""}`)
     }
 
     addJobAdvToFavorites(candId, jobAdvertisementId) {

@@ -1,18 +1,21 @@
-import {Button, Container, Dropdown, Grid, Header, Icon, Image, Menu, Modal} from "semantic-ui-react";
+import {Button, Container, Dropdown, Grid, Icon, Menu} from "semantic-ui-react";
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {signOut} from "../store/actions/userActions";
 import {Link, useHistory} from "react-router-dom";
+import AreYouSureModal from "../components/common/AreYouSureModal";
+import UserAvatar from "../components/common/UserAvatar";
 
 export default function SignedIn({toggle, verticalScreen}) {
 
     const dropdownStyle = {marginTop: 0, backgroundColor: "rgba(250, 250, 250, 0.85)", borderRadius: 0}
     const vertDropdownStyle = {marginTop: 0, backgroundColor: "rgba(250,250,250,1)"}
 
-    const [surePopupOpen, setSurePopupOpen] = useState(false)
-    const userProps = useSelector(state => state?.user?.userProps)
+    const userProps = useSelector(state => state?.user.userProps)
     const dispatch = useDispatch();
     const history = useHistory();
+
+    const [surePopupOpen, setSurePopupOpen] = useState(false)
 
     const scrollToTop = () => window.scrollTo(0, 0)
 
@@ -23,29 +26,10 @@ export default function SignedIn({toggle, verticalScreen}) {
         scrollToTop()
     }
 
-    function areYouSurePopup() {
-        return (
-            <Modal basic onClose={() => setSurePopupOpen(false)} open={surePopupOpen} size='small' dimmer={"blurring"}>
-                <Header size={"large"} color={"yellow"} dividing>
-                    Are you sure you want to sign out ?
-                </Header>
-                <Modal.Actions>
-                    <Button color='yellow' inverted size='large' onClick={surePopupYesAct} floated={"left"}>
-                        <Icon name='checkmark'/> Yes
-                    </Button>
-                    <Button basic color='red' inverted size='large' floated={"left"}
-                            onClick={() => setSurePopupOpen(false)}>
-                        <Icon name='remove'/> No
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-        )
-    }
-
     return (
         <Container>
-            {areYouSurePopup()}
-
+            <AreYouSureModal open={surePopupOpen} message={"Are you sure you want to sign out ?"}
+                             onYes={surePopupYesAct} onNo={() => setSurePopupOpen(false)}/>
             {String(userProps.userType) === "candidate" ?
                 <Grid columns={"equal"} padded>
                     <Grid.Column>
@@ -71,7 +55,7 @@ export default function SignedIn({toggle, verticalScreen}) {
             <Menu.Menu position='right'>
                 {String(userProps.userType) === "candidate" ?
                     <Menu.Item style={{marginRight: 10, marginLeft: 10}}>
-                        <Image size="mini" circular src='https://freesvg.org/img/abstract-user-flat-1.png'/>
+                        <UserAvatar user={userProps.user} size={"mini"}/>
                         <Dropdown item simple text={userProps.user?.firstName} closeOnEscape closeOnBlur closeOnChange>
                             <Dropdown.Menu style={verticalScreen ? vertDropdownStyle : {...dropdownStyle, width: 142, marginRight: 1}}>
                                 <Dropdown.Item as={Link} to={"/candidate/CVs"} onClick={scrollToTop}>
@@ -92,12 +76,14 @@ export default function SignedIn({toggle, verticalScreen}) {
                     </Menu.Item> : null}
                 {String(userProps.userType) === "employer" ?
                     <Menu.Item style={{marginRight: 10, marginLeft: 10}}>
-                        <Image size="mini"
-                               src={"https://www.linkpicture.com/q/pngkey.com-black-building-icon-png-3232548.png"}/>
+                        <UserAvatar user={userProps.user} size={"mini"}/>
                         <Dropdown simple item text={userProps.user?.companyName} closeOnEscape closeOnBlur closeOnChange>
                             <Dropdown.Menu style={verticalScreen ? vertDropdownStyle : dropdownStyle}>
                                 <Dropdown.Item as={Link} to={"/employer/jobAdverts"} onClick={scrollToTop}>
                                     <Icon name="file outline" color="orange"/>Adverts
+                                </Dropdown.Item>
+                                <Dropdown.Item as={Link} to={`/employers/${userProps.user?.id}`} onClick={scrollToTop}>
+                                    <Icon name="building outline" color={"blue"}/>Summary
                                 </Dropdown.Item>
                                 <Dropdown.Divider/>
                                 <Dropdown.Item as={Link} to={"/employer/account"} onClick={scrollToTop}>
@@ -111,15 +97,14 @@ export default function SignedIn({toggle, verticalScreen}) {
                     </Menu.Item> : null}
                 {String(userProps.userType) === "systemEmployee" ?
                     <Menu.Item style={{marginRight: 10, marginLeft: 10}}>
-                        <Image size="mini" circular style={{opacity: 0.8}}
-                               src="https://www.linkpicture.com/q/pngkey.com-park-icon-png-3050875.png"/>
+                        <UserAvatar user={userProps.user} size={"mini"}/>
                         <Dropdown simple item text={userProps.user?.firstName} closeOnEscape closeOnBlur closeOnChange>
                             <Dropdown.Menu style={verticalScreen ? vertDropdownStyle : dropdownStyle}>
                                 <Dropdown.Header content={"Manage"}/>
-                                <Dropdown.Item as={Link} to={"/"}>
+                                <Dropdown.Item as={Link} to={"/"} onClick={scrollToTop}>
                                     <Icon name="file alternate" style={{color: "rgba(28,177,110,0.9)"}}/>Job Advertisements
                                 </Dropdown.Item>
-                                <Dropdown.Item as={Link} to={"/systemEmployee/employerManagement"}>
+                                <Dropdown.Item as={Link} to={"/systemEmployee/employerManagement"} onClick={scrollToTop}>
                                     <Icon name="building" style={{color: "rgba(21,96,184,0.9)"}}/>Employers
                                 </Dropdown.Item>
                                 <Dropdown.Divider/>

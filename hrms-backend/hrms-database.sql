@@ -55,6 +55,7 @@ CREATE TABLE public.users
     email            character varying(100)         NOT NULL,
     password         character varying(100)         NOT NULL,
     email_verified   boolean                        NOT NULL DEFAULT FALSE,
+    profile_img_id   int,
     created_at       timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
     last_modified_at timestamp(0) without time zone,
     CONSTRAINT pk_users PRIMARY KEY (id),
@@ -73,6 +74,10 @@ CREATE TABLE public.images
         REFERENCES public.users (id)
         ON DELETE CASCADE
 );
+
+ALTER TABLE users
+    ADD CONSTRAINT fk_users_profile_img_id
+        FOREIGN KEY (profile_img_id) REFERENCES public.images (id);
 
 CREATE TABLE public.system_employees
 (

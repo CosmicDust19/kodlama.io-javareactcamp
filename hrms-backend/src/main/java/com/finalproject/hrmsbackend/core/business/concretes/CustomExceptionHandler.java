@@ -4,6 +4,8 @@ import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
+import com.finalproject.hrmsbackend.core.utilities.results.ErrorResult;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
@@ -72,6 +74,14 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ex.printStackTrace();
         ApiError apiError = new ApiError(ex.getMostSpecificCause().getMessage(), null, null);
         return ResponseEntity.badRequest().body(new ErrorDataResult<>(Msg.FAILED.get(), apiError));
+    }
+
+    @ExceptionHandler({FileSizeLimitExceededException.class})
+    public ResponseEntity<Object> handleConstraintViolation(FileSizeLimitExceededException ex, WebRequest request) {
+        ex.printStackTrace();
+        String mb = String.valueOf(Math.round(ex.getPermittedSize() / 1000000.0));
+        String msg = String.format("%s. You can upload files up to %s MB", Msg.FILE_TOO_LARGE.get(), mb);
+        return ResponseEntity.badRequest().body(new ErrorResult(msg));
     }
 
     @Override

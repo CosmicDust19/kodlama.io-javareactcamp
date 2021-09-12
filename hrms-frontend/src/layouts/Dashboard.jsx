@@ -1,26 +1,26 @@
 import {Container} from 'semantic-ui-react'
 import {Route} from "react-router-dom";
-import JobAdvertList from "../pages/public/JobAdvertList";
-import JobAdvertDetail from "../pages/public/JobAdvertDetail";
-import EmployerDetail from "../pages/public/EmployerDetail";
+import JobAdverts from "../pages/common/JobAdverts";
+import JobAdvertDetail from "../pages/common/JobAdvertDetail";
+import EmployerDetail from "../pages/employer/EmployerDetail";
 import Navi from "./Navi";
 import Footer from "./Footer";
-import UserList from "../pages/public/UserList";
-import Login from "../pages/public/Login";
-import CandidateDetail from "../pages/public/CandidateDetail";
+import UserList from "../pages/common/UserList";
+import Login from "../pages/common/Login";
+import CandidateDetail from "../pages/candidate/CandidateDetail";
 import {ToastContainer} from "react-toastify";
-import CandidateList from "../pages/public/CandidateList";
+import CandidateList from "../pages/candidate/CandidateList";
 import {useSelector} from "react-redux";
-import EmployerList from "../pages/public/EmployerList";
+import EmployerList from "../pages/employer/EmployerList";
 import {CandidateAccount} from "../pages/candidate/CandidateAccount"
 import {CandidateCVs} from "../pages/candidate/CandidateCVs"
 import {CandidateProfile} from "../pages/candidate/CandidateProfile";
 import {SystemEmployeeAccount} from "../pages/system-employee/SystemEmployeeAccount";
-import JobAdvertsManagement from "../pages/system-employee/JobAdvertsManagement";
-import EmployersManagement from "../pages/system-employee/EmployersManagement";
+import JobAdvertMng from "../pages/system-employee/JobAdvertMng";
+import EmployerMng from "../pages/system-employee/EmployerMng";
 import {EmployerAccount} from "../pages/employer/EmployerAccount";
 import {EmployerJobAdverts} from "../pages/employer/EmployerJobAdverts";
-import {SignUp} from "../pages/public/SignUp";
+import {SignUp} from "../pages/common/SignUp";
 
 export default function Dashboard() {
 
@@ -28,22 +28,22 @@ export default function Dashboard() {
 
     function mainPage() {
         switch (userType) {
-            case "candidate" :      return JobAdvertList
+            case "candidate" :      return JobAdverts
             case "employer" :       return CandidateList
-            case "systemEmployee" : return JobAdvertsManagement
-            default:                return JobAdvertList
+            case "systemEmployee" : return JobAdvertMng
+            default:                return JobAdverts
         }
     }
 
     return (
         <div className="dashboard">
             <Navi/>
-            <ToastContainer position={"bottom-left"} pauseOnFocusLoss={false} style={{marginBottom: 10, width: "27em"}}/>
+            <ToastContainer position={"bottom-left"} pauseOnFocusLoss={false} style={{marginBottom: 10, width: "24em"}} closeButton={null}/>
             <Container className="main container">
                 <Route exact path="/" component={mainPage()}/>
                 <Route path="/login" component={Login}/>
                 <Route path="/signup/:userType" component={SignUp}/>
-                <Route exact path="/jobAdverts" component={JobAdvertList}/>
+                <Route exact path="/jobAdverts" component={JobAdverts}/>
                 <Route path="/jobAdverts/:id" component={JobAdvertDetail}/>
                 <Route path="/users" component={UserList}/>
                 <Route exact path="/candidates" component={CandidateList}/>
@@ -56,7 +56,7 @@ export default function Dashboard() {
                 <Route path="/employer/account" component={EmployerAccount}/>
                 <Route path="/employer/jobAdverts" component={EmployerJobAdverts}/>
                 <Route path="/systemEmployee/account" component={SystemEmployeeAccount}/>
-                <Route path="/systemEmployee/employerManagement" component={EmployersManagement}/>
+                <Route path="/systemEmployee/employerManagement" component={EmployerMng}/>
             </Container>
             <Footer/>
         </div>

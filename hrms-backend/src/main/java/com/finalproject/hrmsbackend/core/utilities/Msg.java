@@ -22,6 +22,7 @@ public enum Msg {
     INVALID_DATE("invalid date format (should be yyyy-mm-dd)"),
     USED("used before"),
     IS_IN_USE("is in use"),
+    REQUESTED("has already been requested by another company"),
     NOT_HAVE("does not have this"),
     NOT_EXIST("does not exist"),
     NOT_FOUND("not found"),
@@ -49,6 +50,7 @@ public enum Msg {
     SORT_DIRECTION("Negative & Null -> Desc, Positive & Zero -> Asc"),
     NOT_AN_IMAGE("Not an image"),
     IMG_VALIDATION_ERR("An error has occurred while validating image"),
+    FILE_TOO_LARGE("File too large"),
     MALFORMED_JSON_REQUEST("Malformed JSON request"),
     LOGIN_FAIL("Please check your email and password");
 

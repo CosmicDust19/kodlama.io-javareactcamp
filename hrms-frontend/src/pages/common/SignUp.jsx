@@ -108,7 +108,7 @@ export function SignUp() {
 
     //inputs according to userType
     const popupSize = !verticalScreen ? undefined : "small"
-    const popupPosition = !verticalScreen ? "right center" : undefined
+    const popupPosition = !verticalScreen ? "right center" : "top center"
     const iconPosition = "left"
     const commonInputs = () => [
         <SPopupInput icon="at" placeholder="Email" name="email" type={"email"} popupposition={popupPosition}

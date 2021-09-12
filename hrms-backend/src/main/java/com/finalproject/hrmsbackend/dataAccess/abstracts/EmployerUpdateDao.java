@@ -13,6 +13,12 @@ import javax.transaction.Transactional;
 @Repository
 public interface EmployerUpdateDao extends JpaRepository<EmployerUpdate, Integer> {
 
+    boolean existsByCompanyName(String companyName);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByWebsite(String website);
+
     @Modifying
     @Query("update EmployerUpdate e set e.email = :email , e.website = :website where e.updateId = :id")
     void updateEmailAndWebsite(@Param(value = "email") String email, @Param(value = "website") String website, @Param(value = "id") Integer id);

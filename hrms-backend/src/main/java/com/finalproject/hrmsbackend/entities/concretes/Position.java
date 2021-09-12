@@ -3,14 +3,14 @@ package com.finalproject.hrmsbackend.entities.concretes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 
@@ -31,6 +31,7 @@ public class Position implements BaseEntity<Short> {
     @JsonIgnore
     @OneToMany(mappedBy = "position")
     @JsonIgnoreProperties(value = {"position"})
+    @ToString.Exclude
     private List<JobAdvertisement> jobAdvertisements;
 
     public Position(short id) {
@@ -40,4 +41,5 @@ public class Position implements BaseEntity<Short> {
     public Position(String title) {
         this.title = title;
     }
+
 }

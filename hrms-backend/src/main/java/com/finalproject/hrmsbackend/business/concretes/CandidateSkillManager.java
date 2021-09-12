@@ -42,6 +42,7 @@ public class CandidateSkillManager implements CandidateSkillService {
         CandidateSkill candidateSkill = modelMapper.map(candSkillAddDto, CandidateSkill.class);
 
         CandidateSkill savedCandSkill = candidateSkillDao.save(candidateSkill);
+        savedCandSkill.setSkill(skillDao.getById(savedCandSkill.getSkill().getId()));
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandSkill);
     }
 

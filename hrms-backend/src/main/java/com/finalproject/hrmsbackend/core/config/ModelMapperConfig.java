@@ -30,6 +30,7 @@ public class ModelMapperConfig {
             map(source.getEmployerId(), destination.getEmployer().getId());
             map(source.getPositionId(), destination.getPosition().getId());
             map(source.getCityId(), destination.getCity().getId());
+            map(true, destination.isActive());
         }
     };
 

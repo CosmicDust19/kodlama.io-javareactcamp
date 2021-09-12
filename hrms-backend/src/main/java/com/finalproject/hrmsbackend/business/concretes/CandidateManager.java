@@ -115,6 +115,7 @@ public class CandidateManager implements CandidateService {
     }
 
     private Result execLastAddAct(Candidate candidate) {
+        candidate.setEmailVerified(true);
         Candidate savedCandidate = candidateDao.save(candidate);
         emailService.sendVerificationMail(savedCandidate.getEmail());
         savedCandidate.setCvs(new ArrayList<>());
@@ -123,6 +124,7 @@ public class CandidateManager implements CandidateService {
         savedCandidate.setCandidateLanguages(new ArrayList<>());
         savedCandidate.setCandidateSkills(new ArrayList<>());
         savedCandidate.setFavoriteJobAdvertisements(new ArrayList<>());
+        savedCandidate.setImages(new ArrayList<>());
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandidate);
     }
 

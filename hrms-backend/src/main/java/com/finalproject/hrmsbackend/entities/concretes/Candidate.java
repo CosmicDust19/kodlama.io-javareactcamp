@@ -2,18 +2,16 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.User;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 
 @Entity
 @Table(name = "candidates")
@@ -41,28 +39,34 @@ public class Candidate extends User {
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<Cv> cvs;
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateJobExperience> candidateJobExperiences;
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateLanguage> candidateLanguages;
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateSchool> candidateSchools;
 
     @OneToMany(mappedBy = "candidate")
     @JsonIgnoreProperties(value = {"candidate"})
+    @ToString.Exclude
     private List<CandidateSkill> candidateSkills;
 
     @ManyToMany
     @JoinTable(name = "candidates_favorite_job_advertisements",
             joinColumns = {@JoinColumn(name = "candidate_id", referencedColumnName = "user_id")},
             inverseJoinColumns = {@JoinColumn(name = "job_advertisement_id", referencedColumnName = "id")})
+    @ToString.Exclude
     private List<JobAdvertisement> favoriteJobAdvertisements;
 
     public Candidate(int id) {
