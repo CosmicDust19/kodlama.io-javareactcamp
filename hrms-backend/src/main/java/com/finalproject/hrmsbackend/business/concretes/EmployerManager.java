@@ -201,9 +201,9 @@ public class EmployerManager implements EmployerService {
     private boolean noChange(Employer employer) {
         EmployerUpdate emplUpd = employer.getEmployerUpdate();
         return check.equals(emplUpd.getCompanyName(), employer.getCompanyName()) &&
-                check.equals(emplUpd.getEmail(), emplUpd.getEmail()) &&
-                check.equals(emplUpd.getWebsite(), emplUpd.getWebsite()) &&
-                check.equals(emplUpd.getPhoneNumber(), emplUpd.getPhoneNumber());
+                check.equals(emplUpd.getEmail(), employer.getEmail()) &&
+                check.equals(emplUpd.getWebsite(), employer.getWebsite()) &&
+                check.equals(emplUpd.getPhoneNumber(), employer.getPhoneNumber());
     }
 
 }
