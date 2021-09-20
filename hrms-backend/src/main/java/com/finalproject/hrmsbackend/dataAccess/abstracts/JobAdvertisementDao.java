@@ -32,7 +32,7 @@ public interface JobAdvertisementDao extends JpaRepository<JobAdvertisement, Int
 
     List<JobAdvertisement> getAllByVerifiedFalse(Sort sort);
 
-    List<JobAdvertisement> getAllByActiveTrueAndVerifiedTrueAndDeadlineAfterAndEmployer_Id(LocalDate date, Integer employerId);
+    List<JobAdvertisement> getAllByActiveTrueAndVerifiedTrueAndDeadlineAfterAndEmployer_Id(LocalDate date, Integer employerId, Sort sort);
 
     @Modifying
     @Query(value = "update job_advertisements set update_id = :updateId where id = :id", nativeQuery = true)

@@ -2,11 +2,11 @@ import axios from "axios"
 
 export default class LanguageService {
 
-    getLanguages() {
+    getAll() {
         return axios.get("http://localhost:8080/api/languages/get/all");
     }
 
-    addLanguage(languageName) {
+    add(languageName) {
         return axios.post(`http://localhost:8080/api/languages/add?languageName=${languageName}`)
     }
 

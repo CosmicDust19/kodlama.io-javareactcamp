@@ -3,41 +3,73 @@ import {getJobAdvertColor} from "../../utilities/JobAdvertUtils";
 import {getRemainedDaysAsFont} from "../../utilities/Utils";
 import JobAdvertInfoLabels from "../common/JobAdvertInfoLabels";
 import SysEmplAdvertDropdown from "./SysEmplAdvertDropdown";
-import React from "react";
+import React, {useEffect, useState} from "react";
+import EmployerLogo from "../employer/EmployerLogo";
 
-function JobAdvertMngList({jobAdverts, noAdvPublished}) {
+function JobAdvertMngList({jobAdverts, ...props}) {
+
+    const [hidden, setHidden] = useState(true);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        return () => {
+            setHidden(undefined)
+            setLoading(undefined)
+        };
+    }, []);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setHidden(false)
+        }, 400)
+    }, []);
+
+    useEffect(() => {
+        setLoading(true)
+        setTimeout(() => {
+            setLoading(false)
+        }, 150)
+    }, [jobAdverts]);
 
     if (!jobAdverts) return <Loader active inline='centered' size={"large"} style={{marginTop: 100}}/>
 
-    if (noAdvPublished)
-        return (
-            <Message warning compact as={Segment} style={{float: "left"}} raised>
-                <Icon name={"wait"} size={"large"}/>
-                <font style={{verticalAlign: "middle"}}>No job advertisement found. Please wait for employers to add.</font>
-            </Message>
-        )
-
     if (jobAdverts.length === 0)
         return (
-            <Message warning compact as={Segment} style={{float: "left"}}>
-                <Icon name={"warning sign"} size={"big"}/>
+            <Message warning compact as={Segment} style={{float: "left", marginLeft: 20}} hidden={hidden}>
+                <Icon name={"warning sign"} size={"large"}/>
                 <font style={{fontSize: "large", verticalAlign: "middle"}}>No results found.</font>
             </Message>
         )
 
     return (
-        <Table style={{borderRadius: 0, marginTop: -3}}>
+        <Table style={{borderRadius: 0, marginTop: -3, opacity: loading ? 0.8 : 1}} padded {...props}>
             <Table.Body>
                 {jobAdverts.map(jobAdvert => (
                     <Table.Row style={{backgroundColor: getJobAdvertColor(jobAdvert)}} key={jobAdvert.id}>
-                        <Table.Cell content={jobAdvert.employer.companyName}/>
-                        <Table.Cell content={jobAdvert.position.title}/>
-                        <Table.Cell content={jobAdvert.city.name}/>
-                        <Table.Cell content={getRemainedDaysAsFont(jobAdvert.deadline)}/>
+                        <Table.Cell collapsing>
+                            <EmployerLogo user={jobAdvert.employer} size={"mini"} defImgSize={26} avatar/>&nbsp;&nbsp;
+                            {jobAdvert.employer.companyName}
+                        </Table.Cell>
+                        <Table.Cell collapsing>
+                            <Icon name={"suitcase"} color={"teal"}/>
+                            {jobAdvert.position.title}
+                        </Table.Cell>
+                        <Table.Cell collapsing>
+                            <Icon name={"map marker alternate"} color={"red"}/>
+                            {jobAdvert.city.name}
+                        </Table.Cell>
+                        <Table.Cell collapsing>
+                            <Icon name={"users"} color={"yellow"}/>&nbsp;&nbsp;
+                            {jobAdvert.openPositions}
+                        </Table.Cell>
+                        <Table.Cell collapsing>
+                            <Icon name={"calendar alternate outline"} color={"purple"}/>&nbsp;&nbsp;
+                            {getRemainedDaysAsFont(jobAdvert.deadline)}
+                        </Table.Cell>
                         <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
                             <JobAdvertInfoLabels jobAdvert={jobAdvert}/>
                         </Table.Cell>
-                        <Table.Cell>
+                        <Table.Cell collapsing>
                             <SysEmplAdvertDropdown jobAdvert={jobAdvert} infoOption fluid direction={undefined}/>
                         </Table.Cell>
                     </Table.Row>

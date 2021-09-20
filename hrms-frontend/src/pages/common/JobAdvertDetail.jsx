@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import JobAdvertisementService from "../../services/jobAdvertisementService";
-import {Card, Divider, Grid, Icon, Loader, Segment, Table} from "semantic-ui-react";
+import {Card, Divider, Grid, Icon, Loader, Segment, Table, Transition} from "semantic-ui-react";
 import {useSelector} from "react-redux";
 import {getCreatedAtAsStr, getRemainedDays} from "../../utilities/Utils";
 import SInfoLabel from "../../components/common/SInfoLabel";
@@ -12,6 +12,7 @@ import JobAdvertInfoLabels from "../../components/common/JobAdvertInfoLabels";
 import {getDeadlineInfo, getSalaryInfo} from "../../utilities/JobAdvertUtils";
 import SUpdateTableCell from "../../components/common/SUpdateTableCell";
 import EmployerSummary from "../../components/employer/EmployerSummary";
+import EmployerLogo from "../../components/employer/EmployerLogo";
 
 const jobAdvertisementService = new JobAdvertisementService();
 
@@ -21,7 +22,17 @@ export default function JobAdvertDetail() {
     const userProps = useSelector(state => state?.user?.userProps)
     const user = useSelector(state => state?.user?.userProps?.user)
 
+    const [visible, setVisible] = useState(false);
     const [jobAdvert, setJobAdvert] = useState({});
+
+    useEffect(() => {
+        setTimeout(() => setVisible(true), 50)
+        return () => {
+            setVisible(undefined)
+            setJobAdvert(undefined)
+        };
+    }, []);
+
 
     useEffect(() => {
         jobAdvertisementService.getById(id).then((result) => setJobAdvert(result.data.data));
@@ -57,98 +68,118 @@ export default function JobAdvertDetail() {
         return <Loader active inline='centered' size={"large"} style={{marginTop: "15em"}}/>
 
     return (
-        <div>
-            <Card raised fluid style={{borderRadius: 0, marginBottom: 0, backgroundColor: "rgba(0,0,0,0.02)"}}>
-                <Card.Content>
-                    <Grid stackable={systemEmployee || publisherEmpl}>
+        <Transition visible={visible} duration={200}>
+            <div>
+                <Card raised fluid style={{borderRadius: 0, marginBottom: 0, backgroundColor: "rgba(0,0,0,0.02)"}}>
+                    <Card.Content>
+                        <Grid stackable={systemEmployee || publisherEmpl}>
 
-                        <Grid.Column width={10}>
-                            <Card.Header>
-                                <font style={{fontSize: "large"}}>{jobAdvert.position?.title}</font> &nbsp;
-                                <SInfoLabel content={<div>{updateIcon}{jobAdvert.jobAdvertisementUpdate?.position.title}</div>}
-                                            visible={(systemEmployee || publisherEmpl) && positionUpdated} backgroundColor={updateColor}/>
-                            </Card.Header>
-                            <Card.Meta>
-                                <Icon name="building outline" color="blue"/>&nbsp;&nbsp;{jobAdvert.employer?.companyName}
-                            </Card.Meta>
-                            <Card.Description>
-                                <Icon name={"map marker"} color={"blue"}/>&nbsp;{jobAdvert.city?.name} &nbsp;
-                                <SInfoLabel
-                                    content={<div>{updateIcon}{jobAdvert.jobAdvertisementUpdate?.city.name}</div>}
-                                    visible={(systemEmployee || publisherEmpl) && cityUpdated} backgroundColor={updateColor}/>
-                            </Card.Description>
-                        </Grid.Column>
+                            <Grid.Column width={10}>
+                                <Card.Header>
+                                    <font style={{fontSize: "large"}}>{jobAdvert.position?.title}</font> &nbsp;
+                                    <SInfoLabel content={<div>{updateIcon}{jobAdvert.jobAdvertisementUpdate?.position.title}</div>}
+                                                visible={(systemEmployee || publisherEmpl) && positionUpdated}
+                                                backgroundColor={updateColor}/>
+                                </Card.Header>
+                                <Card.Meta style={{marginTop: 4}}>
+                                    &nbsp;<EmployerLogo user={jobAdvert.employer} size={"mini"}/>&nbsp;&nbsp;
+                                    {jobAdvert.employer?.companyName}
+                                </Card.Meta>
+                                <Card.Description style={{marginTop: 4}}>
+                                    <Icon name={"map marker alternate"} size={"large"} color={"red"}/>&nbsp;&nbsp;
+                                    {jobAdvert.city?.name} &nbsp;
+                                    <SInfoLabel
+                                        content={<div>{updateIcon}{jobAdvert.jobAdvertisementUpdate?.city.name}</div>}
+                                        visible={(systemEmployee || publisherEmpl) && cityUpdated} backgroundColor={updateColor}/>
+                                </Card.Description>
+                            </Grid.Column>
 
-                        <Grid.Column width={6} textAlign={"right"} verticalAlign={systemEmployee || publisherEmpl ? "middle" : undefined}>
-                            <FavoriteAdvertIcon jobAdvert={jobAdvert} iconSize={"large"}/>
-                            <JobAdvertInfoLabels jobAdvert={jobAdvert}/>
-                            <SysEmplAdvertDropdown jobAdvert={jobAdvert} setJobAdvert={setJobAdvert}/>
-                            <EmplAdvertDropdown jobAdvert={jobAdvert} setJobAdvert={setJobAdvert}/>
-                        </Grid.Column>
+                            <Grid.Column width={6} textAlign={"right"}
+                                         verticalAlign={systemEmployee || publisherEmpl ? "middle" : undefined}>
+                                <FavoriteAdvertIcon jobAdvert={jobAdvert} iconSize={"large"}/>
+                                <JobAdvertInfoLabels jobAdvert={jobAdvert}/>
+                                <SysEmplAdvertDropdown jobAdvert={jobAdvert} setJobAdvert={setJobAdvert}/>
+                                <EmplAdvertDropdown jobAdvert={jobAdvert} setJobAdvert={setJobAdvert}/>
+                            </Grid.Column>
 
-                    </Grid>
-                </Card.Content>
-            </Card>
+                        </Grid>
+                    </Card.Content>
+                </Card>
 
-            <Table striped celled style={{borderRadius: 0, marginTop: 0}}>
-                <Table.Body>
-                    <Table.Row>
-                        <Table.Cell content={"Work Time & Work Model"} width={3}/>
-                        <Table.Cell content={`${jobAdvert.workTime} & ${jobAdvert.workModel}`}/>
-                        <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={workModelOrTimeUpdated}
-                                          content={`${jobAdvert.jobAdvertisementUpdate?.workTime} & ${jobAdvert.jobAdvertisementUpdate?.workModel}`}
-                                          emptyCell={tableInfosUpdated}/>
-                    </Table.Row>
-                    {salaryInfo !== "No Salary Info" || systemEmployee || publisherEmpl ?
+                <Table striped celled style={{borderRadius: 0, marginTop: 0}}>
+                    <Table.Body>
                         <Table.Row>
-                            <Table.Cell content={"Salary"} width={3}/>
-                            <Table.Cell content={salaryInfo}/>
-                            <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={salaryUpdated}
-                                              content={updatedSalaryInfo} emptyCell={tableInfosUpdated}/>
-                        </Table.Row> : null}
-                    <Table.Row>
-                        <Table.Cell content={"Deadline"} width={3}/>
-                        <Table.Cell content={deadlineInfo}/>
-                        <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={deadlineUpdated}
-                                          content={updatedDeadlineInfo} emptyCell={tableInfosUpdated}/>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell content={"Open Positions"} width={3}/>
-                        <Table.Cell content={jobAdvert.openPositions}/>
-                        <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={openPositionsUpdated}
-                                          content={jobAdvert.jobAdvertisementUpdate?.openPositions} emptyCell={tableInfosUpdated}/>
-                    </Table.Row>
-                </Table.Body>
-            </Table>
-
-            <Table style={{borderRadius: 0}} definition structured color={"red"}>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell content={<strong style={{marginLeft: 10}}>Job Description</strong>}/>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    <Table.Row>
-                        <Table.Cell>
-                            <Segment basic>
-                                <font className={"jobDescription"} style={{fontSize: "large"}}>{<p>{jobAdvert.jobDescription}</p>}</font>
-                            </Segment>
-                        </Table.Cell>
-                    </Table.Row>
-                    {(systemEmployee || publisherEmpl) && descUpdated ?
-                        <Table.Row>
-                            <Table.Cell warning>
-                                <Segment basic content={<p>{jobAdvert.jobAdvertisementUpdate.jobDescription}</p>}/>
+                            <Table.Cell collapsing>
+                                <Icon name={"suitcase"} color={"teal"}/>&nbsp;
+                                Working Model & Time&nbsp;
                             </Table.Cell>
-                        </Table.Row> : null}
-                </Table.Body>
-            </Table>
+                            <Table.Cell content={`${jobAdvert.workModel} & ${jobAdvert.workTime}`}/>
+                            <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={workModelOrTimeUpdated}
+                                              content={`${jobAdvert.jobAdvertisementUpdate?.workModel} & ${jobAdvert.jobAdvertisementUpdate?.workTime}`}
+                                              emptyCell={tableInfosUpdated}/>
+                        </Table.Row>
+                        {salaryInfo !== "No Salary Info" || systemEmployee || publisherEmpl ?
+                            <Table.Row>
+                                <Table.Cell collapsing>
+                                    <Icon name={"dollar sign"} color={"green"}/>&nbsp;
+                                    Salary
+                                </Table.Cell>
+                                <Table.Cell content={salaryInfo}/>
+                                <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={salaryUpdated}
+                                                  content={updatedSalaryInfo} emptyCell={tableInfosUpdated}/>
+                            </Table.Row> : null}
+                        <Table.Row>
+                            <Table.Cell collapsing>
+                                <Icon name={"calendar alternate outline"} color={"purple"}/>&nbsp;
+                                Deadline
+                            </Table.Cell>
+                            <Table.Cell content={deadlineInfo}/>
+                            <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={deadlineUpdated}
+                                              content={updatedDeadlineInfo} emptyCell={tableInfosUpdated}/>
+                        </Table.Row>
+                        <Table.Row>
+                            <Table.Cell collapsing>
+                                <Icon name={"users"} color={"yellow"}/>&nbsp;
+                                Open Positions
+                            </Table.Cell>
+                            <Table.Cell content={jobAdvert.openPositions}/>
+                            <SUpdateTableCell infoAuthorized={systemEmployee || publisherEmpl} visible={openPositionsUpdated}
+                                              content={jobAdvert.jobAdvertisementUpdate?.openPositions} emptyCell={tableInfosUpdated}/>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
 
-            <EmployerSummary employer={jobAdvert.employer}/>
-            <Divider/>
-            <font style={{float: "right"}}>
-                {getCreatedAtAsStr(jobAdvert.createdAt)}
-            </font>
-        </div>
+                <Table style={{borderRadius: 0}} definition structured color={"red"}>
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell>
+                                <Icon name={"tasks"} color={"red"} style={{marginRight: -2}}/>
+                                <strong style={{marginLeft: 10}}>Job Description</strong>
+                            </Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        <Table.Row>
+                            <Table.Cell>
+                                <Segment basic content={<p className={"paragraph"}>{jobAdvert.jobDescription}</p>}/>
+                            </Table.Cell>
+                        </Table.Row>
+                        {(systemEmployee || publisherEmpl) && descUpdated ?
+                            <Table.Row>
+                                <Table.Cell warning>
+                                    <Segment content={<p className={"paragraph"}>{jobAdvert.jobAdvertisementUpdate.jobDescription}</p>}
+                                             basic/>
+                                </Table.Cell>
+                            </Table.Row> : null}
+                    </Table.Body>
+                </Table>
+
+                <EmployerSummary employer={jobAdvert.employer}/>
+                <Divider/>
+                <font style={{float: "right"}}>
+                    {getCreatedAtAsStr(jobAdvert.createdAt)}
+                </font>
+            </div>
+        </Transition>
     );
 }

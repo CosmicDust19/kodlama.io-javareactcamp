@@ -1,4 +1,4 @@
-import {Button, Divider, Grid, Header, Icon, Message, Segment,} from "semantic-ui-react";
+import {Button, Divider, Grid, Header, Icon, Message, Segment, Transition,} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import CandJobExpsTable from "../../components/candidate/CandJobExpsTable";
@@ -12,8 +12,18 @@ export function CandidateProfile() {
 
     const userProps = useSelector(state => state?.user?.userProps)
 
+    const [visible, setVisible] = useState(false);
     const [user, setUser] = useState(userProps.user);
     const [editable, setEditable] = useState(true);
+
+    useEffect(() => {
+        setTimeout(() => setVisible(true), 50)
+        return () => {
+            setVisible(undefined)
+            setUser(undefined)
+            setEditable(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         setUser(userProps.user)
@@ -36,25 +46,27 @@ export function CandidateProfile() {
         </Message>
 
     return (
-        <div style={{marginRight: -20, marginLeft: -20}}>
-            <Segment basic  style={{marginLeft: 20, marginRight: 20, marginBottom: 10}}>
-                <Header dividing content={"Manage Your Infos"} sub as="font"/>
-                <Button compact size={"small"} onClick={toggleEditable} inverted floated={"right"}
-                        style={{borderRadius: 0, marginTop: -3}} color={"vk"}>
-                    <Icon name={editable ? "eye" : "edit"}/>
-                    {editable ? <font style={{fontSize: 12}}>Simple</font> :
-                        <font style={{fontSize: 12}}>Editable</font>}
-                    &nbsp;view
-                </Button>
-            </Segment>
-            <Grid stackable style={{marginRight: 20, marginLeft: 20}}>
-                <CandJobExpsTable user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
-                <CandSchoolsTable user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
-                <CandLangsTable user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
-                <CandSkillsSeg user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
-            </Grid>
-            <Divider style={{marginTop: 20}}/>
-            {!editable && noInfo ? noInfoMessage : null}
-        </div>
+        <Transition visible={visible} duration={200}>
+            <div style={{marginRight: -20, marginLeft: -20}}>
+                <Segment basic style={{marginLeft: 20, marginRight: 20, marginBottom: 10}}>
+                    <Header dividing content={"Manage Your Infos"} sub as="font" style={{userSelect: "none"}}/>
+                    <Button compact size={"small"} onClick={toggleEditable} inverted floated={"right"}
+                            style={{borderRadius: 0, marginTop: -3}} color={"vk"}>
+                        <Icon name={editable ? "eye" : "edit"}/>
+                        {editable ? <font style={{fontSize: 12}}>Simple</font> :
+                            <font style={{fontSize: 12}}>Editable</font>}
+                        &nbsp;view
+                    </Button>
+                </Segment>
+                <Grid stackable style={{marginRight: 20, marginLeft: 20}}>
+                    <CandJobExpsTable user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
+                    <CandSchoolsTable user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
+                    <CandLangsTable user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
+                    <CandSkillsSeg user={user} editable={editable} unstackable={!editable} vertical={verticalScreen}/>
+                </Grid>
+                <Divider style={{marginTop: 20}}/>
+                {!editable && noInfo ? noInfoMessage : null}
+            </div>
+        </Transition>
     )
 }

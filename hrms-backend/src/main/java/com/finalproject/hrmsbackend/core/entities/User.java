@@ -38,8 +38,10 @@ public class User implements BaseEntity<Integer> {
     @Column(name = "password", nullable = false, length = 100)
     private String password;
 
-    @Column(name = "profileImgId")
-    private Integer profileImgId;
+    @OneToOne
+    @JoinColumn(name = "profile_img_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = {"user"})
+    private Image profileImg;
 
     @OneToMany(mappedBy = "user")
     @JsonIgnoreProperties(value = {"user"})

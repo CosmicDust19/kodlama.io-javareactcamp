@@ -2,25 +2,31 @@ import axios from "axios"
 
 export default class JobAdvertisementService {
 
-    getAll() {
-        return axios.get("http://localhost:8080/api/jobAdvertisements/get/all");
+    getAll(propName, sortDirection) {
+        const params = propName && sortDirection ? `propName=${propName}&sortDirection=${sortDirection}` : undefined
+        return axios.get(`http://localhost:8080/api/jobAdvertisements/get/all?${params ? params : undefined}`);
     }
 
     getAllByEmployerId(employerId) {
         return axios.get(`http://localhost:8080/api/jobAdvertisements/get/byEmployer?employerId=${employerId}`);
     }
 
-    getPublic(sortDirection) {
-        if (!sortDirection) return axios.get(`http://localhost:8080/api/jobAdvertisements/get/public`);
-        return axios.get(`http://localhost:8080/api/jobAdvertisements/get/public?sortDirection=${sortDirection}`);
+    getPublic(propName, sortDirection) {
+        const params = propName && sortDirection ? `propName=${propName}&sortDirection=${sortDirection}` : undefined
+        return axios.get(`http://localhost:8080/api/jobAdvertisements/get/public?${params ? params : undefined}`);
     }
 
-    getPublicByEmployerId(employerId) {
-        return axios.get(`http://localhost:8080/api/jobAdvertisements/get/publicByEmployer?employerId=${employerId}`);
+    getPublicByEmployerId(employerId, propName, sortDirection) {
+        const params = propName && sortDirection ? `propName=${propName}&sortDirection=${sortDirection}` : undefined
+        return axios.get(`http://localhost:8080/api/jobAdvertisements/get/publicByEmployer?employerId=${employerId}&${params ? params : undefined}`);
     }
 
     getById(jobAdvId) {
         return axios.get(`http://localhost:8080/api/jobAdvertisements/get/byId?jobAdvId=${jobAdvId}`);
+    }
+
+    deleteById(jobAdvId) {
+        return axios.delete(`http://localhost:8080/api/jobAdvertisements/delete/byId?jobAdvId=${jobAdvId}`);
     }
 
     add(values) {

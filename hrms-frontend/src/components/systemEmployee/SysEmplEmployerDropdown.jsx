@@ -1,6 +1,6 @@
 import {Dropdown, Icon} from "semantic-ui-react";
 import {changePropInList, handleCatch} from "../../utilities/Utils";
-import {changeFilteredEmployers} from "../../store/actions/filterActions";
+import {changeFilteredEmployers} from "../../store/actions/listingActions";
 import {toast} from "react-toastify";
 import {useDispatch, useSelector} from "react-redux";
 import React from "react";
@@ -11,7 +11,7 @@ function SysEmplEmployerDropdown({employer, setEmployer, infoOption, ...props}) 
 
     const employerService = new EmployerService();
 
-    const filteredEmployers = useSelector(state => state?.filter.filter.filteredEmployers)
+    const filteredEmployers = useSelector(state => state?.listingReducer.listingProps.employers.filteredEmployers)
     const userType = useSelector(state => state?.user?.userProps.userType)
     const dispatch = useDispatch();
     const history = useHistory();

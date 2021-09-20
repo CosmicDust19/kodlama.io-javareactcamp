@@ -21,7 +21,7 @@ export default function SignedOut({toggle}) {
                     <Menu.Item name="Jobs" as={Link} to={"/"} content={"Jobs"}/>
                 </Grid.Column>
                 <Grid.Column>
-                    <Menu.Item name="Users" as={Link} to={"/users"} color={"red"} content={"Users"} onClick={() => scroll(40)}/>
+                    <Menu.Item name="Users" as={Link} to={"/users"} color={"red"} content={"Users"} onClick={() => scroll(10)}/>
                 </Grid.Column>
             </Grid>
 

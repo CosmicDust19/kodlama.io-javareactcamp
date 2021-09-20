@@ -6,11 +6,13 @@ import CandSchoolsTable from "./CandSchoolsTable";
 import CandLangsTable from "./CandLangsTable";
 import CandSkillsSeg from "./CandSkillsSeg";
 import {getCreatedAtAsStr, handleCatch} from "../../utilities/Utils";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {changeCandCVs} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
 import CandidateCvService from "../../services/candidateCvService";
 import {useDispatch} from "react-redux";
+import Avatar from "../common/Avatar";
+import ImageUploadModal from "../common/ImageUploadModal";
 
 function CandCvSeg({user, cv, setIndex}) {
 
@@ -19,6 +21,10 @@ function CandCvSeg({user, cv, setIndex}) {
     const dispatch = useDispatch();
 
     const [popupOpen, setPopupOpen] = useState(false);
+
+    useEffect(() => {
+        return () => setPopupOpen(undefined)
+    }, []);
 
     const verticalScreen = window.innerWidth < window.innerHeight
 
@@ -36,8 +42,17 @@ function CandCvSeg({user, cv, setIndex}) {
     return (
         <div style={{marginRight: -10, marginLeft: -10}}>
 
-            <CandCvTitleSeg user={user} cv={cv}/>
-            <CandCvCoverLetterSeg user={user} cv={cv}/>
+            <Grid style={{marginBottom: -10}} stackable>
+                <Grid.Column width={3} style={{marginTop: -15}} verticalAlign={"middle"}>
+                    <Avatar image={cv.image} size={"small"} avatar={false} centered/>
+                    <ImageUploadModal user={user} cv={cv}
+                                      style={{marginTop: 20, marginRight: 107, borderRadius: 20, opacity: 0.85, width: 33}}/>
+                </Grid.Column>
+                <Grid.Column width={13}>
+                    <CandCvTitleSeg user={user} cv={cv}/>
+                    <CandCvCoverLetterSeg user={user} cv={cv}/>
+                </Grid.Column>
+            </Grid>
             <Grid stackable>
                 <CandJobExpsTable user={user} cv={cv} unstackable editable small={verticalScreen}/>
                 <CandSchoolsTable user={user} cv={cv} unstackable editable small={verticalScreen}/>

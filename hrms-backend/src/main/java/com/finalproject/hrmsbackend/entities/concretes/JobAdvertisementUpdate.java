@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -53,10 +54,10 @@ public class JobAdvertisementUpdate {
     @Column(name = "deadline")
     private LocalDate deadline;
 
-    @Column(name = "work_model", length = 20)
+    @Column(name = "work_model", length = Utils.Const.MAX_JOB_ADV_WORK_MODEL)
     private String workModel;
 
-    @Column(name = "work_time", length = 20)
+    @Column(name = "work_time", length = Utils.Const.MAX_JOB_ADV_WORK_TIME)
     private String workTime;
 
 }

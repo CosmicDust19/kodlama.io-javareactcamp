@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.entities.abstracts.CvProp;
 import lombok.*;
 
@@ -29,7 +30,7 @@ public class CandidateJobExperience implements CvProp {
             "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 
-    @Column(name = "workplace", nullable = false, length = 100)
+    @Column(name = "workplace", nullable = false, length = Utils.Const.MAX_WORKPLACE)
     private String workPlace;
 
     @ManyToOne

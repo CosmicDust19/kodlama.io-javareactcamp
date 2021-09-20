@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.User;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,7 +21,7 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Employer extends User {
 
-    @Column(name = "company_name", nullable = false, unique = true, length = 100)
+    @Column(name = "company_name", nullable = false, unique = true, length = Utils.Const.MAX_COMPANY_NAME)
     private String companyName;
 
     @Column(name = "website", nullable = false, unique = true, length = 200)

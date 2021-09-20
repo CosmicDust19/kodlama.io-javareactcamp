@@ -17,6 +17,6 @@ public interface UserService {
 
     Result updatePW(String password, String oldPassword, int userId);
 
-    Result updateProfileImgId(Integer imgId, int userId);
+    Result updateProfileImg(Integer imgId, int userId);
 }
 

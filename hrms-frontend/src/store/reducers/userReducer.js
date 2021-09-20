@@ -29,7 +29,7 @@ export default function userReducer(state = initialState, {type, payload}) {
                     ...state.userProps,
                     user: {...payload.user},
                     userType: payload.userType,
-                    loggedIn: true, guest: false
+                    loggedIn: true, guest: false, lastLogin: new Date().getTime()
                 }
             }
         case SIGN_OUT:
@@ -37,9 +37,7 @@ export default function userReducer(state = initialState, {type, payload}) {
                 ...state,
                 userProps: {
                     ...state.userProps,
-                    user: null,
-                    userType: null,
-                    loggedIn: false
+                    user: null, userType: null, loggedIn: false, lastLogin: null
                 }
             }
         case SYNC_USER:

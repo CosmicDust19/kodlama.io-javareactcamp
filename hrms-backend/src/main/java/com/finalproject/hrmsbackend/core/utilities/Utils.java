@@ -36,7 +36,7 @@ public class Utils {
         public static final int MAX_ACCOUNT_LINK = 100;
         public static final int MAX_WORKPLACE = 100;
         public static final int MAX_CV_TITLE = 50;
-        public static final int MAX_CV_COVER_LETTER = 200;
+        public static final int MAX_CV_COVER_LETTER = 1000;
         public static final int MAX_COMPANY_NAME = 100;
         public static final int MIN_YEAR = 1900;
         public static final int THIS_YEAR = 2021;
@@ -74,6 +74,7 @@ public class Utils {
     }
 
     public Sort getSortByDirection(Short sortDirection, String propName) {
+
         if (sortDirection == null || sortDirection < 0) return Sort.by(Sort.Direction.DESC, propName);
         else return Sort.by(Sort.Direction.ASC, propName);
     }

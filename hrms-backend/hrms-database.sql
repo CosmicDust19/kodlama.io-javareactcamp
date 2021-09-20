@@ -69,6 +69,8 @@ CREATE TABLE public.images
     name      character varying(100),
     user_id   integer                NOT NULL,
     image_url character varying(150) NOT NULL,
+    width     smallint,
+    height    smallint,
     CONSTRAINT pk_images PRIMARY KEY (id),
     CONSTRAINT fk_images_user_id FOREIGN KEY (user_id)
         REFERENCES public.users (id)
@@ -220,6 +222,9 @@ CREATE TABLE public.candidates_schools
     graduation_year smallint,
     CONSTRAINT pk_candidates_schools PRIMARY KEY (id),
     CONSTRAINT uk_candidates_schools_candidate_school_department UNIQUE (candidate_id, school_id, department_id),
+    CONSTRAINT fk_candidates_schools_candidate_id FOREIGN KEY (candidate_id)
+        REFERENCES public.candidates (user_id)
+        ON DELETE CASCADE,
     CONSTRAINT fk_candidates_schools_school_id FOREIGN KEY (school_id)
         REFERENCES public.schools (id),
     CONSTRAINT fk_candidates_schools_department_id FOREIGN KEY (department_id)
@@ -260,13 +265,16 @@ CREATE TABLE public.cvs
     id               integer                        NOT NULL,
     title            char varying(50)               NOT NULL,
     candidate_id     integer                        NOT NULL,
-    cover_letter     char varying(200),
+    cover_letter     char varying(1000),
+    img_id           integer,
     created_at       timestamp(0) without time zone NOT NULL DEFAULT current_timestamp,
     last_modified_at timestamp(0) without time zone,
     CONSTRAINT pk_candidates_cvs PRIMARY KEY (id),
     CONSTRAINT fk_candidates_cvs_candidate_id FOREIGN KEY (candidate_id)
         REFERENCES public.candidates (user_id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_cvs_img_id
+        FOREIGN KEY (img_id) REFERENCES public.images (id)
 );
 
 CREATE TABLE public.cvs_schools
@@ -612,14 +620,14 @@ VALUES (4, 'examplefn4', 'exampleln4', '12345678910', 1994),
 UPDATE candidates
 SET github_account   = 'https://github.com/CosmicDust19',
     linkedin_account = 'https://www.linkedin.com/in/semih-kayan/'
-WHERE user_id = 4;
+WHERE user_id = 5;
 
 INSERT INTO employers_updates
-VALUES (7, 'example7@example.com', 'example_company7', 'www.example_web_site7.com', '05005005057'),
-       (8, 'example8@example.com', 'example_company8', 'www.example_web_site8.com', '05005005058'),
-       (9, 'example9@example.com', 'example_company9', 'www.example_web_site9.com', '05005005059');
+VALUES (7, 'example7@example.com', 'example_company7', 'www.example_web_site7.com', '0 200 200 20 27'),
+       (8, 'example8@example.com', 'example_company8', 'www.example_web_site8.com', '0 200 200 20 28'),
+       (9, 'example9@example.com', 'example_company9', 'www.example_web_site9.com', '0 200 200 20 29');
 
 INSERT INTO employers
-VALUES (7, 'example_company7', 'www.example_web_site7.com', '05005005057', 7, true),
-       (8, 'example_company8', 'www.example_web_site8.com', '05005005058', 8, true),
-       (9, 'example_company9', 'www.example_web_site9.com', '05005005059', 9, true);
+VALUES (7, 'example_company7', 'www.example_web_site7.com', '0 200 200 20 27', 7, true),
+       (8, 'example_company8', 'www.example_web_site8.com', '0 200 200 20 28', 8, true),
+       (9, 'example_company9', 'www.example_web_site9.com', '0 200 200 20 29', 9, true);

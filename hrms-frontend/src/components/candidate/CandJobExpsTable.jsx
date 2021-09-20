@@ -1,4 +1,4 @@
-import {Accordion, Button, Card, Grid, Header, Icon, Loader, Segment, Table} from "semantic-ui-react";
+import {Button, Grid, Icon, Loader, Table, Transition} from "semantic-ui-react";
 import SInput from "../../utilities/customFormControls/SInput";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
 import React, {useEffect, useState} from "react";
@@ -10,8 +10,11 @@ import {getFilteredCandJobExpOption, onCVUpdate, onPropAdd, syncCandidate} from 
 import {useDispatch} from "react-redux";
 import PositionService from "../../services/positionService";
 import CandidateCvService from "../../services/candidateCvService";
+import ManagementTable from "../common/ManagementTable";
+import AreYouSureModal from "../common/AreYouSureModal";
 
-function CandJobExpsTable({user, cv, editable = false, defaultClosed = false, unstackable = false, vertical = false, small = false, width = 16}) {
+function CandJobExpsTable
+({user, cv, editable = false, defaultClosed = false, unstackable = false, vertical = false, small = false, width = 16}) {
 
     const candJobExpService = new CandidateJobExperienceService();
     const candCvService = new CandidateCvService();
@@ -19,12 +22,21 @@ function CandJobExpsTable({user, cv, editable = false, defaultClosed = false, un
     const dispatch = useDispatch();
 
     const [positions, setPositions] = useState([]);
-    const [open, setOpen] = useState(defaultClosed !== true);
+    const [active, setActive] = useState(defaultClosed !== true);
+    const [candJobExpIdDel, setCandJobExpIdDel] = useState();
+
+    useEffect(() => {
+        return () => {
+            setPositions(undefined)
+            setActive(undefined)
+            setCandJobExpIdDel(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         if (editable && !cv) {
             const positionService = new PositionService();
-            positionService.getPositions().then((result) => setPositions(result.data.data));
+            positionService.getAll().then((result) => setPositions(result.data.data));
         }
     }, [cv, editable]);
 
@@ -88,79 +100,61 @@ function CandJobExpsTable({user, cv, editable = false, defaultClosed = false, un
             .catch(handleCatch)
     //
 
-    const onRemove = (candJobExpId) => cv ? removeJobExpFromCv(candJobExpId) : deleteJobExperience(candJobExpId)
+    const onRemove = () => {
+        cv ? removeJobExpFromCv(candJobExpIdDel) : deleteJobExperience(candJobExpIdDel)
+        setCandJobExpIdDel(undefined)
+    }
+
+    const headerRow = [
+        "Workplace", "Position", "Start Year", "Quit Year",
+        editable && (candJobExps.length !== 0 || !cv) ? "" : undefined
+    ]
+
+    const tableData = candJobExps
+        .map(candJobExp => ({candJobExp: candJobExp}))
+        .sort((a, b) => a.candJobExp.quitYear - b.candJobExp.quitYear)
+
+    // semantic takes the field value as the key. we guaranteed that they will be different by giving a unique key
+    const renderBodyRow = ({candJobExp}, i) => ({
+        key: i,
+        cells: [
+            {content: candJobExp.workPlace, key: "workPlace"},
+            {content: candJobExp.position.title, key: "position"},
+            {content: candJobExp.startYear, key: "startYear"},
+            candJobExp.quitYear ? {content: candJobExp.quitYear, key: "quitYear"} : "Continues",
+            editable ?
+                <Table.Cell key={"del"} onClick={() => setCandJobExpIdDel(candJobExp.id)} negative selectable
+                            icon={<Icon name={"x"} style={{marginRight: 0}}/>}/> : null
+        ]
+    })
+
+    const footerCells = editable && !cv ? [
+        <SInput name="workPlace" placeholder="Workplace" formik={formik} style={inputStyle}/>,
+        <SDropdown options={positionOption} name="positionId" placeholder="Position" multiple={false} formik={formik} style={{}}/>,
+        <SInput name="startYear" placeholder="Start Year" formik={formik} style={inputStyle} type="number"/>,
+        <SInput name="quitYear" placeholder="Quit Year" formik={formik} style={inputStyle} type="number"/>
+    ] : null
 
     return (
         <Grid.Column width={width} style={{marginTop: 10}}>
-            <Accordion>
-                <Accordion.Title onClick={() => setOpen(!open)} active={open}>
-                    <Card fluid raised style={{borderRadius: 0}} onClick={() => {}}>
-                        <Card.Header>
-                            <Header textAlign={"center"} dividing color="green" content={"Job Experiences"}
-                                    style={{marginBottom: 0, borderRadius: 0}} block/>
-                        </Card.Header>
-                    </Card>
-                </Accordion.Title>
-                <Accordion.Content active={open} as={Segment} size={segmentSize} raised vertical
-                                   style={{marginTop: -6.5, marginBottom: 10, borderRadius: 0}}>
-                    <Table size={tableSize} celled unstackable={unstackable} textAlign="center" striped
-                           style={{marginTop: -14, marginBottom: -14, borderRadius: 0}}>
-                        <Table.Header>
-                            <Table.Row>
-                                <Table.HeaderCell content={"Work Place"}/>
-                                <Table.HeaderCell content={"Position"}/>
-                                <Table.HeaderCell content={"Start Year"}/>
-                                <Table.HeaderCell content={"Quit Year"}/>
-                                {editable && (candJobExps.length !== 0 || !cv) ? <Table.HeaderCell/> : null}
-                            </Table.Row>
-                        </Table.Header>
-
-                        <Table.Body>
-                            {candJobExps.map((candJobExp) => (
-                                <Table.Row key={candJobExp.id}>
-                                    <Table.Cell content={candJobExp.workPlace}/>
-                                    <Table.Cell content={candJobExp.position.title}/>
-                                    <Table.Cell content={candJobExp.startYear}/>
-                                    <Table.Cell content={!candJobExp.quitYear ? "Continues" : candJobExp.quitYear}/>
-                                    {editable ? <Table.Cell onClick={() => onRemove(candJobExp.id)} negative selectable
-                                                            icon={<Icon name={"x"} style={{marginRight: 0}}/>}/> : null}
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-
-                        {editable && !cv ?
-                            <Table.Footer>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <SInput name="workPlace" placeholder="Work Place" formik={formik} style={inputStyle}/>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <SDropdown options={positionOption} name="positionId" placeholder="Position"
-                                                   multiple={false} formik={formik} style={{}}/>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <SInput name="startYear" placeholder="Start Year" formik={formik}
-                                                style={inputStyle} type="number"/>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <SInput name="quitYear" placeholder="Quit Year" formik={formik}
-                                                style={inputStyle} type="number"/>
-                                    </Table.Cell>
-                                    <Table.Cell positive icon={<Icon name={"plus"} style={{marginRight: 0}} disabled={invalidCandJobExp}/>}
-                                                onClick={addJobExperience} selectable disabled={invalidCandJobExp}/>
-                                </Table.Row>
-                            </Table.Footer> : null}
-                    </Table>
-                </Accordion.Content>
-            </Accordion>
-            {editable && cv && open ?
+            <AreYouSureModal open={!!candJobExpIdDel} message={`Are you sure you want to remove${cv ? "" : " from everywhere"} ?`}
+                             yesColor={"red"} noColor={"grey"} onYes={onRemove} onNo={() => setCandJobExpIdDel(undefined)}/>
+            <ManagementTable
+                headerContent={"Job Experiences"} color={"green"} unstackable={unstackable} open={active} setOpen={setActive}
+                tableSize={tableSize} segmentSize={segmentSize} onAdd={addJobExperience} addDisabled={invalidCandJobExp}
+                headerRow={headerRow} tableData={tableData} renderBodyRow={renderBodyRow} footerCells={footerCells}/>
+            <Transition visible={active} duration={200} animation={"slide down"}>
                 <div>
-                    <SDropdown options={candJobExpOption} name="candJobExpIds" placeholder="Job experiences"
-                               formik={formik} loading={false} disabled={candJobExpOption.length === 0}
-                               style={{marginRight: 10, color: "rgba(30,170,30,0.9)"}}/>
-                    <Button icon="plus" color="blue" content={"Add"} onClick={addJobExpsToCv}
-                            disabled={formik.values.candJobExpIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
-                </div> : null}
+                    {editable && cv ?
+                        <div>
+                            <SDropdown options={candJobExpOption} name="candJobExpIds" placeholder="Job experiences"
+                                       formik={formik} loading={false} disabled={candJobExpOption.length === 0}
+                                       style={{marginRight: 10, color: "rgba(30,170,30,0.9)"}}/>
+                            <Button icon="plus" color="blue" content={"Add"} onClick={addJobExpsToCv}
+                                    disabled={formik.values.candJobExpIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
+                        </div> : null}
+                </div>
+            </Transition>
         </Grid.Column>
     )
 }

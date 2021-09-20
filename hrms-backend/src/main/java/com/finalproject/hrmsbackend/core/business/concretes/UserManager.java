@@ -9,6 +9,7 @@ import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerDao;
+import com.finalproject.hrmsbackend.dataAccess.abstracts.ImageDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.SystemEmployeeDao;
 import com.finalproject.hrmsbackend.entities.concretes.Image;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class UserManager implements UserService {
     private final CandidateDao candidateDao;
     private final EmployerDao employerDao;
     private final SystemEmployeeDao sysEmplDao;
+    private final ImageDao imageDao;
     private final CheckService check;
     private final EmailService emailService;
 
@@ -82,15 +84,15 @@ public class UserManager implements UserService {
     }
 
     @Override
-    public Result updateProfileImgId(Integer imgId, int userId) {
+    public Result updateProfileImg(Integer imgId, int userId) {
         if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
 
         User user = userDao.getById(userId);
-        if (check.equals(user.getProfileImgId(), imgId))
+        if (user.getProfileImg() != null && check.equals(user.getProfileImg().getId(), imgId))
             return new ErrorResult(Msg.IS_THE_SAME.get("Profile photo"));
         for (Image img : user.getImages())
             if (imgId == null || check.equals(img.getId(), imgId)) {
-                user.setProfileImgId(imgId);
+                user.setProfileImg(imgId == null ? null : imageDao.getById(imgId));
                 return execLastUpdAct(user);
             }
 

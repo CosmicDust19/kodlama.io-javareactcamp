@@ -15,6 +15,15 @@
   font-family: "Lucida Handwriting", cursive;
 }
 
-.jobDescription{
+.paragraph{
   font-family: "Calibri Light", sans-serif;
+  white-space: pre-wrap;
+}
+
+.container__table {
+  margin-bottom: -14px;
+  margin-top: -13px;
+  margin-right: -10px;
+  max-height: 30em;
+  overflow-y: auto;
 }

@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {Button, Dimmer, Grid, Image, Modal, Popup, Segment} from "semantic-ui-react";
+import React, {useEffect, useState} from "react";
+import {Button, Dimmer, Grid, Icon, Image, Label, Modal, Popup, Segment} from "semantic-ui-react";
 import ImageService from "../../services/imageService";
 import {toast} from "react-toastify";
 import {useDispatch} from "react-redux";
@@ -7,20 +7,48 @@ import {changeImages} from "../../store/actions/userActions";
 import {handleCatch} from "../../utilities/Utils";
 import UserService from "../../services/userService";
 import {onUpdate} from "../../utilities/UserUtils";
+import CandidateCvService from "../../services/candidateCvService";
+import {onCVUpdate} from "../../utilities/CandidateUtils";
 
-function ImageUploadModal({user, ...props}) {
+function ImageUploadModal({user, cv, ...props}) {
 
     const imageService = new ImageService();
-    const userService = new UserService()
+    const userService = new UserService();
+    const cvService = new CandidateCvService();
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState();
     const [fileInput, setFileInput] = useState();
+    const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [selectedImgId, setSelectedImgId] = useState();
+
+    useEffect(() => {
+        return () => {
+            setOpen(undefined)
+            setSelectedFile(undefined)
+            setFileInput(undefined)
+            setLoading(undefined)
+            setUploading(undefined)
+            setDeleting(undefined)
+            setSelectedImgId(undefined)
+        };
+    }, []);
+
+    useEffect(() => {
+        if (selectedFile?.size / 1000000 > 1) {
+            toast.warning("You can upload files up to 1 MB")
+            setSelectedFile(undefined)
+        }
+    }, [selectedFile]);
+
+    if (!user) return null
+
+    const profileImgId = user.profileImg?.id
+    const cvImgId = cv?.image?.id
 
     const selectFile = (event) => setSelectedFile(event.target.files[0])
 
@@ -33,18 +61,23 @@ function ImageUploadModal({user, ...props}) {
                 user.images.push(r.data.data)
                 dispatch(changeImages(user.images))
                 setSelectedFile(undefined)
+                setSelectedImgId(r.data.data.id)
                 toast("Uploaded");
             })
-            .catch(err => {
-                if (!handleCatch(err))
-                    toast.warning("You can upload files up to 1 MB")
-            })
+            .catch(handleCatch)
             .finally(() => setUploading(false))
     };
 
     const deleteImg = () => {
         setDeleting(true)
-        if (selectedImgId === user.profileImgId) updateProfileImg(undefined)
+        if (selectedImgId === profileImgId) updateProfileImg(undefined)
+        if (selectedImgId === cvImgId) updateCvImg(undefined)
+        const index = user.cvs ? user.cvs.findIndex(userCv => userCv.id !== cv?.id && userCv.image?.id === selectedImgId) : -1
+        if (index !== -1) {
+            toast.warning(`You are using this image in ${cv ? "other CVs" : "your CVs"}`)
+            setDeleting(false);
+            return;
+        }
         imageService.deleteById(selectedImgId)
             .then(() => {
                 const imgIndex = user.images.findIndex(img => img.id === selectedImgId)
@@ -55,13 +88,27 @@ function ImageUploadModal({user, ...props}) {
             })
             .catch(handleCatch)
             .finally(() => setDeleting(false))
-    }
+    };
+
+    const photoKind = !!user.companyName ? "logo" : cv ? "CV photo" : "profile photo"
 
     const updateProfileImg = (imgId) => {
-        userService.updateProfileImgId(imgId, user.id)
-            .then(r => onUpdate(dispatch, r, imgId ? "Successful" : "Profile photo removed"))
+        setLoading(true)
+        userService.updateProfileImg(imgId, user.id)
+            .then(r => onUpdate(dispatch, r, imgId ? "Successful" : "Removed from profile"))
             .catch(handleCatch)
+            .finally(() => setLoading(false))
     }
+
+    const updateCvImg = (imgId) => {
+        setLoading(true)
+        cvService.updateImg(imgId, cv.id)
+            .then(r => onCVUpdate(dispatch, cv.id, user.cvs, r, imgId ? "Successful" : "Removed from CV"))
+            .catch(handleCatch)
+            .finally(() => setLoading(false))
+    }
+
+    const onUpdateImg = (imgId) => cv ? updateCvImg(imgId) : updateProfileImg(imgId)
 
     const handleImgClick = (imageId) =>
         selectedImgId === imageId ? setSelectedImgId(undefined) : setSelectedImgId(imageId)
@@ -71,14 +118,16 @@ function ImageUploadModal({user, ...props}) {
     const dimmerStyle = {backgroundColor: "rgba(0,0,0,0.3)", outlineStyle: "ridge"}
     const imgDimmer = <Dimmer active style={dimmerStyle}/>
 
+    const modelHeaderContent = !hasImg ?
+        <div>Upload {photoKind} &nbsp;<Icon name={"cloud upload"} color={"blue"}/></div> : "Select a Photo"
+
     return (
         <Modal onClose={() => setOpen(false)} onOpen={() => setOpen(true)} open={open} closeIcon basic
                trigger={
-                   <Button compact color={"violet"} labelPosition={"right"} icon={"images"}
-                           content={user.images?.length === 0 ? "Add a photo" : "Your photos"} {...props}/>}>
-            <Modal.Header style={{marginLeft: 15}}>
-                {!hasImg ? "Upload your first photo" : "Select a Photo"}
-            </Modal.Header>
+                   <Label attached={"top right"} as={Button}
+                          icon={<Icon name={"images"} style={{marginLeft: -2, marginTop: -2}} size={"large"} color={"violet"}/>}
+                          style={{marginTop: -10, marginRight: -10, borderRadius: 20, opacity: 0.85, width: 33}} {...props}/>}>
+            <Modal.Header style={{marginLeft: 15}} content={modelHeaderContent}/>
             {!hasImg ? null :
                 <Modal.Content image scrolling style={{maxHeight: "30em"}}>
                     <Modal.Description>
@@ -98,9 +147,9 @@ function ImageUploadModal({user, ...props}) {
                 <Grid stackable doubling>
                     {!hasImg ? null :
                         <Grid.Column width={5}>
-                            <Button content={"Make profile photo"} icon={"user"} labelPosition={"right"} fluid
-                                    onClick={() => updateProfileImg(selectedImgId)} color={"blue"}
-                                    disabled={!selectedImgId || selectedImgId === user.profileImgId}/>
+                            <Button content={`Make ${photoKind}`} icon={!!user.companyName ? "building outline" : "user"} loading={loading}
+                                    labelPosition={"right"} fluid onClick={() => onUpdateImg(selectedImgId)} color={"blue"}
+                                    disabled={!selectedImgId || cv ? selectedImgId === cvImgId : selectedImgId === profileImgId || loading}/>
                         </Grid.Column>}
                     {!hasImg ? null :
                         <Grid.Column width={5}>
@@ -109,9 +158,9 @@ function ImageUploadModal({user, ...props}) {
                         </Grid.Column>}
                     {!hasImg ? null :
                         <Grid.Column width={5}>
-                            <Button content={"Remove profile photo"} icon={"x"} labelPosition={"right"} fluid
-                                    onClick={() => updateProfileImg(undefined)} color={"yellow"}
-                                    disabled={!user.profileImgId}/>
+                            <Button content={`Remove ${photoKind}`} icon={"x"} labelPosition={"right"} fluid
+                                    onClick={() => onUpdateImg(undefined)} color={"yellow"} loading={loading}
+                                    disabled={cv ? !cvImgId : !profileImgId || loading}/>
                         </Grid.Column>}
                     <Grid.Column width={5}>
                         <Button content={selectedFile ? "Change selected file" : "Choose a file to upload"}

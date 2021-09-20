@@ -1,7 +1,7 @@
 import {Dropdown, Icon} from "semantic-ui-react";
 import {changePropInList, handleCatch} from "../../utilities/Utils";
 import JobAdvertisementService from "../../services/jobAdvertisementService";
-import {changeFilteredJobAdverts} from "../../store/actions/filterActions";
+import {changeFilteredJobAdverts} from "../../store/actions/listingActions";
 import {toast} from "react-toastify";
 import {useDispatch, useSelector} from "react-redux";
 import React from "react";
@@ -11,7 +11,7 @@ function SysEmplAdvertDropdown({jobAdvert, setJobAdvert, infoOption, ...props}) 
 
     const jobAdvertisementService = new JobAdvertisementService();
 
-    const filteredJobAdverts = useSelector(state => state?.filter.filter.filteredJobAdverts)
+    const filteredJobAdverts = useSelector(state => state?.listingReducer.listingProps.jobAdverts.filteredJobAdverts)
     const userType = useSelector(state => state?.user?.userProps.userType)
     const dispatch = useDispatch();
     const history = useHistory();

@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import SignedIn from "./SignedIn"
 import SignedOut from "./SignedOut"
 import {useSelector} from "react-redux";
-import {Icon, Menu, Sidebar} from "semantic-ui-react";
+import {Icon, Menu, Sidebar, Transition} from "semantic-ui-react";
 
 export default function Navi() {
 
@@ -11,6 +11,15 @@ export default function Navi() {
     const [verticalScreen, setVerticalScreen] = useState(window.innerWidth < window.innerHeight)
     const [authenticated, setAuthenticated] = useState(false)
     const [visible, setVisible] = useState(!verticalScreen)
+
+    useEffect(() => {
+        return () => {
+            setVerticalScreen(undefined)
+            setAuthenticated(undefined)
+            setVisible(undefined)
+        };
+    }, []);
+
 
     useEffect(() => {
         setAuthenticated(userProps.loggedIn)
@@ -28,12 +37,15 @@ export default function Navi() {
                     <SignedIn toggle={toggle} verticalScreen={verticalScreen}/> :
                     <SignedOut toggle={toggle}/>}
             </Sidebar>
-            {!visible ?
-                <Menu fixed={"top"} size={"mini"} style={{height: 1}} secondary>
-                    <Menu.Item position={"right"} onClick={toggle} style={{marginTop: 0, marginBottom: -35, marginRight: 6}}>
-                        <Icon name='bars' style={{marginRight: 10, marginLeft: 10, marginTop: 10, marginBottom: 10}} size={"large"} color={"black"}/>
-                    </Menu.Item>
-                </Menu> : null}
+            <Transition visible={!visible} duration={1000}>
+                <div>
+                    <Menu fixed={"top"} size={"mini"} style={{height: 1}} secondary>
+                        <Menu.Item position={"right"} onClick={toggle} style={{marginTop: 0, marginBottom: -32, marginRight: 6}}>
+                            <Icon name='bars' style={{marginRight: 10, marginLeft: 10, marginTop: 10, marginBottom: 10}} size={"large"} color={"black"}/>
+                        </Menu.Item>
+                    </Menu>
+                </div>
+            </Transition>
         </div>
     )
 

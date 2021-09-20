@@ -13,6 +13,8 @@ public interface CandidateSkillService {
 
     Result add(CandidateSkillAddDto candidateSkillAddDto);
 
+    Result addMultiple(List<CandidateSkillAddDto> candSkillAddDtoList);
+
     Result deleteById(int candSkillId);
 
 }

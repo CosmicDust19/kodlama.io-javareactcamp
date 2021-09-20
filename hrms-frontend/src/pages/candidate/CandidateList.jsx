@@ -1,14 +1,25 @@
 import React, {useEffect, useState} from "react";
 import CandidateService from "../../services/candidateService";
-import {Card, Image, Loader, Placeholder} from "semantic-ui-react";
+import {Card, Icon, Image, Loader, Placeholder, Transition} from "semantic-ui-react";
 import {useHistory} from "react-router-dom";
 import {getRandomImg, placeholderImageNames} from "../../utilities/Utils";
-import UserAvatar from "../../components/common/UserAvatar";
+import Avatar from "../../components/common/Avatar";
+import {getAge} from "../../utilities/UserUtils";
 
 export default function CandidateList() {
 
+    const [visible, setVisible] = useState(false);
     const [candidates, setCandidates] = useState();
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setTimeout(() => setVisible(true), 100)
+        return () => {
+            setVisible(undefined)
+            setCandidates(undefined)
+            setLoading(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         setLoading(true)
@@ -16,7 +27,7 @@ export default function CandidateList() {
         candidateService.getAll().then((result) => setCandidates(result.data.data));
         setTimeout(() => {
             setLoading(false)
-        }, 1000)
+        }, 500)
     }, []);
 
     const history = useHistory();
@@ -29,31 +40,40 @@ export default function CandidateList() {
     if (!candidates) return <Loader active inline='centered' size={"large"}/>
 
     return (
-        <div>
-            <Card.Group itemsPerRow={3} stackable>
-                {candidates.map(candidate => (
-                    <Card style={{borderRadius: 5}} onClick={() => handleCandidateClick(candidate.id)}
-                          key={candidate.id}>
-                        {loading ?
-                            <Placeholder>
-                                <Placeholder.Image square/>
-                            </Placeholder> : candidate.profileImgId ?
-                                <UserAvatar user={candidate} size={"large"} avatar={false} style={{}}/> :
-                                <Image src={getRandomImg("large")}/>}
-                        <Card.Content>
-                            <Card.Header content={candidate.firstName}/>
-                            <Card.Meta content={candidate.lastName}/>
-                            <Card.Description content={candidate.email}/>
-                        </Card.Content>
-                        <Card.Content extra content={`Birth Year | ${candidate.birthYear}`}/>
-                    </Card>
-                ))}
-            </Card.Group>
-            {loading ?
-                placeholderImageNames.map(imgName =>
-                    <Image src={`https://semantic-ui.com/images/avatar2/large/${imgName}.png`} style={{opacity: 0}}
-                           size={"mini"} key={placeholderImageNames.indexOf(imgName)}/>
-                ) : null}
-        </div>
+        <Transition visible={visible} duration={200}>
+            <div>
+                <Card.Group itemsPerRow={3} stackable>
+                    {candidates.map(candidate => (
+                        <Card style={{borderRadius: 5}} onClick={() => handleCandidateClick(candidate.id)}
+                              key={candidate.id}>
+                            {loading ?
+                                <Placeholder>
+                                    <Placeholder.Image square/>
+                                </Placeholder> : candidate.profileImg ?
+                                    <Avatar image={candidate.profileImg} size={"big"} avatar={false}/> :
+                                    <Image src={getRandomImg("large")}/>}
+                            <Card.Content style={{height: 0, marginBottom: -28.5}}/>
+                            <Card.Content extra>
+                                <Card.Header content={candidate.firstName}/>
+                                <Card.Meta content={candidate.lastName}/>
+                                <Card.Description>
+                                    <Icon name={"mail outline"} color={"red"}/>
+                                    {candidate.email}
+                                </Card.Description>
+                            </Card.Content>
+                            <Card.Content extra>
+                                <Icon name={"calendar alternate outline"} color={"purple"}/>
+                                {getAge(candidate.birthYear)} years old
+                            </Card.Content>
+                        </Card>
+                    ))}
+                </Card.Group>
+                {loading ?
+                    placeholderImageNames.map((imgName, index) =>
+                        <Image src={`https://semantic-ui.com/images/avatar2/large/${imgName}.png`} style={{opacity: 0}}
+                               size={"mini"} key={index}/>
+                    ) : null}
+            </div>
+        </Transition>
     );
 }

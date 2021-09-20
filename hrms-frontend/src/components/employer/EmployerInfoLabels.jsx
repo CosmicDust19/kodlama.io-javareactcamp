@@ -10,9 +10,9 @@ function EmployerInfoLabels({employer, ...props}) {
 
     return (
         <span {...props}>
-            <SInfoLabel content={<div><Icon name="user plus" color="blue"/>Sign Up Approval</div>}
+            <SInfoLabel content={<div><Icon name="user plus" color="blue"/>Sign Up</div>}
                         visible={employer.verified === false && employer.rejected === null} backgroundColor={"rgba(0,94,255,0.1)"}/>
-            <SInfoLabel content={<div><Icon name="redo alternate" color="orange"/>Update Approval</div>}
+            <SInfoLabel content={<div><Icon name="redo alternate" color="orange"/>Update</div>}
                         visible={employer.updateVerified === false} backgroundColor={"rgba(255,113,0,0.1)"}/>
             <SInfoLabel content={<div><Icon name="check circle outline" color="green"/>Verified</div>}
                         visible={employer.verified === true} backgroundColor={"rgba(58,255,0,0.1)"}/>

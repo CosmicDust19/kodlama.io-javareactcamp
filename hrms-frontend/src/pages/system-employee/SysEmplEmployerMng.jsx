@@ -1,22 +1,30 @@
 import React, {useEffect, useState} from "react";
-import {Header, Loader} from "semantic-ui-react";
+import {Header, Transition} from "semantic-ui-react";
 import {useSelector} from "react-redux";
-import EmployerService from "../../services/employerService";
 import ItemsPerPageBar from "../../components/common/ItemsPerPageBar";
 import PaginationBar from "../../components/common/PaginationBar";
 import EmployerMngFilterSeg from "../../components/systemEmployee/EmployerMngFilterSeg";
 import EmployerMngList from "../../components/systemEmployee/EmployerMngList";
 
-export default function EmployerMng() {
+export default function SysEmplEmployerMng() {
 
     const userProps = useSelector(state => state?.user?.userProps)
-    const filteredEmployersRedux = useSelector(state => state?.filter.filter.filteredEmployers)
+    const filterProps = useSelector(state => state?.listingReducer.listingProps.employers)
+    const filteredEmployersRedux = filterProps.filteredEmployers
 
+    const [listVisible, setListVisible] = useState(false);
     const [filteredEmployers, setFilteredEmployers] = useState(filteredEmployersRedux);
-    const [noEmplFound, setNoEmplFound] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [employersPerPage, setEmployersPerPage] = useState(20);
-    const [employers, setEmployers] = useState();
+    const [employersPerPage, setEmployersPerPage] = useState(filteredEmployers.length <= 5 ? 5 : 10);
+
+    useEffect(() => {
+        setTimeout(() => setListVisible(true), 200)
+        return () => {
+            setFilteredEmployers(undefined)
+            setCurrentPage(undefined)
+            setEmployersPerPage(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         setFilteredEmployers(filteredEmployersRedux)
@@ -24,28 +32,18 @@ export default function EmployerMng() {
 
     useEffect(() => {
         setCurrentPage(1)
-        setNoEmplFound(filteredEmployersRedux.length === 0)
     }, [filteredEmployersRedux.length]);
-
-    useEffect(() => {
-        const employerService = new EmployerService();
-        employerService.getAll().then((result) => {
-            setEmployers(result.data.data)
-            if (filteredEmployers.length === 0) setFilteredEmployers(result.data.data)
-        });
-    }, [filteredEmployers]);
 
     if (String(userProps.userType) !== "systemEmployee") return <Header content={"😛🤪🤭"}/>
 
-    if (!employers) return <Loader active inline='centered' size={"big"} style={{marginTop: 50}}/>
-
     const indexOfLastEmployer = currentPage * employersPerPage
     const indexOfFirstEmployer = indexOfLastEmployer - employersPerPage
-    const currentEmployers = noEmplFound ? [] : filteredEmployers.slice(indexOfFirstEmployer, indexOfLastEmployer)
+    const currentEmployers = filteredEmployers.slice(indexOfFirstEmployer, indexOfLastEmployer)
 
-    const noFilteredEmpl = filteredEmployers.length === 0
+    const noEmployer = filteredEmployers.length === 0
 
     const itemsPerPageClick = (number) => {
+        if (number === employersPerPage) return
         setCurrentPage(1)
         setEmployersPerPage(number)
     }
@@ -55,18 +53,23 @@ export default function EmployerMng() {
     function listingOptions() {
         return (
             <div align={"center"} style={{marginBottom: 30, marginTop: 30}}>
-                <ItemsPerPageBar itemPerPage={employersPerPage} handleClick={itemsPerPageClick} disabled={noFilteredEmpl || noEmplFound}/>
+                <ItemsPerPageBar itemPerPage={employersPerPage} handleClick={itemsPerPageClick} compact style={{marginTop: 15}}
+                                 disabled={noEmployer} listedItemsLength={filteredEmployers.length}/>
                 <PaginationBar itemsPerPage={employersPerPage} listedItemsLength={filteredEmployers.length} activePage={currentPage}
-                               disabled={noFilteredEmpl || noEmplFound} onPageChange={changePage}/>
+                               disabled={noEmployer} onPageChange={changePage} style={{marginTop: 15}}/>
             </div>
         )
     }
 
     return (
         <div>
-            <EmployerMngFilterSeg employers={employers}/>
+            <EmployerMngFilterSeg/>
             {listingOptions()}
-            <EmployerMngList employers={currentEmployers} noEmplSignedUp={employers.length === 0}/>
+            <Transition visible={listVisible} duration={200}>
+                <div>
+                    <EmployerMngList employers={currentEmployers}/>
+                </div>
+            </Transition>
         </div>
     );
 }

@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,7 +24,7 @@ public class School implements BaseEntity<Integer> {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 100)
+    @Column(name = "name", nullable = false, unique = true, length = Utils.Const.MAX_SCHOOL_NAME)
     private String name;
 
     public School(int id) {

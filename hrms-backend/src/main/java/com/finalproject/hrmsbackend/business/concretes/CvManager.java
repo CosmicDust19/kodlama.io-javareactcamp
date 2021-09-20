@@ -30,13 +30,15 @@ public class CvManager implements CvService {
     private final CandidateLanguageDao candidateLangDao;
     private final CandidateSchoolDao candidateSchoolDao;
     private final CandidateSkillDao candidateSkillDao;
+    private final ImageDao imageDao;
     private final ModelMapper modelMapper;
     private final CheckService check;
 
     @Override
     public boolean existsCandidatePropInCv(Class<?> propType, int propId, int cvId) {
         if (propId <= 0) return false;
-        else if (CandidateJobExperience.class.equals(propType) && cvDao.existsCandidateJobExpInCv(propId, cvId)) return true;
+        else if (CandidateJobExperience.class.equals(propType) && cvDao.existsCandidateJobExpInCv(propId, cvId))
+            return true;
         else if (CandidateLanguage.class.equals(propType) && cvDao.existsCandidateLangInCv(propId, cvId)) return true;
         else if (CandidateSchool.class.equals(propType) && cvDao.existsCandidateSchoolInCv(propId, cvId)) return true;
         else return CandidateSkill.class.equals(propType) && cvDao.existsCandidateSkillInCv(propId, cvId);
@@ -102,6 +104,21 @@ public class CvManager implements CvService {
 
         cv.setCoverLetter(coverLetter);
         return execLastUpdAct(cv);
+    }
+
+    @Override
+    public Result updateImg(Integer imgId, int cvId) {
+        if (check.notExistsById(cvDao, cvId)) return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
+
+        Cv cv = cvDao.getById(cvId);
+        if ((cv.getImage() == null && imgId == null) || (cv.getImage() != null && check.equals(cv.getImage().getId(), imgId)))
+            return new ErrorResult(Msg.IS_THE_SAME.get("Profile photo"));
+        for (Image img : cv.getCandidate().getImages())
+            if (imgId == null || check.equals(img.getId(), imgId)) {
+                cv.setImage(imgId == null ? null : imageDao.getById(imgId));
+                return execLastUpdAct(cv);
+            }
+        return new ErrorResult(Msg.NOT_HAVE.get("Candidate"));
     }
 
     @Override
@@ -194,10 +211,10 @@ public class CvManager implements CvService {
         Cv cv = cvDao.getById(cvId);
 
         if (fail == 0) {
-            return new SuccessDataResult<>(Msg.SUCCESS.getCustom("Completely %s ✅"), cv);
+            return new SuccessDataResult<>(Msg.SAVED.getCustom("They are all %s ✅"), cv);
         } else if (success == 0) {
             results.put("cv", cv);
-            return new ErrorDataResult<>(Msg.FAILED.getCustom("Completely %s ❌"), results);
+            return new ErrorDataResult<>(Msg.SAVED.getCustom("None %s ❌"), results);
         }
 
         String resultSum = ("Success Rate: %" + String.format("%.2f", ((double) success / (fail + success) * 100))) + String.format(" (Successful -> ✅%d  Failed -> ❌%d)", success, fail);

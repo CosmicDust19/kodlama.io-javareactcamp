@@ -1,4 +1,4 @@
-import {Segment, Grid, Form, Button, Icon, Header, Message} from "semantic-ui-react";
+import {Segment, Grid, Form, Button, Icon, Header, Message, Transition} from "semantic-ui-react";
 import {Link, useHistory} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {login} from "../../store/actions/userActions";
@@ -6,7 +6,7 @@ import {useFormik} from "formik";
 import {toast} from "react-toastify";
 import UserService from "../../services/userService";
 import SPopupInput from "../../utilities/customFormControls/SPopupInput";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {handleCatch} from "../../utilities/Utils";
 import * as Yup from "yup";
 
@@ -17,8 +17,20 @@ export default function Login() {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const [verticalScreen] = useState(window.innerWidth < window.innerHeight);
-    const [loginMsgOpen, setLoginMsgOpen] = useState(true);
+    const [jiggle, setJiggle] = useState(true);
+    const [visible, setVisible] = useState(false);
+    const [verticalScreen, setVerticalScreen] = useState(window.innerWidth < window.innerHeight);
+    const [signUpMsgOpen, setSignUpMsgOpen] = useState(true);
+
+    useEffect(() => {
+        setVisible(true)
+        return () => {
+            setJiggle(undefined)
+            setVisible(undefined)
+            setVerticalScreen(undefined)
+            setSignUpMsgOpen(undefined)
+        };
+    }, []);
 
     const formik = useFormik({
         initialValues: {
@@ -42,42 +54,46 @@ export default function Login() {
     const popupSize = !verticalScreen ? undefined : "small"
 
     return (
-        <div>
-            <Header color="yellow" textAlign="center" content={"Login"}/>
-            <Grid centered stackable padded>
-                <Grid.Column mobile={6}>
-                    <Segment placeholder color={"yellow"} padded textAlign={"center"} raised style={{borderRadius: 15}}>
-                        <Form size="large" onSubmit={formik.handleSubmit}>
+        <Transition visible={visible} duration={200}>
+            <div>
+                <Header color="yellow" textAlign="center" content={"Login"}/>
+                <Grid centered stackable padded>
+                    <Grid.Column mobile={6}>
+                        <Segment placeholder color={"yellow"} padded textAlign={"center"} raised style={{borderRadius: 15}}>
+                            <Form size="large" onSubmit={formik.handleSubmit}>
 
-                            <Grid padded>
-                                <Grid.Column>
-                                    <SPopupInput icon="at" iconposition={"left"} placeholder="Email" name="email"
-                                                 formik={formik} popupposition={popupPosition} popupsize={popupSize}/>
-                                    <SPopupInput icon="lock" iconposition={"left"} placeholder="Password" name="password"
-                                                 type={"password"} formik={formik} popupposition={popupPosition} popupsize={popupSize}/>
-                                </Grid.Column>
-                            </Grid>
+                                <Grid padded>
+                                    <Grid.Column>
+                                        <SPopupInput icon="at" iconposition={"left"} placeholder="Email" name="email" jiggle={jiggle}
+                                                     formik={formik} popupposition={popupPosition} popupsize={popupSize}/>
+                                        <SPopupInput icon="lock" iconposition={"left"} placeholder="Password" name="password" jiggle={jiggle}
+                                                     type={"password"} formik={formik} popupposition={popupPosition} popupsize={popupSize}/>
+                                    </Grid.Column>
+                                </Grid>
 
-                            <Button animated="fade" type="submit" size="big" color="yellow">
-                                <Button.Content hidden><Icon name='sign in alternate'/></Button.Content>
-                                <Button.Content visible>Login</Button.Content>
-                            </Button>
+                                <Button animated="fade" type="submit" size="big" color="yellow" onClick={() => setJiggle(!jiggle)}>
+                                    <Button.Content hidden><Icon name='sign in alternate'/></Button.Content>
+                                    <Button.Content visible>Login</Button.Content>
+                                </Button>
 
-                        </Form>
-                    </Segment>
-                </Grid.Column>
-            </Grid>
-            <Grid textAlign="center" stackable>
-                <Grid.Column width={9}>
-                    <Message warning onDismiss={() => setLoginMsgOpen(false)} hidden={!loginMsgOpen}>
-                        <Icon name='help'/>
-                        Didn't you signed up yet ? Sign up as a
-                        <Link to={"/signup/candidate"} onClick={() => window.scrollTo(0, 100)}> candidate </Link>
-                        or an
-                        <Link to={"/signup/employer"} onClick={() => window.scrollTo(0, 50)}> employer</Link>.
-                    </Message>
-                </Grid.Column>
-            </Grid>
-        </div>
+                            </Form>
+                        </Segment>
+                    </Grid.Column>
+                </Grid>
+                <Grid textAlign="center" stackable>
+                    <Grid.Column width={9}>
+                        <Transition visible={signUpMsgOpen} duration={200}>
+                            <Message warning onDismiss={() => setSignUpMsgOpen(false)}>
+                                <Icon name='help'/>
+                                Didn't you signed up yet ? Sign up as a
+                                <Link to={"/signup/candidate"} onClick={() => window.scrollTo(0, 100)}> candidate </Link>
+                                or an
+                                <Link to={"/signup/employer"} onClick={() => window.scrollTo(0, 50)}> employer</Link>.
+                            </Message>
+                        </Transition>
+                    </Grid.Column>
+                </Grid>
+            </div>
+        </Transition>
     )
 }

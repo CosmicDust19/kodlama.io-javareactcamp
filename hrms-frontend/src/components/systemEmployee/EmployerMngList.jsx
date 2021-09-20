@@ -1,56 +1,83 @@
-import {Icon, Loader, Message, Segment, Table} from "semantic-ui-react";
+import {Icon, Loader, Message, Segment, Table, Transition} from "semantic-ui-react";
 import {getEmployerColor} from "../../utilities/EmployerUtils";
-import SInfoLabel from "../common/SInfoLabel";
 import SysEmplEmployerDropdown from "./SysEmplEmployerDropdown";
-import React from "react";
+import React, {useEffect, useState} from "react";
+import EmployerInfoLabels from "../employer/EmployerInfoLabels";
+import EmployerLogo from "../employer/EmployerLogo";
 
-function EmployerMngList({employers, noEmplSignedUp}) {
+function EmployerMngList({employers}) {
+
+    const [visible, setVisible] = useState(false);
+    const [hidden, setHidden] = useState(true);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setVisible(true)
+        return () => {
+            setVisible(undefined)
+            setHidden(undefined)
+            setLoading(undefined)
+        };
+    }, []);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setHidden(false)
+        }, 400)
+    }, []);
+
+    useEffect(() => {
+        setLoading(true)
+        setTimeout(() => {
+            setLoading(false)
+        }, 150)
+    }, [employers]);
 
     if (!employers) return <Loader active inline='centered' size={"large"} style={{marginTop: 100}}/>
 
-    if (noEmplSignedUp)
-        return (
-            <Message warning compact as={Segment} style={{float: "left"}} raised>
-                <Icon name={"wait"} size={"large"}/>
-                <font style={{verticalAlign: "middle"}}>No employer signed up yet.</font>
-            </Message>
-        )
-
     if (employers.length === 0)
         return (
-            <Message warning compact as={Segment} style={{float: "left"}}>
+            <Message warning compact as={Segment} style={{float: "left"}} hidden={hidden}>
                 <Icon name={"warning sign"} size={"big"}/>
                 <font style={{fontSize: "large", verticalAlign: "middle"}}>No results found.</font>
             </Message>
         )
 
     return (
-        <Table style={{borderRadius: 0}}>
-            <Table.Body>
-                {employers.map((employer) => (
-                    <Table.Row style={{backgroundColor: getEmployerColor(employer)}} key={employer.id}>
-                        <Table.Cell content={employer.companyName}/>
-                        <Table.Cell content={employer.phoneNumber}/>
-                        <Table.Cell content={employer.email}/>
-                        <Table.Cell content={employer.website}/>
-                        <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
-                            <SInfoLabel content={<div><Icon name="add user" color="blue"/>Sign Up Approval</div>}
-                                        visible={employer.verified === false && employer.rejected === null}
-                                        backgroundColor={"rgba(0,94,255,0.1)"}/>
-                            <SInfoLabel content={<div><Icon name="redo alternate" color="orange"/>Update Approval</div>}
-                                        visible={employer.updateVerified === false} backgroundColor={"rgba(255,113,0,0.1)"}/>
-                            <SInfoLabel content={<div><Icon name="check circle outline" color="green"/>Verified</div>}
-                                        visible={employer.verified === true} backgroundColor={"rgba(58,255,0,0.1)"}/>
-                            <SInfoLabel content={<div><Icon name="ban" color="red"/>Rejected</div>}
-                                        visible={employer.rejected === true} backgroundColor={"rgba(226,14,14,0.1)"}/>
-                        </Table.Cell>
-                        <Table.Cell>
-                            <SysEmplEmployerDropdown employer={employer} infoOption fluid direction={undefined}/>
-                        </Table.Cell>
-                    </Table.Row>
-                ))}
-            </Table.Body>
-        </Table>
+        <Transition visible={visible} duration={200}>
+            <div>
+                <Table style={{borderRadius: 0, opacity: loading ? 0.8 : 1}} padded>
+                    <Table.Body>
+                        {employers.map((employer) => (
+                            <Table.Row style={{backgroundColor: getEmployerColor(employer)}} key={employer.id}>
+                                <Table.Cell collapsing>
+                                    <EmployerLogo user={employer} size={"mini"} defImgSize={26} avatar/>&nbsp;&nbsp;
+                                    {employer.companyName}
+                                </Table.Cell>
+                                <Table.Cell collapsing>
+                                    <Icon name={"phone"} color={"yellow"}/>
+                                    {employer.phoneNumber}
+                                </Table.Cell>
+                                <Table.Cell collapsing>
+                                    <Icon name={"mail outline"} color={"red"}/>
+                                    {employer.email}
+                                </Table.Cell>
+                                <Table.Cell collapsing>
+                                    <Icon name={"world"} color={"blue"}/>
+                                    {employer.website}
+                                </Table.Cell>
+                                <Table.Cell textAlign={"center"} verticalAlign={"middle"}>
+                                    <EmployerInfoLabels employer={employer}/>
+                                </Table.Cell>
+                                <Table.Cell collapsing>
+                                    <SysEmplEmployerDropdown employer={employer} infoOption fluid direction={undefined}/>
+                                </Table.Cell>
+                            </Table.Row>
+                        ))}
+                    </Table.Body>
+                </Table>
+            </div>
+        </Transition>
     )
 }
 

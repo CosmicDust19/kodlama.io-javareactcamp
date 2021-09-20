@@ -1,13 +1,36 @@
 import {Button, Card, Icon, Loader, Message, Segment} from "semantic-ui-react";
 import FavoriteAdvertIcon from "../candidate/FavoriteAdvertIcon";
 import {getCreatedAtAsStr} from "../../utilities/Utils";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {useHistory} from "react-router-dom";
 import SInfoLabel from "./SInfoLabel";
+import EmployerLogo from "../employer/EmployerLogo";
 
-function JobAdvertListPublic({jobAdverts, noAdvPublished, itemsPerRow, loading, noMsg = false}) {
+function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, ...props}) {
 
     const history = useHistory();
+    const [hidden, setHidden] = useState(true);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        return () => {
+            setHidden(undefined)
+            setLoading(undefined)
+        };
+    }, []);
+
+    useEffect(() => {
+        setTimeout(() => {
+            setHidden(false)
+        }, 200)
+    }, []);
+
+    useEffect(() => {
+        setLoading(true)
+        setTimeout(() => {
+            setLoading(false)
+        }, 300)
+    }, [jobAdverts]);
 
     const handleAdvertisementClick = (jobAdvertId) => {
         history.push(`/jobAdverts/${jobAdvertId}`);
@@ -19,28 +42,20 @@ function JobAdvertListPublic({jobAdverts, noAdvPublished, itemsPerRow, loading, 
         window.scrollTo(0, 0);
     };
 
-    const unavailable = (jobAdvert) => jobAdvert.rejected === true || jobAdvert.employer.rejected === true
+    const unavailable = (jobAdvert) => jobAdvert.verified === false || jobAdvert.employer.verified === false
 
     if (!jobAdverts) return <Loader active inline='centered' size={"large"} style={{marginTop: 100}}/>
 
-    if (noAdvPublished)
-        return (
-            <Message warning compact as={Segment} style={{float: "left"}} raised>
-                <Icon name={"wait"} size={"large"}/>
-                <font style={{verticalAlign: "middle"}}>No job advertisement found. Please wait for employers to add.</font>
-            </Message>
-        )
-
     if (jobAdverts.length === 0 && !noMsg)
         return (
-            <Message warning compact as={Segment} style={{float: "left"}}>
+            <Message warning compact as={Segment} style={{float: "left", marginLeft: 20}} hidden={hidden}>
                 <Icon name={"warning sign"} size={"large"}/>
                 <font style={{fontSize: "large", verticalAlign: "middle"}}>No results found.</font>
             </Message>
         )
 
     return (
-        <Card.Group itemsPerRow={itemsPerRow} stackable doubling>
+        <Card.Group itemsPerRow={itemsPerRow} stackable doubling {...props}>
             {jobAdverts.map((jobAdvert) => (
                 <Card color={"red"} key={jobAdvert.id} style={{borderRadius: 0}} raised fluid>
                     <Card.Content>
@@ -52,12 +67,13 @@ function JobAdvertListPublic({jobAdverts, noAdvPublished, itemsPerRow, loading, 
                                             visible={unavailable(jobAdvert)} backgroundColor={"rgba(226,14,14,0.1)"}/>
                             </span>
                         </Card.Header>
-                        <Card.Meta>
-                            <Icon name="building outline" style={{color: "rgba(31,90,211,0.78)"}}/>&nbsp;
+                        <Card.Meta style={{marginTop: 3}}>
+                            <EmployerLogo user={jobAdvert.employer} size={"mini"}/>&nbsp;&nbsp;
                             <font onClick={() => handleEmployerClick(jobAdvert.employer.id)}>{jobAdvert.employer.companyName}</font>
                         </Card.Meta>
-                        <Card.Description>
-                            <Icon name={"map marker"} style={{color: "rgba(0,111,255,0.66)"}}/>{jobAdvert.city.name}
+                        <Card.Description style={{marginTop: 5}}>
+                            <Icon name={"map marker alternate"} color={"blue"} size={"large"} style={{marginLeft: -1.5, marginRight: 5}}/>
+                            &nbsp;{jobAdvert.city.name}
                             <Button compact icon labelPosition='right' disabled={loading} floated={"right"} inverted
                                     onClick={() => handleAdvertisementClick(jobAdvert.id)}
                                     style={{borderRadius: 0, marginTop: -4, marginBottom: -4}}>

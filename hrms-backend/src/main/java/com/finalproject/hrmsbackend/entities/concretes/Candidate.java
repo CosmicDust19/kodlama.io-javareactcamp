@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.User;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -19,10 +20,10 @@ import java.util.List;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Candidate extends User {
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Column(name = "first_name", nullable = false, length = Utils.Const.MAX_FN)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Column(name = "last_name", nullable = false, length = Utils.Const.MAX_LN)
     private String lastName;
 
     @Column(name = "nationality_id", nullable = false, unique = true, length = 11)
@@ -31,10 +32,10 @@ public class Candidate extends User {
     @Column(name = "birth_year", nullable = false)
     private Short birthYear;
 
-    @Column(name = "github_account", length = 100)
+    @Column(name = "github_account", length = Utils.Const.MAX_ACCOUNT_LINK)
     private String githubAccount;
 
-    @Column(name = "linkedin_account", length = 100)
+    @Column(name = "linkedin_account", length = Utils.Const.MAX_ACCOUNT_LINK)
     private String linkedinAccount;
 
     @OneToMany(mappedBy = "candidate")

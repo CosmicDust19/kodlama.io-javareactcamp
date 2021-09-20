@@ -42,7 +42,7 @@ public class CandidateJobExperienceManager implements CandidateJobExperienceServ
     }
 
     @Override
-    public Result add(CandidateJobExperienceAddDto candJobExpAddDto) {
+    public DataResult<?> add(CandidateJobExperienceAddDto candJobExpAddDto) {
         Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(candidateDao, candJobExpAddDto.getCandidateId()))
             errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));

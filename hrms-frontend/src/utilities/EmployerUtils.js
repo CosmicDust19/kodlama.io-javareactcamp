@@ -1,10 +1,3 @@
-import EmployerService from "../services/employerService";
-import {handleCatch} from "./Utils";
-import {onUpdate} from "./UserUtils";
-
-
-const employerService = new EmployerService()
-
 export const employerStatuses = ["Sign Up Approval", "Update Approval", "Verified", "Rejected"]
 
 export const employerStatusOptions = employerStatuses.map((status, index) => ({
@@ -12,25 +5,6 @@ export const employerStatusOptions = employerStatuses.map((status, index) => ({
     text: status,
     value: status,
 }));
-
-export const updateEmailAndWebsite = (dispatch, employer, email, website) => {
-    employerService.updateEmailAndWebsite(employer.id, email, website)
-        .then(r => onUpdate(dispatch, r, "Sent"))
-        .catch(handleCatch)
-}
-
-export const updateCompanyName = (dispatch, employer, companyName) => {
-    employerService.updateCompanyName(employer.id, companyName)
-        .then(r => onUpdate(dispatch, r, "Sent"))
-        .catch(handleCatch)
-}
-
-export const updatePhoneNumber = (dispatch, employer, phoneNumber) => {
-    if (phoneNumber.includes("+")) phoneNumber = phoneNumber.substr(1)
-    employerService.updatePhoneNumber(employer.id, phoneNumber)
-        .then(r => onUpdate(dispatch, r, "Sent"))
-        .catch(handleCatch)
-}
 
 export const getEmployerColor = (employer) => {
     if (employer.rejected === null && employer.verified === false)

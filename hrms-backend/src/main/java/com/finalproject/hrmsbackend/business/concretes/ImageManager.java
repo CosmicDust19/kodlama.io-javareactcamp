@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Map;
 
 @Service
@@ -37,14 +40,24 @@ public class ImageManager implements ImageService {
     @Override
     public Result upload(MultipartFile multipartFile, int userId) {
         if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
+        if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(Msg.NOT_FOUND.get("File"));
 
-        Result uploadErr = check.validateImage(multipartFile);
-        if (uploadErr != null) return uploadErr;
+        int width;
+        int height;
+        try {
+            BufferedImage bufferedImage = ImageIO.read(multipartFile.getInputStream());
+            if (bufferedImage == null) return new ErrorResult(Msg.NOT_AN_IMAGE.get());
+            width = bufferedImage.getWidth();
+            height = bufferedImage.getHeight();
+        } catch (IOException exception) {
+            return new ErrorResult(Msg.IMG_VALIDATION_ERR.get());
+        }
 
         Map<?, ?> uploadRes = cloudinaryService.upload(multipartFile);
         if (uploadRes == null) return new ErrorResult(Msg.UPLOAD_ERROR.get());
 
-        Image image = new Image(0, (String) uploadRes.get("public_id"), (String) uploadRes.get("original_filename"), new User(userId), (String) uploadRes.get("url"));
+        Image image = new Image(0, (String) uploadRes.get("public_id"), (String) uploadRes.get("original_filename"),
+                new User(userId), (String) uploadRes.get("url"), (short) width, (short) height);
         Image savedImg = imageDao.save(image);
         return new SuccessDataResult<>(Msg.UPLOADED.get(), savedImg);
     }

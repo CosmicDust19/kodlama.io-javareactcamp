@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.finalproject.hrmsbackend.core.entities.User;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -19,10 +20,10 @@ import javax.persistence.Table;
 @PrimaryKeyJoinColumn(name = "user_id", referencedColumnName = "id")
 public class SystemEmployee extends User {
 
-    @Column(name = "first_name", nullable = false, length = 50)
+    @Column(name = "first_name", nullable = false, length = Utils.Const.MAX_FN)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 50)
+    @Column(name = "last_name", nullable = false, length = Utils.Const.MAX_LN)
     private String lastName;
 
 }

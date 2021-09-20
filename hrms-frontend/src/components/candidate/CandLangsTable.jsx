@@ -1,4 +1,4 @@
-import {Accordion, Button, Card, Grid, Header, Icon, Loader, Segment, Table} from "semantic-ui-react";
+import {Button, Grid, Icon, Loader, Table, Transition} from "semantic-ui-react";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
 import {
     getFilteredCandLangOption, getFilteredLanguageOption, languageLevelOption, onCVUpdate, onPropAdd, syncCandidate
@@ -11,8 +11,11 @@ import {useFormik} from "formik";
 import {changeLangs} from "../../store/actions/userActions";
 import {handleCatch} from "../../utilities/Utils";
 import CandidateCvService from "../../services/candidateCvService";
+import ManagementTable from "../common/ManagementTable";
+import AreYouSureModal from "../common/AreYouSureModal";
 
-function CandLangsTable({user, cv, editable = false, defaultClosed = false, unstackable = false, vertical = false, small = false, width = 8}) {
+function CandLangsTable
+({user, cv, editable = false, defaultClosed = false, unstackable = false, vertical = false, small = false, width = 8}) {
 
     const candLangService = new CandidateLanguageService();
     const candCvService = new CandidateCvService()
@@ -20,12 +23,21 @@ function CandLangsTable({user, cv, editable = false, defaultClosed = false, unst
     const dispatch = useDispatch();
 
     const [languages, setLanguages] = useState([]);
-    const [open, setOpen] = useState(defaultClosed !== true);
+    const [active, setActive] = useState(defaultClosed !== true);
+    const [candLangIdDel, setCandLangIdDel] = useState();
+
+    useEffect(() => {
+        return () => {
+            setLanguages(undefined)
+            setActive(undefined)
+            setCandLangIdDel(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         if (editable && !cv) {
             const languageService = new LanguageService();
-            languageService.getLanguages().then((result) => setLanguages(result.data.data));
+            languageService.getAll().then((result) => setLanguages(result.data.data));
         }
     }, [cv, editable]);
 
@@ -82,67 +94,55 @@ function CandLangsTable({user, cv, editable = false, defaultClosed = false, unst
             .catch(handleCatch)
     //
 
-    const onRemove = (candLangId) => cv ? removeLangFromCv(candLangId) : deleteLanguage(candLangId)
+    const onRemove = () => {
+        cv ? removeLangFromCv(candLangIdDel) : deleteLanguage(candLangIdDel)
+        setCandLangIdDel(undefined)
+    }
+
+    const headerRow = [
+        "Languages", "Level(CEFR)",
+        editable && (candLangs.length !== 0 || !cv) ? "" : undefined
+    ]
+
+    const tableData = candLangs.map(candLang => ({candLang: candLang}))
+
+    const renderBodyRow = ({candLang}, i) => ({
+        key: i,
+        cells: [
+            candLang.language.name,
+            candLang.languageLevel,
+            editable ?
+                <Table.Cell key={"del"} onClick={() => setCandLangIdDel(candLang.id)} negative selectable
+                            icon={<Icon name={"x"} style={{marginRight: 0}}/>}/> : null
+        ]
+    })
+
+    const footerCells = editable && !cv ? [
+        <SDropdown options={languageOption} name="languageId" placeholder="Language" multiple={false} formik={formik} style={{}}/>,
+        <SDropdown options={languageLevelOption} name="languageLevel" placeholder="Language Level" multiple={false} formik={formik} style={{}}/>,
+    ] : null
 
     return (
         <Grid.Column width={width} style={{marginTop: 10}}>
-            <Accordion>
-                <Accordion.Title onClick={() => setOpen(!open)} active={open}>
-                    <Card fluid raised style={{borderRadius: 0}} onClick={() => {}}>
-                        <Card.Header>
-                            <Header textAlign={"center"} dividing color="violet" content={"Languages"}
-                                    style={{marginBottom: 0, borderRadius: 0}} block/>
-                        </Card.Header>
-                    </Card>
-                </Accordion.Title>
-                <Accordion.Content active={open} as={Segment} size={segmentSize} raised vertical
-                                   style={{marginTop: -6.5, marginBottom: 10, borderRadius: 0}}>
-                    <Table size={tableSize} celled unstackable={unstackable} textAlign="center" striped
-                           style={{marginTop: -14, marginBottom: -14, borderRadius: 0}}>
-                        <Table.Header>
-                            <Table.Row>
-                                <Table.HeaderCell content={"Languages"}/>
-                                <Table.HeaderCell content={"Level(CEFR)"}/>
-                                {editable && (candLangs.length !== 0 || !cv) ? <Table.HeaderCell/> : null}
-                            </Table.Row>
-                        </Table.Header>
-
-                        <Table.Body>
-                            {candLangs.map((candLang) => (
-                                <Table.Row key={candLang.id}>
-                                    <Table.Cell content={candLang.language.name}/>
-                                    <Table.Cell content={candLang.languageLevel}/>
-                                    {editable ? <Table.Cell onClick={() => onRemove(candLang.id)} negative selectable
-                                                            icon={<Icon name={"x"} style={{marginRight: 0}}/>}/> : null}
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-
-                        {editable && !cv ? <Table.Footer>
-                            <Table.Row>
-                                <Table.Cell>
-                                    <SDropdown options={languageOption} name="languageId" placeholder="Language"
-                                               multiple={false} formik={formik} style={{}}/>
-                                </Table.Cell>
-                                <Table.Cell>
-                                    <SDropdown options={languageLevelOption} name="languageLevel" placeholder="Language Level"
-                                               multiple={false} formik={formik} style={{}}/>
-                                </Table.Cell>
-                                <Table.Cell positive icon={<Icon name={"plus"} style={{marginRight: 0}} disabled={invalidCandLang}/>}
-                                            onClick={addLanguage} selectable disabled={invalidCandLang}/>
-                            </Table.Row>
-                        </Table.Footer> : null}
-                    </Table>
-                </Accordion.Content>
-            </Accordion>
-            {editable && cv && open ?
+            <AreYouSureModal open={!!candLangIdDel} message={`Are you sure you want to remove${cv ? "" : " from everywhere"} ?`}
+                             yesColor={"red"} noColor={"grey"} onYes={onRemove} onNo={() => setCandLangIdDel(undefined)}/>
+            <ManagementTable
+                headerContent={"Languages"} color={"violet"} unstackable={unstackable} open={active} setOpen={setActive}
+                tableSize={tableSize} segmentSize={segmentSize} onAdd={addLanguage} addDisabled={invalidCandLang}
+                headerRow={headerRow} tableData={tableData} renderBodyRow={renderBodyRow} footerCells={footerCells}/>
+            <Transition visible={active} duration={200} animation={"slide down"}>
                 <div>
-                    <SDropdown options={candLangOption} name="candLangIds" placeholder="Languages"
-                               formik={formik} loading={false} disabled={candLangOption.length === 0}
-                               style={{marginRight: 10, color: "rgba(90,20,200,0.9)"}}/>
-                    <Button icon="plus" color="blue" content={"Add"} onClick={addLangsToCv}
-                            disabled={formik.values.candLangIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
-                </div> : null}
+                    {editable && cv ?
+                        <div>
+                            <SDropdown options={candLangOption} name="candLangIds" placeholder="Languages"
+                                       formik={formik} loading={false} disabled={candLangOption.length === 0}
+                                       style={{marginRight: 10, color: "rgba(90,20,200,0.9)"}}/>
+                            <Button icon="plus" color="blue" content={"Add"} onClick={addLangsToCv}
+                                    disabled={formik.values.candLangIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
+                        </div> : null}
+                </div>
+            </Transition>
+
         </Grid.Column>
     )
 }

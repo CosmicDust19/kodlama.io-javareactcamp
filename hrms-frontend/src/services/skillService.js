@@ -2,11 +2,11 @@ import axios from "axios"
 
 export default class SkillService {
 
-    getSkills() {
+    getAll() {
         return axios.get("http://localhost:8080/api/skills/get/all");
     }
 
-    addSkill(skillName) {
+    add(skillName) {
         return axios.post(`http://localhost:8080/api/skills/add?skillName=${skillName}`)
     }
 

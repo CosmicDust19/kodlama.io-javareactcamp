@@ -1,48 +1,96 @@
-import {Button, Dropdown, Segment} from "semantic-ui-react";
+import {Button, Dropdown, Icon, Loader, Message, Segment} from "semantic-ui-react";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
 import {employerStatusOptions, getFilteredEmployers} from "../../utilities/EmployerUtils";
 import {defDropdownStyle} from "../../utilities/Utils";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
-import {changeEmployersFilters, changeFilteredEmployers} from "../../store/actions/filterActions";
+import {changeEmployersFilters, changeFilteredEmployers} from "../../store/actions/listingActions";
 import EmployerService from "../../services/employerService";
+import {toast} from "react-toastify";
 
-function EmployerMngFilterSeg({employers}) {
-
-    const employerService = new EmployerService();
+function EmployerMngFilterSeg() {
 
     const dispatch = useDispatch();
-
-    const filters = useSelector(state => state?.filter.filter.employersFilters)
+    const filterProps = useSelector(state => state?.listingReducer.listingProps.employers)
+    const filters = filterProps.filters
+    const firstFilter = filterProps.firstFilter
+    const lastSynced = filterProps.lastSynced
+    const now = new Date().getTime()
 
     const [loading, setLoading] = useState(false);
+    const [allEmployers, setAllEmployers] = useState();
+
+    useEffect(() => {
+        return () => {
+            setLoading(undefined)
+            setAllEmployers(undefined)
+        };
+    }, []);
+
+    useEffect(() => {
+        setLoading(true)
+        const employerService = new EmployerService()
+        employerService.getAll()
+            .then(r => {
+                const data = r.data.data ? r.data.data : []
+                setAllEmployers(r.data.data)
+                if (firstFilter === true)
+                    dispatch(changeFilteredEmployers(data, undefined,data.length === 0))
+            })
+            .catch(() => setTimeout(() => toast("Waiting for response 🕔 ... Thanks for your patience."), 2500))
+            .finally(() => setLoading(false))
+    }, [dispatch, firstFilter, filterProps.filteredEmployers]);
+
+    useEffect(() => {
+        if (now - lastSynced > 120000) {
+            const employerService = new EmployerService()
+            employerService.getAll().then(r => {
+                const data = r.data.data ? r.data.data : []
+                setAllEmployers(r.data.data)
+                dispatch(changeFilteredEmployers(getFilteredEmployers(data, filters), true))
+            })
+        }
+    }, [dispatch, filters, lastSynced, now]);
 
     const formik = useFormik({
-        initialValues: {statuses: filters.statuses, employerId: filters.employerId}
+        initialValues: {...filters}
     });
+
+    if (!allEmployers) return <Loader active inline='centered' size={"large"} content={"Waiting for response..."}
+                                      style={{marginTop: 100, marginBottom: 100}}/>
+
+    if (allEmployers.length === 0)
+        return (
+            <Message warning compact as={Segment} raised style={{marginBottom: 50, marginLeft: -5}}>
+                <Icon name={"wait"} size={"large"}/>
+                <font style={{verticalAlign: "middle"}}>
+                    No employer found. Please wait for employers to sign up. Employers listed if stored before.
+                </font>
+            </Message>
+        )
 
     let key = 0
     let employerOption
-    const employerCompanyNameOption = employers.map((employer) => ({
+    const employerCompanyNameOption = allEmployers.map((employer) => ({
         key: key++,
         text: employer.companyName,
         value: employer.id,
     }));
 
-    const employerEmailOption = employers.map((employer) => ({
+    const employerEmailOption = allEmployers.map((employer) => ({
         key: key++,
         text: employer.email,
         value: employer.id,
     }));
 
-    const employersWebsiteOption = employers.map((employer) => ({
+    const employersWebsiteOption = allEmployers.map((employer) => ({
         key: key++,
         text: employer.website,
         value: employer.id,
     }));
 
-    const employersPhoneOption = employers.map((employer) => ({
+    const employersPhoneOption = allEmployers.map((employer) => ({
         key: key++,
         text: employer.phoneNumber,
         value: employer.id,
@@ -53,9 +101,8 @@ function EmployerMngFilterSeg({employers}) {
         .concat(employerEmailOption)
         .concat(employersWebsiteOption)
 
-
     const changeStatusFilter = (value) => {
-        if (value.length !== 0) formik.values.employerId = 0
+        if (value.length !== 0) formik.values.employerId = ""
         formik.setFieldValue("statuses", value);
         formik.values.statuses = value
         handleFilter()
@@ -68,32 +115,23 @@ function EmployerMngFilterSeg({employers}) {
         handleFilter()
     }
 
-    const handleReset = () => {
-        formik.setValues({statuses: [], employerId: 0})
-        formik.values = {statuses: [], employerId: 0}
-        handleFilter()
-    }
-
     const handleFilter = () => {
         setLoading(true)
         dispatch(changeEmployersFilters(formik.values))
-        employerService.getAll().then(r => {
-            const filteredEmployers = getFilteredEmployers(r.data.data, formik.values)
-            dispatch(changeFilteredEmployers(filteredEmployers))
-        }).finally(() => setLoading(false))
+        dispatch(changeFilteredEmployers(getFilteredEmployers(allEmployers, formik.values), true))
+        setLoading(false)
     }
 
     return (
         <Segment basic textAlign={"center"} loading={loading}>
             <Dropdown placeholder="Search" search className="icon" selectOnBlur={false} button labeled
-                      icon="search" options={employerOption} value={formik.values.employerId} basic
-                      style={{borderRadius: 5, height: 38, width: 196, marginLeft: 4}}
-                      onChange={(event, data) => search(data.value)}/>
-            {formik.values.employerId === 0 ? null : <Button icon="x" circular onClick={() => search(0)}/>}
+                      loading={employerOption.length === 0} icon="search" options={employerOption}
+                      value={formik.values.employerId} basic onChange={(event, data) => search(data.value)}
+                      style={{borderRadius: 5, height: 38, width: 196, marginLeft: 4}}/>
+            {formik.values.employerId === "" ? null : <Button icon="x" circular onClick={() => search("")}/>}
             <SDropdown name={"statuses"} placeholder="Statuses" options={employerStatusOptions} formik={formik}
                        onChange={(event, data) => changeStatusFilter(data.value)}
                        style={{...defDropdownStyle}}/>
-            <Button icon="sync" circular onClick={handleReset} content={"Reset & Sync"} primary compact/>
         </Segment>
     )
 }

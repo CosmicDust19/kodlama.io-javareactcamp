@@ -1,5 +1,6 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
 import com.finalproject.hrmsbackend.core.entities.User;
 import lombok.*;
@@ -14,6 +15,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "Images")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Image implements BaseEntity<Integer> {
 
     @Id
@@ -30,9 +32,19 @@ public class Image implements BaseEntity<Integer> {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties(value = {"image"})
     private User user;
 
     @Column(name = "image_url", nullable = false, length = 150)
     private String imageUrl;
 
+    @Column(name = "width")
+    private Short width;
+
+    @Column(name = "height")
+    private Short height;
+
+    public Image(Integer id) {
+        this.id = id;
+    }
 }

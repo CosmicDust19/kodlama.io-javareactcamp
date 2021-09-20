@@ -1,5 +1,5 @@
 import {Button, Form, Input, Popup, Segment} from "semantic-ui-react";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useFormik} from "formik";
 import {onCVUpdate} from "../../utilities/CandidateUtils";
 import {handleCatch} from "../../utilities/Utils";
@@ -14,15 +14,18 @@ function CandCvTitleSeg({user, cv}) {
 
     const [popupOpen, setPopupOpen] = useState(false);
 
+    useEffect(() => {
+        return () => setPopupOpen(undefined)
+    }, []);
+
     const formik = useFormik({
         initialValues: {title: ""}
     });
 
-    const updateTitle = () => {
+    const updateTitle = () =>
         candidateCvService.updateTitle(cv.id, formik.values.title)
             .then(r => onCVUpdate(dispatch, cv.id, user.cvs, r))
             .catch(handleCatch)
-    }
 
     return (
         <Segment basic style={{marginBottom: -10}}>

@@ -1,4 +1,4 @@
-### This package is not used in this project, i write them because they may be needed later.
+### This package is not used in this project, I write them because they may be needed later.
 
 ### It may help us for some errors 
 

@@ -1,4 +1,4 @@
-import {Accordion, Button, Card, Grid, Header, Icon, Loader, Segment, Table} from "semantic-ui-react";
+import {Button, Grid, Icon, Loader, Table, Transition} from "semantic-ui-react";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
 import SInput from "../../utilities/customFormControls/SInput";
 import React, {useEffect, useState} from "react";
@@ -11,8 +11,11 @@ import {getDepartmentOption, getSchoolOption, handleCatch} from "../../utilities
 import {changeSchools} from "../../store/actions/userActions";
 import {getFilteredCandSchOption, onCVUpdate, onPropAdd, syncCandidate} from "../../utilities/CandidateUtils";
 import CandidateCvService from "../../services/candidateCvService";
+import ManagementTable from "../common/ManagementTable";
+import AreYouSureModal from "../common/AreYouSureModal";
 
-function CandSchoolsTable({user, cv, editable = false, defaultClosed = false, unstackable = false, vertical = false, small = false, width = 16}) {
+function CandSchoolsTable
+({user, cv, editable = false, defaultClosed = false, unstackable = false, vertical = false, small = false, width = 16}) {
 
     const candSchService = new CandidateSchoolService();
     const candCvService = new CandidateCvService();
@@ -21,14 +24,24 @@ function CandSchoolsTable({user, cv, editable = false, defaultClosed = false, un
 
     const [schools, setSchools] = useState([]);
     const [departments, setDepartments] = useState([]);
-    const [open, setOpen] = useState(defaultClosed !== true);
+    const [active, setActive] = useState(defaultClosed !== true);
+    const [candSchIdDel, setCandSchIdDel] = useState();
+
+    useEffect(() => {
+        return () => {
+            setSchools(undefined)
+            setDepartments(undefined)
+            setActive(undefined)
+            setCandSchIdDel(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         if (editable && !cv) {
             const schoolService = new SchoolService();
             const departmentService = new DepartmentService();
-            schoolService.getSchools().then((result) => setSchools(result.data.data));
-            departmentService.getDepartments().then((result) => setDepartments(result.data.data));
+            schoolService.getAll().then((result) => setSchools(result.data.data));
+            departmentService.getAll().then((result) => setDepartments(result.data.data));
         }
     }, [cv, editable]);
 
@@ -93,80 +106,60 @@ function CandSchoolsTable({user, cv, editable = false, defaultClosed = false, un
             .catch(handleCatch)
     //
 
-    const onRemove = (candSchId) => cv ? removeSchFromCv(candSchId) : deleteSchool(candSchId)
+    const onRemove = () => {
+        cv ? removeSchFromCv(candSchIdDel) : deleteSchool(candSchIdDel)
+        setCandSchIdDel(undefined)
+    }
+
+    const headerRow = [
+        "Schools", "Department", "Start Year", "Graduation Year",
+        editable && (candSchs.length !== 0 || !cv) ? "" : undefined
+    ]
+
+    const tableData = candSchs
+        .map(candSch => ({candSch: candSch}))
+        .sort((a, b) => a.candSch.graduationYear - b.candSch.graduationYear)
+
+    const renderBodyRow = ({candSch}, i) => ({
+        key: i,
+        cells: [
+            {content: candSch.school.name, key: "school"},
+            {content: candSch.department.name, key: "department"},
+            {content: candSch.startYear, key: "startYear"},
+            candSch.graduationYear ? {content: candSch.graduationYear, key: "gradYear"} : "Continues",
+            editable ?
+                <Table.Cell key={"del"} onClick={() => setCandSchIdDel(candSch.id)} negative selectable
+                            icon={<Icon name={"x"} style={{marginRight: 0}}/>}/> : null
+        ]
+    })
+
+    const footerCells = editable && !cv ? [
+        <SDropdown options={schoolOption} name="schoolId" placeholder="School" multiple={false} formik={formik} style={{}}/>,
+        <SDropdown options={departmentOption} name="departmentId" placeholder="Department" multiple={false} formik={formik} style={{}}/>,
+        <SInput name="startYear" placeholder="Start Year" formik={formik} style={inputStyle} type="number"/>,
+        <SInput name="graduationYear" placeholder="Graduation Year" formik={formik} style={inputStyle} type="number"/>
+    ] : null
 
     return (
         <Grid.Column width={width} style={{marginTop: 10}}>
-            <Accordion>
-                <Accordion.Title onClick={() => setOpen(!open)} active={open}>
-                    <Card fluid raised style={{borderRadius: 0}} onClick={() => {}}>
-                        <Card.Header>
-                            <Header textAlign={"center"} dividing color="yellow" content={"Schools"}
-                                    style={{marginBottom: 0, borderRadius: 0}} block/>
-                        </Card.Header>
-                    </Card>
-                </Accordion.Title>
-                <Accordion.Content active={open} as={Segment} size={segmentSize} raised vertical
-                                   style={{marginTop: -6.5, marginBottom: 10, borderRadius: 0}}>
-                    <Table size={tableSize} celled unstackable={unstackable} textAlign="center" striped
-                           style={{marginTop: -14, marginBottom: -14, borderRadius: 0}}>
-                        <Table.Header>
-                            <Table.Row>
-                                <Table.HeaderCell content={"Schools"}/>
-                                <Table.HeaderCell content={"Department"}/>
-                                <Table.HeaderCell content={"Start Year"}/>
-                                <Table.HeaderCell content={"Graduation Year"}/>
-                                {editable && (candSchs.length !== 0 || !cv) ? <Table.HeaderCell/> : null}
-                            </Table.Row>
-                        </Table.Header>
-
-                        <Table.Body>
-                            {candSchs.map((candSch) => (
-                                <Table.Row key={candSch.id}>
-                                    <Table.Cell content={candSch.school?.name}/>
-                                    <Table.Cell content={candSch.department?.name}/>
-                                    <Table.Cell content={candSch.startYear}/>
-                                    <Table.Cell content={!candSch.graduationYear ? "Continues" : candSch.graduationYear}/>
-                                    {editable ? <Table.Cell onClick={() => onRemove(candSch.id)} negative selectable
-                                                            icon={<Icon name={"x"} style={{marginRight: 0}}/>}/> : null}
-                                </Table.Row>
-                            ))}
-                        </Table.Body>
-
-                        {editable && !cv ?
-                            <Table.Footer>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <SDropdown options={schoolOption} name="schoolId" placeholder="School"
-                                                   multiple={false} formik={formik} style={{}}/>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <SDropdown options={departmentOption} name="departmentId" placeholder="Department"
-                                                   multiple={false} formik={formik} style={{}}/>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <SInput name="startYear" placeholder="Start Year" formik={formik}
-                                                style={inputStyle} type="number"/>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <SInput name="graduationYear" placeholder="Graduation Year" formik={formik}
-                                                style={inputStyle} type="number"/>
-                                    </Table.Cell>
-                                    <Table.Cell positive icon={<Icon name={"plus"} style={{marginRight: 0}} disabled={invalidCandSchool}/>}
-                                                onClick={addSchool} selectable disabled={invalidCandSchool}/>
-                                </Table.Row>
-                            </Table.Footer> : null}
-                    </Table>
-                </Accordion.Content>
-            </Accordion>
-            {editable && cv && open ?
+            <AreYouSureModal open={!!candSchIdDel} message={`Are you sure you want to remove${cv ? "" : " from everywhere"} ?`}
+                             yesColor={"red"} noColor={"grey"} onYes={onRemove} onNo={() => setCandSchIdDel(undefined)}/>
+            <ManagementTable
+                headerContent={"Schools"} color={"yellow"} unstackable={unstackable} open={active} setOpen={setActive}
+                tableSize={tableSize} segmentSize={segmentSize} onAdd={addSchool} addDisabled={invalidCandSchool}
+                headerRow={headerRow} tableData={tableData} renderBodyRow={renderBodyRow} footerCells={footerCells}/>
+            <Transition visible={active} duration={200} animation={"slide down"}>
                 <div>
-                    <SDropdown options={candSchOption} name="candSchIds" placeholder="Schools"
-                               formik={formik} loading={false} disabled={candSchOption.length === 0}
-                               style={{marginRight: 10, color: "rgba(220,150,10,0.9)"}}/>
-                    <Button icon="plus" color="blue" content={"Add"} onClick={addSchsToCv}
-                            disabled={formik.values.candSchIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
-                </div> : null}
+                    {editable && cv ?
+                        <div>
+                            <SDropdown options={candSchOption} name="candSchIds" placeholder="Schools"
+                                       formik={formik} loading={false} disabled={candSchOption.length === 0}
+                                       style={{marginRight: 10, color: "rgba(220,150,10,0.9)"}}/>
+                            <Button icon="plus" color="blue" content={"Add"} onClick={addSchsToCv}
+                                    disabled={formik.values.candSchIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
+                        </div> : null}
+                </div>
+            </Transition>
         </Grid.Column>
     )
 }

@@ -3,30 +3,30 @@ export const CHANGE_FILTERED_JOB_ADVS = "CHANGE_FILTERED_JOB_ADVS"
 export const CHANGE_EMPLOYERS_FILTERS = "CHANGE_EMPLOYERS_FILTERS"
 export const CHANGE_FILTERED_EMPLOYERS = "CHANGE_FILTERED_EMPLOYERS"
 
-export function changeJobAdvertsFilters(jobAdvertsFilters) {
+export function changeJobAdvertsFilters(filters) {
     return {
         type: CHANGE_JOB_ADVERTS_FILTERS,
-        payload: {jobAdvertsFilters: jobAdvertsFilters}
+        payload: {filters}
     }
 }
 
-export function changeFilteredJobAdverts(filteredJobAdverts) {
+export function changeFilteredJobAdverts(filteredJobAdverts, synced, firstFilter) {
     return {
         type: CHANGE_FILTERED_JOB_ADVS,
-        payload: {filteredJobAdverts}
+        payload: {filteredJobAdverts, synced, firstFilter}
     }
 }
 
-export function changeEmployersFilters(employersFilters) {
+export function changeEmployersFilters(filters) {
     return {
         type: CHANGE_EMPLOYERS_FILTERS,
-        payload: {employersFilters}
+        payload: {filters}
     }
 }
 
-export function changeFilteredEmployers(filteredEmployers) {
+export function changeFilteredEmployers(filteredEmployers, synced, firstFilter) {
     return {
         type: CHANGE_FILTERED_EMPLOYERS,
-        payload: {filteredEmployers}
+        payload: {filteredEmployers, firstFilter}
     }
 }

@@ -26,12 +26,13 @@ public class JobAdvertisementsController {
     private final JobAdvertisementService jobAdvService;
 
     @GetMapping("/get/all")
-    public ResponseEntity<?> getAll() {
-        return Utils.getResponseEntity(jobAdvService.getAll());
+    public ResponseEntity<?> getAll(@RequestParam(required = false) Short sortDirection,
+                                    @RequestParam(required = false) String propName) {
+        return Utils.getResponseEntity(jobAdvService.getAll(sortDirection, propName));
     }
 
     @GetMapping("/get/byEmployer")
-    public ResponseEntity<?> getAllByEmployer(Integer employerId) {
+    public ResponseEntity<?> getAllByEmployer(@RequestParam Integer employerId) {
         return Utils.getResponseEntity(jobAdvService.getAllByEmployer(employerId));
     }
 
@@ -46,8 +47,10 @@ public class JobAdvertisementsController {
     }
 
     @GetMapping("/get/publicByEmployer")
-    public ResponseEntity<?> getPublicByEmployer(@RequestParam int employerId) {
-        return Utils.getResponseEntity(jobAdvService.getPublicByEmployer(employerId));
+    public ResponseEntity<?> getPublicByEmployer(@RequestParam int employerId,
+                                                 @RequestParam(required = false) Short sortDirection,
+                                                 @RequestParam(required = false) String propName) {
+        return Utils.getResponseEntity(jobAdvService.getPublicByEmployer(employerId, sortDirection, propName));
     }
 
     @GetMapping("/get/unverified")
@@ -56,8 +59,9 @@ public class JobAdvertisementsController {
     }
 
     @GetMapping("/get/public")
-    public ResponseEntity<?> getPublic(@RequestParam(required = false) Short sortDirection) {
-        return Utils.getResponseEntity(jobAdvService.getPublic(sortDirection));
+    public ResponseEntity<?> getPublic(@RequestParam(required = false) Short sortDirection,
+                                       @RequestParam(required = false) String propName) {
+        return Utils.getResponseEntity(jobAdvService.getPublic(sortDirection, propName));
     }
 
     @GetMapping("/get/activeVerifiedPast")

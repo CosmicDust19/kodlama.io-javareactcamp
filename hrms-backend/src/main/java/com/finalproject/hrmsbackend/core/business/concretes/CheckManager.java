@@ -1,17 +1,11 @@
 package com.finalproject.hrmsbackend.core.business.concretes;
 
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.core.utilities.results.ErrorResult;
-import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
@@ -27,21 +21,6 @@ public class CheckManager implements CheckService {
     @Override
     public boolean notExistsById(CrudRepository<?, Short> dao, Short id) {
         return id == null || id <= 0 || !dao.existsById(id);
-    }
-
-    @Override
-    public boolean invalidLength(String value, int min, int max) {
-        return value == null || value.length() < min || value.length() > max;
-    }
-
-    @Override
-    public boolean invalidRange(Double value, double min, double max) {
-        return value == null || value < min || value > max;
-    }
-
-    @Override
-    public boolean invalidRange(Short value, int min, int max) {
-        return value == null || value < min || value > max;
     }
 
     @Override
@@ -82,18 +61,6 @@ public class CheckManager implements CheckService {
     @Override
     public boolean greater(Double greater, Double less) {
         return greater != null && less != null && greater > less;
-    }
-
-    @Override
-    public Result validateImage(MultipartFile multipartFile) {
-        if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(Msg.NOT_FOUND.get("File"));
-        try {
-            if (ImageIO.read(multipartFile.getInputStream()) == null) return new ErrorResult(Msg.NOT_AN_IMAGE.get());
-            //only BMP, GIF, JPG and PNG are recognized
-        } catch (IOException exception) {
-            return new ErrorResult(Msg.IMG_VALIDATION_ERR.get());
-        }
-        return null;
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface JobAdvertisementService {
 
-    DataResult<List<JobAdvertisement>> getAll();
+    DataResult<List<JobAdvertisement>> getAll(Short sortDirection, String propName);
 
     DataResult<List<JobAdvertisement>> getAllByEmployer(Integer employerId);
 
@@ -18,11 +18,11 @@ public interface JobAdvertisementService {
 
     DataResult<List<JobAdvertisement>> getActiveVerifiedByCreatedAt(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> getPublicByEmployer(int employerId);
+    DataResult<List<JobAdvertisement>> getPublicByEmployer(int employerId, Short sortDirection, String propName);
 
     DataResult<List<JobAdvertisement>> getUnverified(Short sortDirection);
 
-    DataResult<List<JobAdvertisement>> getPublic(Short sortDirection);
+    DataResult<List<JobAdvertisement>> getPublic(Short sortDirection, String propName);
 
     DataResult<List<JobAdvertisement>> getActiveVerifiedPast();
 

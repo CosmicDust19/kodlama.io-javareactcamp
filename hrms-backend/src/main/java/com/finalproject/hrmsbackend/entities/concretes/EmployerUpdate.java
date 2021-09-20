@@ -1,6 +1,7 @@
 package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,7 +26,7 @@ public class EmployerUpdate {
     @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "company_name", length = 100)
+    @Column(name = "company_name", length = Utils.Const.MAX_COMPANY_NAME)
     private String companyName;
 
     @Column(name = "website", length = 200)

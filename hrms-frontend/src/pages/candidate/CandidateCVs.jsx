@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {changeCandCVs} from "../../store/actions/userActions";
 import {useFormik} from "formik";
-import {Button, Form, Grid, Header, Input, Menu, Popup} from "semantic-ui-react";
+import {Button, Form, Grid, Header, Input, Menu, Popup, Transition} from "semantic-ui-react";
 import CandidateCvService from "../../services/candidateCvService";
 import {getRandomColor, handleCatch} from "../../utilities/Utils";
 import {toast} from "react-toastify";
@@ -15,11 +15,24 @@ export function CandidateCVs() {
     const dispatch = useDispatch();
     const userProps = useSelector(state => state?.user?.userProps)
 
+    const [visible, setVisible] = useState(false);
     const [user, setUser] = useState(userProps.user);
     const [index, setIndex] = useState(userProps.user.cvs.length === 0 ? -1 : 0);
     const [selectedCv, setSelectedCv] = useState({});
     const [activeItem, setActiveItem] = useState();
     const [cvAddPopupOpen, setCvAddPopupOpen] = useState(false);
+
+    useEffect(() => {
+        setVisible(true)
+        return () => {
+            setVisible(undefined)
+            setUser(undefined)
+            setIndex(undefined)
+            setSelectedCv(undefined)
+            setActiveItem(undefined)
+            setCvAddPopupOpen(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         setUser(userProps.user)
@@ -58,35 +71,37 @@ export function CandidateCVs() {
     }
 
     return (
-        <Grid stackable padded>
-            <Grid.Column width={4}>
-                <Header content={"Manage Your CVs"} sub/>
-                <Menu fluid vertical secondary>
-                    {user?.cvs?.map(cv =>
-                        <Menu.Item key={cv?.id} name={cv?.title} active={activeItem === cv?.title} color={getRandomColor()}
-                                   onClick={() => handleMenuItemClick(user.cvs.indexOf(cv))}/>)}
-                    <Popup
-                        trigger={
-                            <Menu.Item
-                                name={"Add New"} color={"green"} header icon={"plus"}
-                                onClick={() => setCvAddPopupOpen(!cvAddPopupOpen)}
-                                active={cvAddPopupOpen}/>}
-                        content={
-                            <Form>
-                                <Input placeholder="Title" value={formik.values.cvAddTitle} name="cvAddTitle"
-                                       onChange={formik.handleChange} onBlur={formik.handleBlur}
-                                       actionPosition={"left"} transparent size="large"/>
-                                <Button content={"Save"} circular style={{marginTop: 10}} onClick={() => addCv()}
-                                        secondary compact fluid type="submit"/>
-                            </Form>}
-                        on='focus' open={cvAddPopupOpen} position='bottom center' pinned
-                        style={{opacity: 0.8}}
-                    />
-                </Menu>
-            </Grid.Column>
-            <Grid.Column stretched width={12}>
-                {selectedCv?.id ? <CandCvSeg user={user} cv={selectedCv} setIndex={setIndex}/> : null}
-            </Grid.Column>
-        </Grid>
+        <Transition visible={visible} duration={200}>
+            <Grid stackable padded>
+                <Grid.Column width={4}>
+                    <Header content={"Manage Your CVs"} sub style={{userSelect: "none"}}/>
+                    <Menu fluid vertical secondary>
+                        {user?.cvs?.map(cv =>
+                            <Menu.Item key={cv?.id} name={cv?.title} active={activeItem === cv?.title} color={getRandomColor()}
+                                       onClick={() => handleMenuItemClick(user.cvs.indexOf(cv))}/>)}
+                        <Popup
+                            trigger={
+                                <Menu.Item
+                                    name={"Add New"} color={"green"} header icon={"plus"}
+                                    onClick={() => setCvAddPopupOpen(!cvAddPopupOpen)}
+                                    active={cvAddPopupOpen}/>}
+                            content={
+                                <Form>
+                                    <Input placeholder="Title" value={formik.values.cvAddTitle} name="cvAddTitle"
+                                           onChange={formik.handleChange} onBlur={formik.handleBlur}
+                                           actionPosition={"left"} transparent size="large"/>
+                                    <Button content={"Save"} circular style={{marginTop: 10}} onClick={() => addCv()}
+                                            secondary compact fluid type="submit"/>
+                                </Form>}
+                            on='focus' open={cvAddPopupOpen} position='bottom center' pinned
+                            style={{opacity: 0.8}}
+                        />
+                    </Menu>
+                </Grid.Column>
+                <Grid.Column stretched width={12}>
+                    {selectedCv?.id ? <CandCvSeg user={user} cv={selectedCv} setIndex={setIndex}/> : null}
+                </Grid.Column>
+            </Grid>
+        </Transition>
     )
 }

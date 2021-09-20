@@ -113,7 +113,7 @@ public class EmployerManager implements EmployerService {
             return new ErrorResult(Msg.IS_THE_SAME.get("Company name"));
         if (!employer.getCompanyName().equals(companyName) && employerDao.existsByCompanyName(companyName))
             return new ErrorResult(Msg.IS_IN_USE.get("Company name"));
-        if (employerUpdateDao.existsByCompanyName(companyName))
+        if (!employerUpdate.getCompanyName().equals(companyName) && employerUpdateDao.existsByCompanyName(companyName))
             return new ErrorResult(Msg.REQUESTED.get("This company name"));
 
         employerUpdate.setCompanyName(companyName);
@@ -140,9 +140,9 @@ public class EmployerManager implements EmployerService {
             return new ErrorResult(Msg.IS_IN_USE.get("Email"));
         if (!employer.getWebsite().equals(website) && employerDao.existsByWebsite(website))
             return new ErrorResult(Msg.IS_IN_USE.get("Website"));
-        if (employerUpdateDao.existsByEmail(email))
+        if (!employerUpdate.getEmail().equals(email) && employerUpdateDao.existsByEmail(email))
             return new ErrorResult(Msg.REQUESTED.get("This email"));
-        if (employerUpdateDao.existsByWebsite(website))
+        if (!employerUpdate.getWebsite().equals(website) && employerUpdateDao.existsByWebsite(website))
             return new ErrorResult(Msg.REQUESTED.get("This website"));
 
         employerUpdate.setEmail(email);
@@ -187,14 +187,23 @@ public class EmployerManager implements EmployerService {
     }
 
     private Result execLastUpdAct(Employer employer) {
+        boolean noChange = noChange(employer);
         EmployerUpdate savedEmplUpdate = employerUpdateDao.save(employer.getEmployerUpdate());
-        employerDao.updateUpdateVerification(false, employer.getId());
+        employerDao.updateUpdateVerification(noChange, employer.getId());
         userDao.updateLastModifiedAt(LocalDateTime.now(), employer.getId());
         employer.setEmployerUpdate(savedEmplUpdate);
-        employer.setUpdateVerified(false);
+        employer.setUpdateVerified(noChange);
         employer.setLastModifiedAt(LocalDateTime.now());
         employer.setPassword(null);
         return new SuccessDataResult<>(Msg.SUCCESS_UPDATE_REQUEST.get(), employer);
+    }
+
+    private boolean noChange(Employer employer) {
+        EmployerUpdate emplUpd = employer.getEmployerUpdate();
+        return check.equals(emplUpd.getCompanyName(), employer.getCompanyName()) &&
+                check.equals(emplUpd.getEmail(), emplUpd.getEmail()) &&
+                check.equals(emplUpd.getWebsite(), emplUpd.getWebsite()) &&
+                check.equals(emplUpd.getPhoneNumber(), emplUpd.getPhoneNumber());
     }
 
 }

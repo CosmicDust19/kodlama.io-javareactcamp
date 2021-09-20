@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSkillService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
@@ -13,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,19 +32,37 @@ public class CandidateSkillManager implements CandidateSkillService {
     }
 
     @Override
-    public Result add(CandidateSkillAddDto candSkillAddDto) {
+    public DataResult<?> add(CandidateSkillAddDto candSkillAddDto) {
+        Map<String, String> errors = new HashMap<>();
         if (check.notExistsById(candidateDao, candSkillAddDto.getCandidateId()))
-            return new ErrorResult(Msg.NOT_EXIST.get("candidateId"));
+            errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
         if (check.notExistsById(skillDao, candSkillAddDto.getSkillId()))
-            return new ErrorResult(Msg.NOT_EXIST.get("skillId"));
+            errors.put("skillId", Msg.NOT_EXIST.get("Skill"));
         if (violatesUk(candSkillAddDto))
-            return new ErrorResult(Msg.UK_CAND_SKILL.get());
+            errors.put("uk", Msg.UK_CAND_SKILL.get());
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
 
         CandidateSkill candidateSkill = modelMapper.map(candSkillAddDto, CandidateSkill.class);
 
         CandidateSkill savedCandSkill = candidateSkillDao.save(candidateSkill);
         savedCandSkill.setSkill(skillDao.getById(savedCandSkill.getSkill().getId()));
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandSkill);
+    }
+
+    @Override
+    public Result addMultiple(List<CandidateSkillAddDto> candSkillAddDtoList) {
+        Map<String, Object> errors = new LinkedHashMap<>();
+        List<Object> savedCandSkills = new ArrayList<>();
+        short failed = 0;
+        for (int i = 0; i < candSkillAddDtoList.size(); i++) {
+            DataResult<?> result = add(candSkillAddDtoList.get(i));
+            if (!result.isSuccess()) {
+                errors.put(String.format("Skill[%d]", i), result);
+                failed++;
+            } else savedCandSkills.add(result.getData());
+        }
+        if (failed > 0) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
+        return new SuccessDataResult<>(Msg.SAVED.get(), savedCandSkills);
     }
 
     @Override

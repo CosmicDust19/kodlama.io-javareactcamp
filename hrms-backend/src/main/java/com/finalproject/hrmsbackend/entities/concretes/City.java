@@ -3,6 +3,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 
 import javax.persistence.*;
@@ -25,7 +26,7 @@ public class City implements BaseEntity<Short> {
     @Column(name = "id")
     private Short id;
 
-    @Column(name = "name", nullable = false, unique = true, length = 50)
+    @Column(name = "name", nullable = false, unique = true, length = Utils.Const.MAX_CITY_NAME)
     private String name;
 
     @JsonIgnore

@@ -23,6 +23,10 @@ export default class CandidateCvService {
         return axios.put(`http://localhost:8080/api/cvs/update/coverLetter?coverLetter=${coverLetter}&cvId=${cvId}`)
     }
 
+    updateImg(imgId, cvId) {
+        return axios.put(`http://localhost:8080/api/cvs/update/image?cvId=${cvId}&${imgId ? `imgId=${imgId}` : ""}`)
+    }
+
     updateJobExperiences(cvId, jobExpIds, updateType) {
         return axios.put(`http://localhost:8080/api/cvs/update/jobExps/${this.getUpdateExp(updateType)}?${this.getCvPropIdListExp(jobExpIds, "candJobExpIds")}cvId=${cvId}`)
     }

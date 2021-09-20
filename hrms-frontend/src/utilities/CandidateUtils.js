@@ -1,6 +1,5 @@
-import {changePropInList, handleCatch} from "./Utils";
+import {changePropInList} from "./Utils";
 import CandidateService from "../services/candidateService";
-import {onUpdate} from "./UserUtils";
 import {toast} from "react-toastify";
 import {changeCandCVs, syncUser} from "../store/actions/userActions";
 
@@ -13,18 +12,6 @@ export const languageLevelOption = languageLevels.map((languageLevel, index) => 
     text: languageLevel,
     value: languageLevel,
 }));
-
-export const updateGithub = (dispatch, candidate, githubAccount) => {
-    candidateService.updateGithubAccount(candidate.id, githubAccount)
-        .then(r => onUpdate(dispatch, r, "Saved"))
-        .catch(handleCatch)
-}
-
-export const updateLinkedin = (dispatch, candidate, linkedinAccount) => {
-    candidateService.updateLinkedinAccount(candidate.id, linkedinAccount)
-        .then(r => onUpdate(dispatch, r, "Saved"))
-        .catch(handleCatch)
-}
 
 export const onPropAdd = (dispatch, newProp, oldProps, saveFunction) => {
     oldProps.push(newProp)
@@ -65,23 +52,23 @@ export const getFilteredCandLangOption = (candLangs, filterCandLangs) =>
 
 export const getFilteredCandSchOption = (candSchs, filterCandSchs) =>
     candSchs?.filter((candSch) => {
-    const index = (filterCandSchs?.findIndex((filterCandSch) => filterCandSch.id === candSch.id))
-    return index === -1;
-}).map((candidateSchool, index) => ({
-    key: index,
-    text: `${candidateSchool.school.name} | ${candidateSchool.department.name}`,
-    value: candidateSchool.id,
-}));
+        const index = (filterCandSchs?.findIndex((filterCandSch) => filterCandSch.id === candSch.id))
+        return index === -1;
+    }).map((candidateSchool, index) => ({
+        key: index,
+        text: `${candidateSchool.school.name} | ${candidateSchool.department.name}`,
+        value: candidateSchool.id,
+    }));
 
 export const getFilteredCandSkillOption = (candSkills, filterCandSkills) =>
     candSkills?.filter((candSkill) => {
-    const index = (filterCandSkills?.findIndex((filterCandSkill) => filterCandSkill.id === candSkill.id))
-    return index === -1;
-}).map((candidateSkill, index) => ({
-    key: index,
-    text: candidateSkill.skill.name,
-    value: candidateSkill.id,
-}));
+        const index = (filterCandSkills?.findIndex((filterCandSkill) => filterCandSkill.id === candSkill.id))
+        return index === -1;
+    }).map((candidateSkill, index) => ({
+        key: index,
+        text: candidateSkill.skill.name,
+        value: candidateSkill.id,
+    }));
 
 export const getFilteredLanguageOption = (languages, candidateLanguages) =>
     languages.filter((language) => {

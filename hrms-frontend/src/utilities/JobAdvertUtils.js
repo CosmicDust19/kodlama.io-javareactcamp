@@ -25,24 +25,25 @@ export const jobAdvertStatusOptions = jobAdvertStatuses.map((status, index) => (
 export const initialJobAdvFilters = {
     cityIds: [], positionIds: [], employerIds: [], workTimes: [], workModels: [], statuses: [],
     minSalaryLessThan: "", maxSalaryLessThan: "", minSalaryMoreThan: "", maxSalaryMoreThan: "",
-    deadLineBefore: "", deadLineAfter: "", today: false, thisWeek: false
+    openPositionsMin: "", openPositionsMax: "", deadLineBefore: "", deadLineAfter: "",
+    today: false, thisWeek: false
 }
 
-export const getJobAdvertColor = (jobAdvert) => {
+export const getJobAdvertColor = (jobAdvert, semantic) => {
     if (jobAdvert.rejected === null && jobAdvert.verified === false)
-        return "rgba(30,113,253,0.1)"
+        return semantic ? "blue" : "rgba(30,113,253,0.1)"
     else if (jobAdvert.rejected === true)
-        return "rgba(255,30,30,0.1)"
+        return semantic ? "red" : "rgba(255,30,30,0.1)"
     else if (jobAdvert.updateVerified === false)
-        return "rgba(255,131,30,0.1)"
+        return semantic ? "orange" : "rgba(255,131,30,0.1)"
     else if (Math.floor((new Date(jobAdvert.deadline).getTime() - new Date().getTime()) / 86400000) + 1 <= 0)
-        return "rgba(214,30,255,0.1)"
+        return semantic ? "purple" : "rgba(214,30,255,0.1)"
     else if (jobAdvert.active === false)
-        return "rgba(63,63,63,0.1)"
+        return semantic ? "grey" : "rgba(63,63,63,0.1)"
     else if (jobAdvert.verified === true)
-        return "rgba(27,252,3,0.1)"
+        return semantic ? "green" : "rgba(27,252,3,0.1)"
     else
-        return "rgba(255,255,255,0.1)"
+        return semantic ? undefined : "rgba(255,255,255,0.1)"
 }
 
 export const getDeadlineInfo = (deadline) => {
@@ -66,49 +67,38 @@ export const getSalaryInfo = (jobAdvert) => {
     return `Between ${jobAdvert.minSalary} ~ ${jobAdvert.maxSalary}$`;
 }
 
-export const getFormikInitialFilters = (reduxFilters) => {
-    return {
-        cityIds: reduxFilters.cityIds, positionIds: reduxFilters.positionIds, employerIds: reduxFilters.employerIds,
-        workTimes: reduxFilters.workTimes, workModels: reduxFilters.workModels, statuses: reduxFilters.statuses,
-        minSalaryLessThan: reduxFilters.minSalaryLessThan, minSalaryMoreThan: reduxFilters.minSalaryMoreThan,
-        maxSalaryLessThan: reduxFilters.maxSalaryLessThan, maxSalaryMoreThan: reduxFilters.maxSalaryMoreThan,
-        deadLineBefore: reduxFilters.deadLineBefore, deadLineAfter: reduxFilters.deadLineAfter,
-        today: reduxFilters.today, thisWeek: reduxFilters.thisWeek,
-    }
-}
-
 export const getFilteredJobAdverts = (jobAdverts, filters) => {
     let filteredJobAdverts = jobAdverts
 
     let temp = []
-    filters.cityIds.forEach(cityId =>
+    filters.cityIds?.forEach(cityId =>
         temp = temp.concat(filteredJobAdverts.filter(jobAdv => jobAdv.city.id === cityId))
     )
-    if (filters.cityIds.length > 0) filteredJobAdverts = temp
+    if (filters.cityIds?.length > 0) filteredJobAdverts = temp
 
     temp = []
-    filters.positionIds.forEach(positionId =>
+    filters.positionIds?.forEach(positionId =>
         temp = temp.concat(filteredJobAdverts.filter(jobAdv => jobAdv.position.id === positionId))
     )
-    if (filters.positionIds.length > 0) filteredJobAdverts = temp
+    if (filters.positionIds?.length > 0) filteredJobAdverts = temp
 
     temp = []
-    filters.employerIds.forEach(employerId =>
+    filters.employerIds?.forEach(employerId =>
         temp = temp.concat(filteredJobAdverts.filter(jobAdv => jobAdv.employer.id === employerId))
     )
-    if (filters.employerIds.length > 0) filteredJobAdverts = temp
+    if (filters.employerIds?.length > 0) filteredJobAdverts = temp
 
     temp = []
-    filters.workModels.forEach(workModel =>
+    filters.workModels?.forEach(workModel =>
         temp = temp.concat(filteredJobAdverts.filter(jobAdv => jobAdv.workModel === workModel))
     )
-    if (filters.workModels.length > 0) filteredJobAdverts = temp
+    if (filters.workModels?.length > 0) filteredJobAdverts = temp
 
     temp = []
-    filters.workTimes.forEach(
+    filters.workTimes?.forEach(
         workTime => temp = temp.concat(filteredJobAdverts.filter(jobAdv => jobAdv.workTime === workTime))
     )
-    if (filters.workTimes.length > 0) filteredJobAdverts = temp
+    if (filters.workTimes?.length > 0) filteredJobAdverts = temp
 
     temp = []
     filters.statuses?.forEach(status => {
@@ -140,11 +130,14 @@ export const getFilteredJobAdverts = (jobAdverts, filters) => {
     })
     if (filters.statuses?.length > 0) filteredJobAdverts = Array.from(new Set(temp))
 
+    if (filters.openPositionsMin)
+        filteredJobAdverts = filteredJobAdverts.filter(jobAdv => jobAdv.openPositions + 1 > filters.openPositionsMin)
+    if (filters.openPositionsMax)
+        filteredJobAdverts = filteredJobAdverts.filter(jobAdv => jobAdv.openPositions - 1 < filters.openPositionsMax)
+
     if (filters.today) filteredJobAdverts = filteredJobAdverts.filter(jobAdv => {
         const now = new Date()
         const creationDate = new Date(jobAdv.createdAt)
-        console.log(now.getDay())
-        console.log(creationDate.getDay())
         return (now.getTime() - creationDate.getTime() < 86500000) && (now.getDay() === creationDate.getDay())
     })
     if (filters.thisWeek)

@@ -56,9 +56,9 @@ public class UsersController {
         return Utils.getResponseEntity(userService.updatePW(password, oldPassword, userId));
     }
 
-    @PutMapping(value = "/update/profileImgId")
-    public ResponseEntity<?> updateProfileImgId(@RequestParam(required = false) Integer imgId, @RequestParam int userId) {
-        return Utils.getResponseEntity(userService.updateProfileImgId(imgId, userId));
+    @PutMapping(value = "/update/profileImg")
+    public ResponseEntity<?> updateProfileImg(@RequestParam(required = false) Integer imgId, @RequestParam int userId) {
+        return Utils.getResponseEntity(userService.updateProfileImg(imgId, userId));
     }
 
 }

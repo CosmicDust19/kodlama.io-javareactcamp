@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -35,11 +36,16 @@ public class Cv implements BaseEntity<Integer> {
             "candidateLanguages", "candidateSchools", "candidateSkills"})
     private Candidate candidate;
 
-    @Column(name = "title", nullable = false, unique = true, length = 50)
+    @Column(name = "title", nullable = false, unique = true, length = Utils.Const.MAX_CV_TITLE)
     private String title;
 
-    @Column(name = "cover_letter", length = 200)
+    @Column(name = "cover_letter", length = Utils.Const.MAX_CV_COVER_LETTER)
     private String coverLetter;
+
+    @OneToOne
+    @JoinColumn(name = "img_id", referencedColumnName = "id")
+    @JsonIgnoreProperties(value = {"user"})
+    private Image image;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false)

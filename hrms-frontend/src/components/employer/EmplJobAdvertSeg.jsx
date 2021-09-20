@@ -38,8 +38,11 @@ export function EmplJobAdvertSeg({...props}) {
     useEffect(() => {
         const cityService = new CityService();
         const positionService = new PositionService();
-        cityService.getCities().then((result) => setCities(result.data.data));
-        positionService.getPositions().then((result) => setPositions(result.data.data));
+        cityService.getAll().then((result) => setCities(result.data.data));
+        positionService.getAll().then((result) => setPositions(result.data.data));
+    }, []);
+
+    useEffect(() => {
         setJobAdvert(props.jobAdvert)
     }, [props.jobAdvert]);
 
@@ -149,7 +152,7 @@ export function EmplJobAdvertSeg({...props}) {
                 <Grid style={{opacity: 0.9}} padded>
                     <Grid.Column>
                         <Header sub dividing style={{marginBottom: 0}} color={"yellow"} textAlign={"left"}
-                                content={<font style={{color: "rgb(0,0,0)", marginLeft: 10}}>Job Description</font>}/>
+                                content={<font style={{color: "rgb(0,0,0)", marginLeft: 10}}>• Job Description</font>}/>
                         <Popup
                             trigger={
                                 <TextArea style={{minHeight: 120, borderRadius: 0}} name="jobDescription"

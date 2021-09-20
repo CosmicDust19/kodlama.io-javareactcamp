@@ -2,11 +2,11 @@ import axios from "axios"
 
 export default class DepartmentService {
 
-    getDepartments() {
+    getAll() {
         return axios.get("http://localhost:8080/api/departments/get/all");
     }
 
-    addDepartment(departmentName) {
+    add(departmentName) {
         return axios.post(`http://localhost:8080/api/departments/add?departmentName=${departmentName}`)
     }
 

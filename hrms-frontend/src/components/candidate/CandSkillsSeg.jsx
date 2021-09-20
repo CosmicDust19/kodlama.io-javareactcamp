@@ -1,4 +1,4 @@
-import {Accordion, Button, Card, Grid, Header, Icon, Loader, Segment} from "semantic-ui-react";
+import {Button, Card, Grid, Header, Icon, Loader, Segment, Transition} from "semantic-ui-react";
 import {getRandomColor, handleCatch} from "../../utilities/Utils";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
 import React, {useEffect, useState} from "react";
@@ -9,8 +9,10 @@ import {useFormik} from "formik";
 import {getFilteredCandSkillOption, getFilteredSkillOption, onCVUpdate, onPropAdd, syncCandidate} from "../../utilities/CandidateUtils";
 import {changeSkills} from "../../store/actions/userActions";
 import CandidateCvService from "../../services/candidateCvService";
+import AreYouSureModal from "../common/AreYouSureModal";
 
-function CandSkillsSeg({user, cv, editable = false, defaultClosed = false, width = 8}) {
+function CandSkillsSeg
+({user, cv, editable = false, defaultClosed = false, width = 8}) {
 
     const candSkillService = new CandidateSkillService();
     const candCvService = new CandidateCvService()
@@ -18,12 +20,21 @@ function CandSkillsSeg({user, cv, editable = false, defaultClosed = false, width
     const dispatch = useDispatch();
 
     const [skills, setSkills] = useState([]);
-    const [open, setOpen] = useState(defaultClosed !== true);
+    const [active, setActive] = useState(defaultClosed !== true);
+    const [candSkillIdDel, setCandSkillIdDel] = useState();
+
+    useEffect(() => {
+        return () => {
+            setSkills(undefined)
+            setActive(undefined)
+            setCandSkillIdDel(undefined)
+        };
+    }, []);
 
     useEffect(() => {
         if (editable && !cv) {
             const skillService = new SkillService();
-            skillService.getSkills().then((result) => setSkills(result.data.data));
+            skillService.getAll().then((result) => setSkills(result.data.data));
         }
     }, [cv, editable]);
 
@@ -75,43 +86,48 @@ function CandSkillsSeg({user, cv, editable = false, defaultClosed = false, width
             .catch(handleCatch)
     //
 
-    const onRemove = (candSkillId) => cv ? removeSkillFromCv(candSkillId) : deleteSkill(candSkillId)
+    const onRemove = () => {
+        cv ? removeSkillFromCv(candSkillIdDel) : deleteSkill(candSkillIdDel)
+        setCandSkillIdDel(undefined)
+    }
     const onAdd = () => cv ? addSkillsToCv() : addSkill()
 
     return (
         <Grid.Column width={width} style={{marginTop: 10}}>
-            <Accordion>
-                <Accordion.Title onClick={() => setOpen(!open)} active={open}>
-                    <Card fluid raised style={{borderRadius: 0}} onClick={() => {}}>
-                        <Card.Header>
-                            <Header textAlign={"center"} dividing color="pink" content={"Skills"}
-                                    style={{marginBottom: 0, borderRadius: 0}} block/>
-                        </Card.Header>
-                    </Card>
-                </Accordion.Title>
-                <Accordion.Content active={open} as={Segment} basic vertical
-                                   style={{marginTop: -6, borderRadius: 0}}>
-                    {candSkills.map((candidateSkill) => (
-                        <Button key={candidateSkill.id} color={getRandomColor()}
-                                style={{marginTop: 2.5, marginBottom: 2.5, marginLeft: 5, borderRadius: 10}}>
-                            {editable ? <Icon onClick={() => onRemove(candidateSkill.id)} name="x"/> : null}
-                            {candidateSkill.skill?.name}
-                        </Button>
-                    ))}
-                </Accordion.Content>
-            </Accordion>
-            {editable && open ?
+            <AreYouSureModal open={!!candSkillIdDel} message={`Are you sure you want to remove${cv ? "" : " from everywhere"} ?`}
+                             yesColor={"red"} noColor={"grey"} onYes={onRemove} onNo={() => setCandSkillIdDel(undefined)}/>
+            <Card fluid raised style={{borderRadius: 0, userSelect: "none"}}>
+                <Card.Header>
+                    <Header textAlign={"center"} dividing color={"pink"} content={"Skills"} onClick={() => setActive(!active)}
+                            style={{marginBottom: 0, borderRadius: 0}} block/>
+                </Card.Header>
+            </Card>
+            <Transition visible={active} duration={200} animation={"slide down"}>
                 <div>
-                    {!cv ?
-                        <SDropdown options={skillOption} name="skillId" placeholder="Skill" multiple={false} formik={formik}
-                                   style={{marginRight: 10}}/> :
-                        <SDropdown options={candSkillOption} name="candSkillIds" placeholder="Skills" formik={formik}
-                                   loading={false} disabled={candSkillOption.length === 0}
-                                   style={{marginRight: 10, color: "rgba(230,20,150,0.9)"}}/>}
-                    <Button icon="plus" color="blue" content={"Add"} onClick={onAdd}
-                            disabled={!cv ? !formik.values.skillId : formik.values.candSkillIds.length === 0}
-                            style={{marginTop: 10, borderRadius: 10}}/>
-                </div> : null}
+                    <Segment basic vertical style={{marginTop: -14, borderRadius: 0}}>
+                        {candSkills.map((candSkill) => (
+                            <Button key={candSkill.id} color={getRandomColor()}
+                                    style={{marginTop: 2.5, marginBottom: 2.5, marginLeft: 5, borderRadius: 10}}>
+                                {editable ? <Icon onClick={() => setCandSkillIdDel(candSkill.id)} name="x"/> : null}
+                                {candSkill.skill?.name}
+                            </Button>
+                        ))}
+                    </Segment>
+                    {editable ?
+                        <div>
+                            {!cv ?
+                                <SDropdown options={skillOption} name="skillId" placeholder="Skill" multiple={false} formik={formik}
+                                           style={{marginRight: 10}}/> :
+                                <SDropdown options={candSkillOption} name="candSkillIds" placeholder="Skills" formik={formik}
+                                           loading={false} disabled={candSkillOption.length === 0}
+                                           style={{marginRight: 10, color: "rgba(230,20,150,0.9)"}}/>}
+                            <Button icon="plus" color="blue" content={"Add"} onClick={onAdd}
+                                    disabled={!cv ? !formik.values.skillId : formik.values.candSkillIds.length === 0}
+                                    style={{marginTop: 10, borderRadius: 10}}/>
+                        </div> : null}
+                </div>
+            </Transition>
+
         </Grid.Column>
     )
 }

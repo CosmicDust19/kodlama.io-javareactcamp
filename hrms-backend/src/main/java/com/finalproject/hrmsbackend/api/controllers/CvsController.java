@@ -68,6 +68,11 @@ public class CvsController {
         return Utils.getResponseEntity(cvService.updateCoverLetter(coverLetter, cvId));
     }
 
+    @PutMapping(value = "/update/image")
+    public ResponseEntity<?> updateImage(@RequestParam(required = false) Integer imgId, @RequestParam int cvId) {
+        return Utils.getResponseEntity(cvService.updateImg(imgId, cvId));
+    }
+
     @PutMapping(value = "/update/jobExps/add")
     public ResponseEntity<?> addJobExpsToCv(@RequestParam Set<@NotNull Integer> candJobExpIds, @RequestParam int cvId) {
         return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candJobExpIds, candidateJobExpDao, Utils.CheckType.ALL, CandidateJobExperience.class));

@@ -10,7 +10,6 @@
 >* Model Mapper
 >* Cloudinary
 >* Swagger UI
-### **Progress _%98_**
 ___
 ###### [Click to see while running (Swagger UI)](https://javareactcamp-hrms-backend.herokuapp.com/swagger-ui.html)
 * ###### ***If no one has used the server recently, it may take a while to start*** ⚠
@@ -20,4 +19,24 @@ ___
 **SQL Script** ([hrms-database.sql](https://github.com/CosmicDust19/kodlama.io-javareactcamp/blob/master/hrms-backend/hrms-database.sql))
 
 **PostgreSQL ER Diagram** ([hrms-database.pgerd](https://github.com/CosmicDust19/kodlama.io-javareactcamp/blob/master/hrms-backend/hrms-database.pgerd))
-###### ![](https://user-images.githubusercontent.com/74824916/128173949-ccd41827-4938-4b5a-a6e0-88add8fb2f4e.png)
+###### ![](https://user-images.githubusercontent.com/74824916/133880291-faffa18a-ccb5-4abb-99f7-9ec40951ca28.png)
+
+----
+
+## 📄 Summary
+
+* **Users: Candidates, employers and system employees**
+* ###### 🟣 Employers
+  * **Become itself(company) and its job adverts visible after system employees are confirmed**
+  * **Can be managed account infos and it becomes visible after confirmation**
+  * **Can be added a logo**
+* ###### 🟣 Candidates
+  * **Can enter their infos**
+  * **Then they can add these infos to CV optionally**
+  * **Can add job adverts to their favorites**
+  * **Images can be added to profile and CVs**
+* ###### 🟣 System Employees
+  * **Can confirm job adverts' release and update; employers' sign up and update**
+  * **Can manage other things like positions, cities etc. as well**
+  * **Can be managed account**
+

@@ -2,6 +2,7 @@ package com.finalproject.hrmsbackend.entities.concretes;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.finalproject.hrmsbackend.core.entities.BaseEntity;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -59,10 +60,10 @@ public class JobAdvertisement implements BaseEntity<Integer> {
     @Column(name = "deadline", nullable = false)
     private LocalDate deadline;
 
-    @Column(name = "work_model", nullable = false, length = 20)
+    @Column(name = "work_model", nullable = false, length = Utils.Const.MAX_JOB_ADV_WORK_MODEL)
     private String workModel;
 
-    @Column(name = "work_time", nullable = false, length = 20)
+    @Column(name = "work_time", nullable = false, length = Utils.Const.MAX_JOB_ADV_WORK_TIME)
     private String workTime;
 
     @OneToOne
