@@ -1,7 +1,7 @@
 import {Icon, Transition} from "semantic-ui-react";
 import React, {useState} from "react";
 
-function ItemsPerRowIcon({visible, itemsPerRow, toggle, ...props}) {
+function ItemsPerRowIcon({visible, itemsPerRow, ...props}) {
 
     const [thLargeVisible, setThLargeVisible] = useState(false);
     const [gridLayoutVisible, setGridLayoutVisible] = useState(true);
@@ -18,7 +18,7 @@ function ItemsPerRowIcon({visible, itemsPerRow, toggle, ...props}) {
     }
 
     return (
-        <span onClick={toggle} style={{float: "right"}}>
+        <span style={{float: "right"}}>
             <Transition visible={itemsPerRow === 1 && thLargeVisible} duration={duration} onHide={toggleVisible} animation={"drop"}>
                 <Icon name={"th large"} style={iconStyle} {...props}/>
             </Transition>

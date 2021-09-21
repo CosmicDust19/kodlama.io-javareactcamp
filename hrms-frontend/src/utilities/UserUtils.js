@@ -13,6 +13,6 @@ export const cropImgByDynamicUrl = (img) => {
 }
 
 export const onUpdate = (dispatch, response, msg) => {
-    dispatch(syncUser(response.data.data));
+    dispatch(syncUser(response.data.data, true));
     toast(msg);
 }

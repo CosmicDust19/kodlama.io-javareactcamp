@@ -33,7 +33,6 @@ export default function JobAdvertDetail() {
         };
     }, []);
 
-
     useEffect(() => {
         jobAdvertisementService.getById(id).then((result) => setJobAdvert(result.data.data));
     }, [id]);

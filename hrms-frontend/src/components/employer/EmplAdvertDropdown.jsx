@@ -59,7 +59,7 @@ function EmplAdvertDropdown({jobAdvert, setJobAdvert, infoOption}) {
             <AreYouSureModal open={deleteModalOpen} message={"Are you sure you want to delete permanently ?"}
                              yesColor={"red"} noColor={"grey"} onYes={deleteJobAdvert} onNo={() => setDeleteModalOpen(false)}/>
             <Dropdown item icon={<Icon name="ellipsis vertical" color="yellow"/>} simple labeled direction={"left"}>
-                <Dropdown.Menu style={{marginTop: 0, marginLeft: -6, backgroundColor: "rgba(250,250,250, 0.7)", borderRadius: 10}}>
+                <Dropdown.Menu style={{marginTop: 0, marginLeft: -6, backgroundColor: "rgba(250,250,250, 0.7)", borderRadius: 0}}>
                     {jobAdvert.active === false ?
                         <Dropdown.Item
                             onClick={() => changeActivation(true)}>

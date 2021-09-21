@@ -9,10 +9,11 @@ import {changeEmployersFilters, changeFilteredEmployers} from "../../store/actio
 import EmployerService from "../../services/employerService";
 import {toast} from "react-toastify";
 
-function EmployerMngFilterSeg() {
+function EmployerMngFilterSeg({setWaitingResp}) {
 
     const dispatch = useDispatch();
     const filterProps = useSelector(state => state?.listingReducer.listingProps.employers)
+    const filteredEmployers = filterProps.filteredEmployers
     const filters = filterProps.filters
     const firstFilter = filterProps.firstFilter
     const lastSynced = filterProps.lastSynced
@@ -33,34 +34,37 @@ function EmployerMngFilterSeg() {
         const employerService = new EmployerService()
         employerService.getAll()
             .then(r => {
-                const data = r.data.data ? r.data.data : []
                 setAllEmployers(r.data.data)
-                if (firstFilter === true)
-                    dispatch(changeFilteredEmployers(data, undefined,data.length === 0))
+                if (firstFilter === true && r.data.data)
+                    dispatch(changeFilteredEmployers(r.data.data, undefined, r.data.data.length === 0))
+                setWaitingResp(false)
             })
-            .catch(() => setTimeout(() => toast("Waiting for response 🕔 ... Thanks for your patience."), 2500))
+            .catch(() => {
+                setWaitingResp(true)
+                toast("Waiting for response 🕔 ... Thanks for your patience")
+                toast.warning("Please refresh the page after a while", {autoClose: 10000})
+            })
             .finally(() => setLoading(false))
-    }, [dispatch, firstFilter, filterProps.filteredEmployers]);
+    }, [dispatch, firstFilter, filteredEmployers, filters, setWaitingResp]);
 
     useEffect(() => {
-        if (now - lastSynced > 120000) {
+        if (now - lastSynced > 180000) {
             const employerService = new EmployerService()
             employerService.getAll().then(r => {
-                const data = r.data.data ? r.data.data : []
                 setAllEmployers(r.data.data)
-                dispatch(changeFilteredEmployers(getFilteredEmployers(data, filters), true))
+                if (r.data.data)
+                    dispatch(changeFilteredEmployers(getFilteredEmployers(r.data.data, filters), true))
             })
         }
-    }, [dispatch, filters, lastSynced, now]);
+    }, [dispatch, filters, filteredEmployers, lastSynced, now]);
 
     const formik = useFormik({
         initialValues: {...filters}
     });
 
-    if (!allEmployers) return <Loader active inline='centered' size={"large"} content={"Waiting for response..."}
-                                      style={{marginTop: 100, marginBottom: 100}}/>
-
-    if (allEmployers.length === 0)
+    if (!allEmployers)
+        return <Loader active inline='centered' size={"large"} content={"Waiting for response..."} style={{marginTop: 100}}/>
+    else if (allEmployers.length === 0)
         return (
             <Message warning compact as={Segment} raised style={{marginBottom: 50, marginLeft: -5}}>
                 <Icon name={"wait"} size={"large"}/>

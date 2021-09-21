@@ -20,7 +20,7 @@ export const onPropAdd = (dispatch, newProp, oldProps, saveFunction) => {
 }
 
 export const syncCandidate = (dispatch, userId) => {
-    candidateService.getById(userId).then(r => dispatch(syncUser(r.data.data)))
+    candidateService.getById(userId).then(r => dispatch(syncUser(r.data.data, true)))
     toast("Removed")
 }
 

@@ -16,23 +16,28 @@ export default function JobAdverts() {
     const filterProps = useSelector(state => state?.listingReducer.listingProps.jobAdverts)
     const filteredJobAdvertsRedux = filterProps.filteredJobAdverts
 
+    const [waitingResp, setWaitingResp] = useState(true);
     const [listVisible, setListVisible] = useState(false);
     const [filteredJobAdverts, setFilteredJobAdverts] = useState(filteredJobAdvertsRedux);
     const [itemsPerRow, setItemsPerRow] = useState(2);
     const [currentPage, setCurrentPage] = useState(1);
-    const [jobAdvertsPerPage, setJobAdvertsPerPage] = useState(filteredJobAdverts.length <= 5 ? 5 : 10);
+    const [itemsPerPage, setItemsPerPage] = useState(filteredJobAdverts.length <= 5 ? 5 : 10);
     const [verticalScreen, setVerticalScreen] = useState(window.innerWidth < window.innerHeight)
 
     useEffect(() => {
-        setTimeout(() => setListVisible(true), 200)
         return () => {
+            setWaitingResp(undefined)
             setFilteredJobAdverts(undefined)
             setItemsPerRow(undefined)
             setCurrentPage(undefined)
-            setJobAdvertsPerPage(undefined)
+            setItemsPerPage(undefined)
             setVerticalScreen(undefined)
         };
     }, []);
+
+    useEffect(() => {
+        setListVisible(!waitingResp)
+    }, [waitingResp]);
 
     useEffect(() => {
         setFilteredJobAdverts(filteredJobAdvertsRedux)
@@ -45,18 +50,18 @@ export default function JobAdverts() {
     useEffect(() => {
         setVerticalScreen(window.innerWidth < window.innerHeight)
         setItemsPerRow(verticalScreen ? 1 : itemsPerRow)
-    }, [itemsPerRow, currentPage, verticalScreen, jobAdvertsPerPage, filteredJobAdvertsRedux]);
+    }, [itemsPerRow, currentPage, verticalScreen, itemsPerPage, filteredJobAdvertsRedux]);
 
-    const indexOfLastJobAdvert = currentPage * jobAdvertsPerPage
-    const indexOfFirstJobAdvert = indexOfLastJobAdvert - jobAdvertsPerPage
+    const indexOfLastJobAdvert = currentPage * itemsPerPage
+    const indexOfFirstJobAdvert = indexOfLastJobAdvert - itemsPerPage
     const currentJobAdverts = filteredJobAdverts.slice(indexOfFirstJobAdvert, indexOfLastJobAdvert)
 
-    const noAdvert = currentJobAdverts.length === 0
+    const noJobAdvertsListing = currentJobAdverts.length === 0
 
     const itemsPerPageClick = (number) => {
-        if (number === jobAdvertsPerPage) return
+        if (number === itemsPerPage) return
         setCurrentPage(1);
-        setJobAdvertsPerPage(number);
+        setItemsPerPage(number);
     }
 
     const changePage = (e, {activePage}) => setCurrentPage(activePage)
@@ -66,12 +71,12 @@ export default function JobAdverts() {
     function listingOptions() {
         return (
             <div align={"center"} style={{marginBottom: 30, marginTop: 30}}>
-                <ItemsPerPageBar itemPerPage={jobAdvertsPerPage} handleClick={itemsPerPageClick} disabled={noAdvert}
+                <ItemsPerPageBar itemPerPage={itemsPerPage} handleClick={itemsPerPageClick} disabled={noJobAdvertsListing || waitingResp}
                                  listedItemsLength={filteredJobAdverts.length} visible={!verticalScreen} compact/>
-                <PaginationBar itemsPerPage={jobAdvertsPerPage} listedItemsLength={filteredJobAdverts.length}
-                               activePage={currentPage} disabled={noAdvert} onPageChange={changePage}/>
+                <PaginationBar itemsPerPage={itemsPerPage} listedItemsLength={filteredJobAdverts.length}
+                               activePage={currentPage} disabled={noJobAdvertsListing || waitingResp} onPageChange={changePage}/>
                 <ItemsPerRowIcon visible={!verticalScreen && !management} itemsPerRow={itemsPerRow}
-                                 toggle={itemsPerRowClick} disabled={noAdvert}/>
+                                 onClick={itemsPerRowClick} disabled={noJobAdvertsListing || waitingResp}/>
             </div>
         )
     }
@@ -79,12 +84,13 @@ export default function JobAdverts() {
     return (
         <Segment padded style={{marginTop: -40}} basic vertical={verticalScreen}>
             {listingOptions()}
-            <JobAdvertSidebar jobAdvertsPerPage={jobAdvertsPerPage} itemsPerPageClick={itemsPerPageClick} style={{marginRight: 10}}/>
-            <Transition duration={200} visible={listVisible}>
+            <JobAdvertSidebar itemsPerPage={itemsPerPage} itemsPerPageClick={itemsPerPageClick}
+                              setWaitingResp={setWaitingResp} style={{marginRight: 10}}/>
+            <Transition visible={listVisible} duration={400}>
                 <div>
                     {management ?
-                        <JobAdvertMngList jobAdverts={currentJobAdverts}/> :
-                        <JobAdvertListPublic jobAdverts={currentJobAdverts} itemsPerRow={itemsPerRow}/>}
+                        <JobAdvertMngList jobAdverts={currentJobAdverts} waitingResp={waitingResp}/> :
+                        <JobAdvertListPublic jobAdverts={currentJobAdverts} waitingResp={waitingResp} itemsPerRow={itemsPerRow}/>}
                 </div>
             </Transition>
         </Segment>

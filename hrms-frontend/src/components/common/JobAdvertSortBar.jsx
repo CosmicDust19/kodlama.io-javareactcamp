@@ -76,7 +76,7 @@ function JobAdvertSortBar({loading, setLoading}) {
 
     return (
         <div>
-            <Button style={{marginTop: 20, marginBottom: 10}} color={"red"} labelPosition={"right"} fluid icon={"sort"}
+            <Button style={{marginTop: 25, marginBottom: 10}} color={"red"} labelPosition={"right"} fluid icon={"sort"}
                     content={<span>{getAccordionStatusIcon(open)}Sort</span>} onClick={() => setOpen(!open)}/>
             <Transition visible={open} duration={150}>
                 <div>
@@ -98,12 +98,12 @@ function JobAdvertSortBar({loading, setLoading}) {
                         </Grid.Column>
                         <Grid.Column width={6}>
                             <span onClick={toggleSortDirection}>
-                                <Transition visible={formik.values.direction < 0 && descVisible} duration={150} onHide={toggleVisible} animation={"drop"}>
+                                <Transition visible={formik.values.direction < 0 && descVisible} duration={100} onHide={toggleVisible} animation={"vertical flip"}>
                                     <div style={{marginTop: 5, marginLeft: 5}}>
                                         <Icon name={"arrow down"}/>Desc
                                     </div>
                                 </Transition>
-                                <Transition visible={formik.values.direction >= 0 && ascVisible} duration={150} onComplete={toggleVisible} animation={"drop"}>
+                                <Transition visible={formik.values.direction >= 0 && ascVisible} duration={100} onComplete={toggleVisible} animation={"vertical flip"}>
                                      <div style={{marginTop: 5, marginLeft: 5}}>
                                          <Icon name={"arrow up"}/>Asc
                                      </div>

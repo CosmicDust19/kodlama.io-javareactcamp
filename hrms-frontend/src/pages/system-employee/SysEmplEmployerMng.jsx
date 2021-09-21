@@ -12,19 +12,24 @@ export default function SysEmplEmployerMng() {
     const filterProps = useSelector(state => state?.listingReducer.listingProps.employers)
     const filteredEmployersRedux = filterProps.filteredEmployers
 
+    const [waitingResp, setWaitingResp] = useState(true);
     const [listVisible, setListVisible] = useState(false);
     const [filteredEmployers, setFilteredEmployers] = useState(filteredEmployersRedux);
     const [currentPage, setCurrentPage] = useState(1);
     const [employersPerPage, setEmployersPerPage] = useState(filteredEmployers.length <= 5 ? 5 : 10);
 
     useEffect(() => {
-        setTimeout(() => setListVisible(true), 200)
         return () => {
+            setWaitingResp(undefined)
             setFilteredEmployers(undefined)
             setCurrentPage(undefined)
             setEmployersPerPage(undefined)
         };
     }, []);
+
+    useEffect(() => {
+        setListVisible(!waitingResp)
+    }, [waitingResp]);
 
     useEffect(() => {
         setFilteredEmployers(filteredEmployersRedux)
@@ -40,7 +45,7 @@ export default function SysEmplEmployerMng() {
     const indexOfFirstEmployer = indexOfLastEmployer - employersPerPage
     const currentEmployers = filteredEmployers.slice(indexOfFirstEmployer, indexOfLastEmployer)
 
-    const noEmployer = filteredEmployers.length === 0
+    const noEmployersListing = filteredEmployers.length === 0
 
     const itemsPerPageClick = (number) => {
         if (number === employersPerPage) return
@@ -54,20 +59,20 @@ export default function SysEmplEmployerMng() {
         return (
             <div align={"center"} style={{marginBottom: 30, marginTop: 30}}>
                 <ItemsPerPageBar itemPerPage={employersPerPage} handleClick={itemsPerPageClick} compact style={{marginTop: 15}}
-                                 disabled={noEmployer} listedItemsLength={filteredEmployers.length}/>
+                                 disabled={noEmployersListing || waitingResp} listedItemsLength={filteredEmployers.length}/>
                 <PaginationBar itemsPerPage={employersPerPage} listedItemsLength={filteredEmployers.length} activePage={currentPage}
-                               disabled={noEmployer} onPageChange={changePage} style={{marginTop: 15}}/>
+                               disabled={noEmployersListing || waitingResp} onPageChange={changePage} style={{marginTop: 15}}/>
             </div>
         )
     }
 
     return (
         <div>
-            <EmployerMngFilterSeg/>
+            <EmployerMngFilterSeg setWaitingResp={setWaitingResp}/>
             {listingOptions()}
             <Transition visible={listVisible} duration={200}>
                 <div>
-                    <EmployerMngList employers={currentEmployers}/>
+                    <EmployerMngList employers={currentEmployers} waitingResp={waitingResp}/>
                 </div>
             </Transition>
         </div>

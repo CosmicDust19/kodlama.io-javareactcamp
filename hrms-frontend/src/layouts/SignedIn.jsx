@@ -1,13 +1,16 @@
 import {Button, Container, Dropdown, Grid, Icon, Menu} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {signOut} from "../store/actions/userActions";
+import {signOut, syncUser} from "../store/actions/userActions";
 import {Link, useHistory} from "react-router-dom";
 import AreYouSureModal from "../components/common/AreYouSureModal";
 import Avatar from "../components/common/Avatar";
 import EmployerLogo from "../components/employer/EmployerLogo";
 import defSysEmplImg from "../assets/images/defSysEmplImg.png"
 import {toast} from "react-toastify";
+import CandidateService from "../services/candidateService";
+import EmployerService from "../services/employerService";
+import SystemEmployeeService from "../services/systemEmployeeService";
 
 export default function SignedIn({toggle, verticalScreen}) {
 
@@ -15,7 +18,10 @@ export default function SignedIn({toggle, verticalScreen}) {
     const vertDropdownStyle = {marginTop: 0, backgroundColor: "rgba(250,250,250,1)"}
 
     const userProps = useSelector(state => state?.user.userProps)
+    const user = userProps.user
     const lastLogin = userProps.lastLogin
+    const lastSynced = userProps.lastSynced
+    const userType = String(userProps.userType)
     const now = new Date().getTime()
 
     const dispatch = useDispatch();
@@ -34,6 +40,14 @@ export default function SignedIn({toggle, verticalScreen}) {
             if (lastLogin) toast.warning("Your session has expired. Please login again.")
         }
     }, [dispatch, history, lastLogin, now]);
+
+    useEffect(() => {
+        if (now - lastSynced > 300000 && user) {
+            const service = userType === "candidate" ? new CandidateService() :
+                userType === "employer" ? new EmployerService() : userType === "systemEmployee" ? new SystemEmployeeService() : null
+            service.getById(user.id).then(r => dispatch(syncUser(r.data.data, true)))
+        }
+    }, [dispatch, lastSynced, now, user, userType]);
 
     const scrollToTop = () => window.scrollTo(0, 0)
 
@@ -58,7 +72,7 @@ export default function SignedIn({toggle, verticalScreen}) {
         <Container>
             <AreYouSureModal open={surePopupOpen} message={"Are you sure you want to sign out ?"}
                              onYes={handleSignOut} onNo={() => setSurePopupOpen(false)}/>
-            {String(userProps.userType) === "candidate" ?
+            {userType === "candidate" ?
                 <Grid columns={"equal"} padded>
                     <Grid.Column>
                         <Menu.Item name="Find Jobs" as={Link} to={"/"}>Find Jobs</Menu.Item>
@@ -67,17 +81,17 @@ export default function SignedIn({toggle, verticalScreen}) {
                         <Menu.Item name="Employers" as={Link} to={"/employers"} onClick={scrollToTop}/>
                     </Grid.Column>
                 </Grid> : null}
-            {String(userProps.userType) === "employer" ?
+            {userType === "employer" ?
                 <Menu.Item name="Candidates" as={Link} to={"/candidates"} onClick={scrollToTop}
                            content={"Candidates"}/> : null}
-            {String(userProps.userType) === "systemEmployee" ?
+            {userType === "systemEmployee" ?
                 <Menu.Item as={Link} to={"/users"} content={"Users"}/> : null}
 
             <Menu.Menu position='right'>
-                {String(userProps.userType) === "candidate" ?
+                {userType === "candidate" ?
                     <Menu.Item style={{marginRight: 10, marginLeft: 10}}>
-                        <Avatar image={userProps.user.profileImg} size={"mini"}/>
-                        <Dropdown item simple text={userProps.user?.firstName} closeOnEscape closeOnBlur closeOnChange>
+                        <Avatar image={user.profileImg} size={"mini"}/>
+                        <Dropdown item simple text={user?.firstName} closeOnEscape closeOnBlur closeOnChange>
                             <Dropdown.Menu style={verticalScreen ? vertDropdownStyle : {...dropdownStyle, width: 142, marginRight: 1}}>
                                 <Dropdown.Item as={Link} to={"/candidate/CVs"} onClick={scrollToTop}>
                                     <Icon name="file alternate outline" color="blue"/>My CVs
@@ -90,15 +104,15 @@ export default function SignedIn({toggle, verticalScreen}) {
                             </Dropdown.Menu>
                         </Dropdown>
                     </Menu.Item> : null}
-                {String(userProps.userType) === "employer" ?
+                {userType === "employer" ?
                     <Menu.Item style={{marginRight: 10, marginLeft: 10}}>
-                        <EmployerLogo user={userProps.user} size={"mini"} defImgSize={37}/>
-                        <Dropdown simple item text={userProps.user?.companyName} closeOnEscape closeOnBlur closeOnChange>
+                        <EmployerLogo user={user} size={"mini"} defImgSize={37}/>
+                        <Dropdown simple item text={user?.companyName} closeOnEscape closeOnBlur closeOnChange>
                             <Dropdown.Menu style={verticalScreen ? vertDropdownStyle : dropdownStyle}>
                                 <Dropdown.Item as={Link} to={"/employer/jobAdverts"} onClick={scrollToTop}>
                                     <Icon name="bullhorn" color="red"/>Adverts
                                 </Dropdown.Item>
-                                <Dropdown.Item as={Link} to={`/employers/${userProps.user?.id}`} onClick={scrollToTop}>
+                                <Dropdown.Item as={Link} to={`/employers/${user?.id}`} onClick={scrollToTop}>
                                     <Icon name="file alternate outline" color={"blue"}/>Summary
                                 </Dropdown.Item>
                                 <Dropdown.Divider/>
@@ -106,10 +120,10 @@ export default function SignedIn({toggle, verticalScreen}) {
                             </Dropdown.Menu>
                         </Dropdown>
                     </Menu.Item> : null}
-                {String(userProps.userType) === "systemEmployee" ?
+                {userType === "systemEmployee" ?
                     <Menu.Item style={{marginRight: 10, marginLeft: 10}}>
-                        <Avatar image={userProps.user.profileImg} size={"mini"} defImgSrc={defSysEmplImg}/>
-                        <Dropdown simple item text={userProps.user?.firstName} closeOnEscape closeOnBlur closeOnChange>
+                        <Avatar image={user.profileImg} size={"mini"} defImgSrc={defSysEmplImg}/>
+                        <Dropdown simple item text={user?.firstName} closeOnEscape closeOnBlur closeOnChange>
                             <Dropdown.Menu style={verticalScreen ? vertDropdownStyle : dropdownStyle}>
                                 <Dropdown.Header content={"Manage"}/>
                                 <Dropdown.Item as={Link} to={"/"} onClick={scrollToTop}>

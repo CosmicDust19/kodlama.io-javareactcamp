@@ -1,18 +1,7 @@
 import {userProps} from "../initialStates/userProps";
 import {
-    LOGIN,
-    SIGN_OUT,
-    CHANGE_EMAIl,
-
-    CHANGE_JOB_EXPS,
-    CHANGE_LANGS,
-    CHANGE_SCHOOLS,
-    CHANGE_SKILLS,
-    CHANGE_FAVORITE_JOB_ADVS,
-
-    SYNC_USER,
-    CHANGE_EMPL_JOB_ADVERTS,
-    CHANGE_CAND_CVS, CHANGE_IMAGES
+    CHANGE_CAND_CVS, CHANGE_EMAIl, CHANGE_EMPL_JOB_ADVERTS, CHANGE_FAVORITE_JOB_ADVS, CHANGE_IMAGES, CHANGE_JOB_EXPS, CHANGE_LANGS,
+    CHANGE_SCHOOLS, CHANGE_SKILLS, LOGIN, SIGN_OUT, SYNC_USER
 } from "../actions/userActions";
 
 const initialState = {
@@ -29,7 +18,8 @@ export default function userReducer(state = initialState, {type, payload}) {
                     ...state.userProps,
                     user: {...payload.user},
                     userType: payload.userType,
-                    loggedIn: true, guest: false, lastLogin: new Date().getTime()
+                    loggedIn: true, lastLogin: new Date().getTime(),
+                    lastSynced: new Date().getTime()
                 }
             }
         case SIGN_OUT:
@@ -43,7 +33,11 @@ export default function userReducer(state = initialState, {type, payload}) {
         case SYNC_USER:
             return {
                 ...state,
-                userProps: {...state.userProps, user: {...payload.user}}
+                userProps: {
+                    ...state.userProps,
+                    user: {...payload.user},
+                    lastSynced: payload.synced === true ? new Date().getTime() : state.userProps.lastSynced
+                },
             }
         case CHANGE_IMAGES:
             return {

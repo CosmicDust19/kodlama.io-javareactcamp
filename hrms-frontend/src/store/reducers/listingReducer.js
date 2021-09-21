@@ -54,7 +54,7 @@ export default function listingReducer(state = initialState, {type, payload}) {
                         ...state.listingProps.employers,
                         filteredEmployers: [...payload.filteredEmployers],
                         firstFilter: payload.firstFilter === true,
-                        lastSynced: payload.synced === true ? new Date().getTime() : state.listingProps.jobAdverts.lastSynced
+                        lastSynced: payload.synced === true ? new Date().getTime() : state.listingProps.employers.lastSynced
                     }
                 }
             }

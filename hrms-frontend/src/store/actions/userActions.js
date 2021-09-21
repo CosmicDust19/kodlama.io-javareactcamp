@@ -24,10 +24,10 @@ export function signOut() {
     }
 }
 
-export function syncUser(user) {
+export function syncUser(user, synced) {
     return {
         type: SYNC_USER,
-        payload: {user}
+        payload: {user, synced}
     }
 }
 

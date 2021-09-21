@@ -3,7 +3,7 @@ export const userProps = {
     loggedIn: false,
     lastLogin: null,
     userType: null,
-    guest: true
+    lastSynced: new Date().getTime()
 }
 
 export default userProps

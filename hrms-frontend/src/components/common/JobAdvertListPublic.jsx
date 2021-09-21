@@ -6,23 +6,13 @@ import {useHistory} from "react-router-dom";
 import SInfoLabel from "./SInfoLabel";
 import EmployerLogo from "../employer/EmployerLogo";
 
-function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, ...props}) {
+function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, waitingResp, ...props}) {
 
     const history = useHistory();
-    const [hidden, setHidden] = useState(true);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        return () => {
-            setHidden(undefined)
-            setLoading(undefined)
-        };
-    }, []);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setHidden(false)
-        }, 200)
+        return () => setLoading(undefined)
     }, []);
 
     useEffect(() => {
@@ -44,11 +34,11 @@ function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, ...props})
 
     const unavailable = (jobAdvert) => jobAdvert.verified === false || jobAdvert.employer.verified === false
 
-    if (!jobAdverts) return <Loader active inline='centered' size={"large"} style={{marginTop: 100}}/>
-
-    if (jobAdverts.length === 0 && !noMsg)
+    if (waitingResp === true) return null
+    else if (!jobAdverts) return <Loader active inline='centered' size={"large"} style={{marginTop: 100}}/>
+    else if (jobAdverts.length === 0 && !noMsg)
         return (
-            <Message warning compact as={Segment} style={{float: "left", marginLeft: 20}} hidden={hidden}>
+            <Message warning compact as={Segment} style={{float: "left", marginLeft: 20}}>
                 <Icon name={"warning sign"} size={"large"}/>
                 <font style={{fontSize: "large", verticalAlign: "middle"}}>No results found.</font>
             </Message>
@@ -57,7 +47,7 @@ function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, ...props})
     return (
         <Card.Group itemsPerRow={itemsPerRow} stackable doubling {...props}>
             {jobAdverts.map((jobAdvert) => (
-                <Card color={"red"} key={jobAdvert.id} style={{borderRadius: 0}} raised fluid>
+                <Card color={"red"} key={jobAdvert.id} style={{borderRadius: 0, textAlign: "left"}} raised fluid>
                     <Card.Content>
                         <Card.Header>
                             {jobAdvert.position.title}

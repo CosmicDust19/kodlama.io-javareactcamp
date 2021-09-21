@@ -6,36 +6,23 @@ import SysEmplAdvertDropdown from "./SysEmplAdvertDropdown";
 import React, {useEffect, useState} from "react";
 import EmployerLogo from "../employer/EmployerLogo";
 
-function JobAdvertMngList({jobAdverts, ...props}) {
+function JobAdvertMngList({jobAdverts, waitingResp, ...props}) {
 
-    const [hidden, setHidden] = useState(true);
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        return () => {
-            setHidden(undefined)
-            setLoading(undefined)
-        };
-    }, []);
-
-    useEffect(() => {
-        setTimeout(() => {
-            setHidden(false)
-        }, 400)
-    }, []);
 
     useEffect(() => {
         setLoading(true)
         setTimeout(() => {
             setLoading(false)
         }, 150)
+        return () => setLoading(undefined)
     }, [jobAdverts]);
 
-    if (!jobAdverts) return <Loader active inline='centered' size={"large"} style={{marginTop: 100}}/>
-
-    if (jobAdverts.length === 0)
+    if (waitingResp === true) return null
+    else if (!jobAdverts) return <Loader active inline='centered' size={"large"} style={{marginTop: 120}}/>
+    else if (jobAdverts.length === 0)
         return (
-            <Message warning compact as={Segment} style={{float: "left", marginLeft: 20}} hidden={hidden}>
+            <Message warning compact as={Segment} style={{float: "left", marginLeft: 20}}>
                 <Icon name={"warning sign"} size={"large"}/>
                 <font style={{fontSize: "large", verticalAlign: "middle"}}>No results found.</font>
             </Message>

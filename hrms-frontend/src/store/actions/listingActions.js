@@ -27,6 +27,6 @@ export function changeEmployersFilters(filters) {
 export function changeFilteredEmployers(filteredEmployers, synced, firstFilter) {
     return {
         type: CHANGE_FILTERED_EMPLOYERS,
-        payload: {filteredEmployers, firstFilter}
+        payload: {filteredEmployers, synced, firstFilter}
     }
 }

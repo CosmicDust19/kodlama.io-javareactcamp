@@ -25,7 +25,6 @@ export const listingProps = {
     employers: {
         lastSynced: new Date().getTime(),
         firstFilter: true,
-        noEmplSignedUp: true,
         filters: {
             statuses: [],
             employerId: ""

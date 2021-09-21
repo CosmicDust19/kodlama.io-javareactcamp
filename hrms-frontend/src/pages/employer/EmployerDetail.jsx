@@ -15,9 +15,9 @@ export default function EmployerDetail() {
 
     const {id} = useParams()
     const userProps = useSelector(state => state?.user?.userProps)
+    const verticalScreen = window.innerWidth < window.innerHeight
 
     const [visible, setVisible] = useState(false);
-
     const [employer, setEmployer] = useState();
     const [jobAdverts, setJobAdverts] = useState();
 
@@ -101,7 +101,9 @@ export default function EmployerDetail() {
                     </Table.Body>
                 </Table>
 
-                <JobAdvertListPublic jobAdverts={jobAdverts} itemsPerRow={2} noMsg style={{minWidth: 319.3}}/>
+                <div align={"center"} style={verticalScreen ? {marginRight: -13.15, marginLeft: -13.15} : undefined}>
+                    <JobAdvertListPublic jobAdverts={jobAdverts} itemsPerRow={2} noMsg/>
+                </div>
             </div>
         </Transition>
     )

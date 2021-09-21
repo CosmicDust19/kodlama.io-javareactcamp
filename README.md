@@ -20,6 +20,12 @@ Front-End
 ![](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
+* Trial accounts
+    * ###### All passwords: 123456
+    * ###### Candidate: example5@example.com (4-5-6)
+    * ###### Employer: example7@example.com (7-8-9)
+    * ###### System Employee: example1@example.com (1-2-3)
+
 * ###### If you have a problem, you can clear the site data or change your browser
   * ###### Clearing site data : F12(Chrome) > application > storage > clear site data button
   * ###### It happens when entering the site after a long time, because old state may be incompatible with the new one

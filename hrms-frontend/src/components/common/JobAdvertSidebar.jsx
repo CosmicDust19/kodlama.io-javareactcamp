@@ -17,7 +17,7 @@ import JobAdvertisementService from "../../services/jobAdvertisementService";
 import {toast} from "react-toastify";
 import JobAdvertSortBar from "./JobAdvertSortBar";
 
-function JobAdvertSidebar({jobAdvertsPerPage, itemsPerPageClick}) {
+function JobAdvertSidebar({itemsPerPage, itemsPerPageClick, setWaitingResp}) {
 
     const dispatch = useDispatch();
 
@@ -70,17 +70,21 @@ function JobAdvertSidebar({jobAdvertsPerPage, itemsPerPageClick}) {
         setLoading(true)
         jobAdvertGetFunc()
             .then(r => {
-                const data = r.data.data ? r.data.data : []
                 setAllJobAdverts(r.data.data)
-                if (firstFilter === true)
-                    dispatch(changeFilteredJobAdverts(data, undefined, data.length === 0))
+                if (firstFilter === true && r.data.data)
+                    dispatch(changeFilteredJobAdverts(r.data.data, undefined, r.data.data.length === 0))
+                setWaitingResp(false)
             })
-            .catch(() => setTimeout(() => toast("Waiting for response 🕔 ... Thanks for your patience."), 2500))
+            .catch(() => {
+                setWaitingResp(true)
+                toast("Waiting for response 🕔 ... Thanks for your patience.")
+                toast.warning("Please refresh the page after a while.", {autoClose: 10000})
+            })
             .finally(() => setLoading(false))
-    }, [dispatch, firstFilter, filteredJobAdverts, filters, jobAdvertGetFunc]);
+    }, [dispatch, firstFilter, filteredJobAdverts, filters, jobAdvertGetFunc, setWaitingResp]);
 
     useEffect(() => {
-        if (now - lastSynced > 120000) jobAdvertGetFunc().then(r => {
+        if (now - lastSynced > 180000) jobAdvertGetFunc().then(r => {
             setAllJobAdverts(r.data.data)
             if (r.data.data)
                 dispatch(changeFilteredJobAdverts(getFilteredJobAdverts(r.data.data, filters), true))
@@ -91,10 +95,9 @@ function JobAdvertSidebar({jobAdvertsPerPage, itemsPerPageClick}) {
         initialValues: management ? {...filters} : {...filters, statuses: []}
     });
 
-    if (!allJobAdverts) return <Loader active inline='centered' size={"large"} content={"Waiting for response..."}
-                                       style={{marginTop: 100, marginBottom: 100}}/>
-
-    if (allJobAdverts.length === 0)
+    if (!allJobAdverts)
+        return <Loader active inline='centered' size={"large"} content={"Waiting for response..."} style={{marginTop: 140, marginBottom: 100}}/>
+    else if (allJobAdverts.length === 0)
         return (
             <Message warning compact as={Segment} raised style={{marginBottom: 50, marginLeft: -5}}>
                 <Icon name={"wait"} size={"large"}/>
@@ -159,27 +162,28 @@ function JobAdvertSidebar({jobAdvertsPerPage, itemsPerPageClick}) {
                 <Label attached={"top right"} onClick={toggle} as={Button} style={{marginTop: 6, marginRight: 5, borderRadius: 20}}
                        icon={<Icon name={"x"} style={{marginRight: -3, marginLeft: 0, marginTop: -2}} size={"large"} color={"black"}/>}/>
 
-                <Button style={{marginTop: 70}} color={"yellow"} labelPosition={"right"} fluid
+                <br/><br/>
+                <Button color={"yellow"} labelPosition={"right"} fluid
                         content={"Scroll To Top"} icon={"arrow up"} onClick={() => window.scrollTo(0, 0)}/>
 
                 {favoriteJobAdverts ? !favoritesMode ?
-                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 20}}
+                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 25}}
                             onClick={() => toggleFavoritesMode(true)}>
                         <Icon name='heart'/>See Favorites
                     </Button> :
-                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 20}}
+                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 25}}
                             onClick={() => toggleFavoritesMode(false)}>
                         <Icon name='arrow left'/>See All
                     </Button> : null}
 
                 {verticalScreen ?
                     <div>
-                        <Button style={{marginTop: 20, marginBottom: 10}} color={"teal"} labelPosition={"right"} fluid icon={"ordered list"}
+                        <Button style={{marginTop: 25, marginBottom: 15}} color={"teal"} labelPosition={"right"} fluid icon={"ordered list"}
                                 content={<span>{getAccordionStatusIcon(jobAdvPerPageOpen)}Adverts Per Page</span>}
                                 onClick={() => setJobAdvPerPageOpen(!jobAdvPerPageOpen)}/>
                         <Transition visible={jobAdvPerPageOpen} duration={150}>
                             <div>
-                                <ItemsPerPageBar itemPerPage={jobAdvertsPerPage} handleClick={itemsPerPageClick} vertical color={"teal"}
+                                <ItemsPerPageBar itemPerPage={itemsPerPage} handleClick={itemsPerPageClick} vertical color={"teal"}
                                                  listedItemsLength={filteredJobAdverts.length} style={{maxWidth: 205}}/>
                             </div>
                         </Transition>
@@ -187,11 +191,13 @@ function JobAdvertSidebar({jobAdvertsPerPage, itemsPerPageClick}) {
 
                 <JobAdvertSortBar loading={loading} setLoading={setLoading}/>
 
-                <Button style={{marginTop: 20, marginBottom: 10}} color={"linkedin"} labelPosition={"right"} fluid
+                <Button style={{marginTop: 25, marginBottom: 20}} color={"linkedin"} labelPosition={"right"} fluid
                         onClick={() => setFiltersOpen(!filtersOpen)}
                         content={<span>{getAccordionStatusIcon(filtersOpen)}Filter</span>} icon={"filter"}/>
                 <Transition visible={filtersOpen} duration={150}>
                     <div>
+                        {management ? <SDropdown options={jobAdvertStatusOptions} name="statuses" placeholder="Statuses" fluid
+                                                 formik={formik} style={filterDropdownStyle}/> : null}
                         <SDropdown options={cityOption} name="cityIds" placeholder="Cities" fluid
                                    formik={formik} style={filterDropdownStyle}/>
                         <SDropdown options={positionOption} name="positionIds" placeholder="Positions" fluid
@@ -202,8 +208,6 @@ function JobAdvertSidebar({jobAdvertsPerPage, itemsPerPageClick}) {
                                    formik={formik} style={filterDropdownStyle}/>
                         <SDropdown options={workTimeOptions} name="workTimes" placeholder="Work times" fluid
                                    formik={formik} style={filterDropdownStyle}/>
-                        {management ? <SDropdown options={jobAdvertStatusOptions} name="statuses" placeholder="Statuses" fluid
-                                                 formik={formik} style={filterDropdownStyle}/> : null}
 
                         <Header size="tiny" style={{...headerStyle, marginTop: 20}} dividing sub>
                             <Icon name={"bullhorn"} color={"yellow"} style={{marginRight: 7}}/>Creation Date

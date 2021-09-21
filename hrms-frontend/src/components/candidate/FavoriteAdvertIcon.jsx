@@ -20,14 +20,14 @@ function FavoriteAdvertIcon({jobAdvert, iconSize, invisible = false, ...props}) 
 
     const addToFavorites = () => {
         candidateService.addJobAdvToFavorites(user.id, jobAdvert.id).then(r => {
-            dispatch(syncUser(r.data.data))
+            dispatch(syncUser(r.data.data, true))
             toast.error("Added to your favorites  😍")
         }).catch(handleCatch)
     }
 
     const removeFromFavorites = () => {
         candidateService.removeJobAdvFromFavorites(user.id, jobAdvert.id).then(r => {
-            dispatch(syncUser(r.data.data))
+            dispatch(syncUser(r.data.data, true))
             toast("Deleted From Favorites")
         }).catch(handleCatch)
     }
