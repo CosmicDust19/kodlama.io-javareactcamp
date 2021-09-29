@@ -1,29 +1,88 @@
 .ui.main.container {
-  margin-top: 10em;
+    margin-top: 10em;
+}
+
+.App {
+    background: url("https://user-images.githubusercontent.com/74824916/135275356-37fe6375-88af-4359-bfb0-f8a16a223182.jpg") no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
 }
 
 .Footer {
-  text-align: center;
-  margin-top: 850px;
+    text-align: center;
+    margin-top: 850px;
 }
 
 .ui.sidebar.menu {
-  overflow: visible !important;
+    overflow: visible !important;
 }
 
-.handWriting{
-  font-family: "Lucida Handwriting", cursive;
+.checkbox {
+    margin: 10px 7px;
+    opacity: 0.8;
 }
 
-.paragraph{
-  font-family: "Calibri Light", sans-serif;
-  white-space: pre-wrap;
+.job-advert-add-input {
+    margin: 15px 20px;
+    width: 200px;
+    height: 40px;
+    border: none;
+}
+
+.job-advert-add-dropdown {
+    margin: 15px 20px;
+    width: 200px;
+    height: 35px;
+}
+
+.error-popup {
+    border-radius: 7px;
+    color: rgb(217, 8, 8);
+    background-color: rgba(255, 255, 255, 0.7);
+    margin-bottom: -1px;
+}
+
+.info-popup {
+    border-radius: 7px;
+    color: rgb(0, 0, 0);
+    background-color: rgba(255, 255, 255, 0.7);
+    margin-bottom: -1px;
+}
+
+.padded {
+    margin: 10px 10px;
 }
 
 .container__table {
-  margin-bottom: -14px;
-  margin-top: -13px;
-  margin-right: -10px;
-  max-height: 30em;
-  overflow-y: auto;
+    margin-bottom: -14px;
+    margin-top: -13px;
+    margin-right: -10px;
+    max-height: 30em;
+    overflow-y: auto;
+}
+
+.paragraph {
+    font-family: "Calibri Light", sans-serif;
+    white-space: pre-wrap;
+}
+
+.hand-writing {
+    font-family: "Lucida Handwriting", cursive;
+}
+
+#job-advert-public-card {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    border-radius: 0;
+    text-align: left;
+    background: no-repeat rgba(245, 245, 245, 0.6)
+}
+
+#wrapper {
+    background-color: transparent;
+    border-radius: 7px;
 }

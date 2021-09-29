@@ -14,12 +14,12 @@ function MainInfos({user, width = 8, simple = false}) {
         <Grid stackable>
             <Grid.Column width={width}>
 
-                <EmployerInfoLabels employer={user} style={{float: "right"}}/>
+                <EmployerInfoLabels employer={user} style={{float: "right"}}/><br/>
                 <Item.Group>
                     <Item>
                         <Item.Image style={{textAlign: "center"}}>
                             {user.companyName && !user.profileImg ?
-                                <EmployerLogo user={user} size={"big"} style={{marginTop: 30}}/> :
+                                <EmployerLogo user={user} size={"big"} style={{}}/> :
                                 <Avatar image={user.profileImg} size={"big"}/>}
                             {!simple ? <ImageUploadModal user={user}/> : null}
                         </Item.Image>

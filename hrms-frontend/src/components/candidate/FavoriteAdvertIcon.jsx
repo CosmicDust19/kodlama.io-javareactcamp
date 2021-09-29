@@ -1,5 +1,5 @@
-import {Icon} from "semantic-ui-react";
-import React from "react";
+import {Icon, Transition} from "semantic-ui-react";
+import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {syncUser} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
@@ -13,9 +13,16 @@ function FavoriteAdvertIcon({jobAdvert, iconSize, invisible = false, ...props}) 
     const user = useSelector(state => state?.user?.userProps?.user)
     const dispatch = useDispatch();
 
-    const jobAdvInFavorites = () => {
-        const index = user.favoriteJobAdvertisements.findIndex((jobAdvertisement2) => jobAdvertisement2.id === jobAdvert.id)
-        return index !== -1;
+    const inFavorites = user?.favoriteJobAdvertisements?.findIndex((favJobAdvert) => favJobAdvert.id === jobAdvert.id) !== -1;
+
+    const [redVisible, setRedVisible] = useState(inFavorites);
+    const [outlineVisible, setOutlineVisible] = useState(!inFavorites);
+
+    if (!user || !user.favoriteJobAdvertisements) return null
+
+    const toggleVisible = () => {
+        setRedVisible(inFavorites)
+        setOutlineVisible(!inFavorites)
     }
 
     const addToFavorites = () => {
@@ -32,12 +39,18 @@ function FavoriteAdvertIcon({jobAdvert, iconSize, invisible = false, ...props}) 
         }).catch(handleCatch)
     }
 
-    return user?.favoriteJobAdvertisements && !invisible ?
-        (jobAdvInFavorites(jobAdvert.id) ?
-            <Icon name={"heart"} color={"red"} size={iconSize} {...props}
-                  onClick={() => removeFromFavorites(jobAdvert.id)}/> :
-            <Icon name={"heart outline"} size={iconSize} {...props}
-                  onClick={() => addToFavorites(jobAdvert.id)}/>) : null
+    return user.favoriteJobAdvertisements && !invisible ?
+        <div style={{float: "right"}}>
+            <Transition visible={inFavorites && redVisible} duration={150} onHide={toggleVisible} animation={"drop"}>
+                <Icon name={"heart"} color={"red"} size={iconSize} {...props}
+                      onClick={() => removeFromFavorites(jobAdvert.id)}/>
+            </Transition>
+            <Transition visible={!inFavorites && outlineVisible} duration={150} onHide={toggleVisible} animation={"drop"}>
+                <Icon name={"heart outline"} size={iconSize} {...props}
+                      onClick={() => addToFavorites(jobAdvert.id)}/>
+            </Transition>
+        </div> : null
+
 }
 
 export default FavoriteAdvertIcon;

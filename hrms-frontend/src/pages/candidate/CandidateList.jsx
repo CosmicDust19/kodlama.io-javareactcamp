@@ -13,21 +13,21 @@ export default function CandidateList() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        setTimeout(() => setVisible(true), 100)
+        setLoading(true)
+        const candidateService = new CandidateService();
+        candidateService.getAll()
+            .then((result) => setCandidates(result.data.data))
+            .finally(() => {
+                setVisible(true)
+                setTimeout(() => {
+                    setLoading(false)
+                }, 500)
+            });
         return () => {
             setVisible(undefined)
             setCandidates(undefined)
             setLoading(undefined)
         };
-    }, []);
-
-    useEffect(() => {
-        setLoading(true)
-        const candidateService = new CandidateService();
-        candidateService.getAll().then((result) => setCandidates(result.data.data));
-        setTimeout(() => {
-            setLoading(false)
-        }, 500)
     }, []);
 
     const history = useHistory();
@@ -44,7 +44,7 @@ export default function CandidateList() {
             <div>
                 <Card.Group itemsPerRow={3} stackable>
                     {candidates.map(candidate => (
-                        <Card style={{borderRadius: 5}} onClick={() => handleCandidateClick(candidate.id)}
+                        <Card style={{borderRadius: 5, backgroundColor: "rgba(255,255,255,0.8)"}} onClick={() => handleCandidateClick(candidate.id)}
                               key={candidate.id}>
                             {loading ?
                                 <Placeholder>
@@ -57,8 +57,7 @@ export default function CandidateList() {
                                 <Card.Header content={candidate.firstName}/>
                                 <Card.Meta content={candidate.lastName}/>
                                 <Card.Description>
-                                    <Icon name={"mail outline"} color={"red"}/>
-                                    {candidate.email}
+                                    <Icon name={"mail outline"} color={"red"}/>{candidate.email}
                                 </Card.Description>
                             </Card.Content>
                             <Card.Content extra>

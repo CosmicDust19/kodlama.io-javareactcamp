@@ -96,10 +96,10 @@ function CandSkillsSeg
         <Grid.Column width={width} style={{marginTop: 10}}>
             <AreYouSureModal open={!!candSkillIdDel} message={`Are you sure you want to remove${cv ? "" : " from everywhere"} ?`}
                              yesColor={"red"} noColor={"grey"} onYes={onRemove} onNo={() => setCandSkillIdDel(undefined)}/>
-            <Card fluid raised style={{borderRadius: 0, userSelect: "none"}}>
+            <Card fluid raised style={{borderRadius: 0, userSelect: "none", backgroundColor: "rgb(250,250,250, 0.4)"}}>
                 <Card.Header>
                     <Header textAlign={"center"} dividing color={"pink"} content={"Skills"} onClick={() => setActive(!active)}
-                            style={{marginBottom: 0, borderRadius: 0}} block/>
+                            style={{marginBottom: 0, marginTop: 0, borderRadius: 0, backgroundColor: "rgb(250,250,250, 0.4)"}} block/>
                 </Card.Header>
             </Card>
             <Transition visible={active} duration={200} animation={"slide down"}>
@@ -120,7 +120,7 @@ function CandSkillsSeg
                                            style={{marginRight: 10}}/> :
                                 <SDropdown options={candSkillOption} name="candSkillIds" placeholder="Skills" formik={formik}
                                            loading={false} disabled={candSkillOption.length === 0}
-                                           style={{marginRight: 10, color: "rgba(230,20,150,0.9)"}}/>}
+                                           style={{marginRight: 10, color: "rgba(230,20,150,0.9)", backgroundColor: "rgba(255,255,255,0.7)"}}/>}
                             <Button icon="plus" color="blue" content={"Add"} onClick={onAdd}
                                     disabled={!cv ? !formik.values.skillId : formik.values.candSkillIds.length === 0}
                                     style={{marginTop: 10, borderRadius: 10}}/>

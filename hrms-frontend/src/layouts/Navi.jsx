@@ -32,7 +32,7 @@ export default function Navi() {
         <div>
             <Sidebar as={Menu} animation={"push"} direction={"top"} visible={visible} size="huge" secondary stackable
                      style={verticalScreen ? {backgroundColor: "rgba(250,250,250,0.95)"} :
-                         {backgroundColor: "rgba(248,248,248,0.85)"}}>
+                         {backgroundColor: "rgba(240,240,240,0.75)"}}>
                 {authenticated ?
                     <SignedIn toggle={toggle} verticalScreen={verticalScreen}/> :
                     <SignedOut toggle={toggle}/>}

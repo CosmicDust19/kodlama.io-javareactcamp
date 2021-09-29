@@ -33,7 +33,7 @@ export default function SignedOut({toggle}) {
                 <Menu.Item style={{marginRight: 30, marginLeft: 30}}>
                     <Dropdown text={"Sign Up As"} icon={<Icon name='signup' color={"purple"} style={{marginLeft: 10, borderRadius: 0}}/>}
                               simple basic fluid button closeOnEscape closeOnBlur closeOnChange>
-                        <Dropdown.Menu style={{backgroundColor: "rgba(246,246,246,0.9)", width: 167, borderRadius: 0}}>
+                        <Dropdown.Menu style={{backgroundColor: "rgba(240,240,240,0.9)", width: 167, borderRadius: 0}}>
                             <Dropdown.Item as={Link} to={"/signup/candidate"} onClick={() => scroll(50)} content={"Candidate"}/>
                             <Dropdown.Item as={Link} to={"/signup/employer"} onClick={() => scroll(50)} content={"Employer"}/>
                             <Dropdown.Item as={Link} to={"/signup/systemEmployee"} onClick={() => scroll(50)} content={"System Employee"}/>

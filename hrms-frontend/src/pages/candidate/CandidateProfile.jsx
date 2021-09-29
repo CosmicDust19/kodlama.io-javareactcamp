@@ -42,7 +42,7 @@ export function CandidateProfile() {
     const noInfoMessage =
         <Message info compact as={Segment} style={{float: "left", marginLeft: 20}} raised>
             <Icon name={"wait"} size={"large"}/>
-            <font style={{verticalAlign: "middle"}}>No info has been entered.</font>
+            <font style={{verticalAlign: "middle"}}>No infos has been entered.</font>
         </Message>
 
     return (
@@ -50,11 +50,10 @@ export function CandidateProfile() {
             <div style={{marginRight: -20, marginLeft: -20}}>
                 <Segment basic style={{marginLeft: 20, marginRight: 20, marginBottom: 10}}>
                     <Header dividing content={"Manage Your Infos"} sub as="font" style={{userSelect: "none"}}/>
-                    <Button compact size={"small"} onClick={toggleEditable} inverted floated={"right"}
+                    <Button compact size={"small"} onClick={toggleEditable} floated={"right"}
                             style={{borderRadius: 0, marginTop: -3}} color={"vk"}>
                         <Icon name={editable ? "eye" : "edit"}/>
-                        {editable ? <font style={{fontSize: 12}}>Simple</font> :
-                            <font style={{fontSize: 12}}>Editable</font>}
+                        <font style={{fontSize: 12}}>{editable ? "Simple" : "Editable"}</font>
                         &nbsp;view
                     </Button>
                 </Segment>

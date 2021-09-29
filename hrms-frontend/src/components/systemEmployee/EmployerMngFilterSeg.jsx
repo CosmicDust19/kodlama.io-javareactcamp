@@ -1,7 +1,6 @@
 import {Button, Dropdown, Icon, Loader, Message, Segment} from "semantic-ui-react";
 import SDropdown from "../../utilities/customFormControls/SDropdown";
 import {employerStatusOptions, getFilteredEmployers} from "../../utilities/EmployerUtils";
-import {defDropdownStyle} from "../../utilities/Utils";
 import React, {useEffect, useState} from "react";
 import {useFormik} from "formik";
 import {useDispatch, useSelector} from "react-redux";
@@ -127,15 +126,15 @@ function EmployerMngFilterSeg({setWaitingResp}) {
     }
 
     return (
-        <Segment basic textAlign={"center"} loading={loading}>
+        <Segment basic textAlign={"center"}>
             <Dropdown placeholder="Search" search className="icon" selectOnBlur={false} button labeled
-                      loading={employerOption.length === 0} icon="search" options={employerOption}
+                      loading={employerOption.length === 0 || loading} icon="search" options={employerOption}
                       value={formik.values.employerId} basic onChange={(event, data) => search(data.value)}
                       style={{borderRadius: 5, height: 38, width: 196, marginLeft: 4}}/>
             {formik.values.employerId === "" ? null : <Button icon="x" circular onClick={() => search("")}/>}
-            <SDropdown name={"statuses"} placeholder="Statuses" options={employerStatusOptions} formik={formik}
-                       onChange={(event, data) => changeStatusFilter(data.value)}
-                       style={{...defDropdownStyle}}/>
+            <SDropdown name={"statuses"} placeholder={"Statuses"} id="" options={employerStatusOptions}
+                       formik={formik} onChange={(event, data) => changeStatusFilter(data.value)}
+                       loading={loading} style={{backgroundColor: "rgba(241,241,241,0)"}} className={"padded"}/>
         </Segment>
     )
 }

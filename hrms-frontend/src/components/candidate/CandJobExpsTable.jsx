@@ -112,7 +112,11 @@ function CandJobExpsTable
 
     const tableData = candJobExps
         .map(candJobExp => ({candJobExp: candJobExp}))
-        .sort((a, b) => a.candJobExp.quitYear - b.candJobExp.quitYear)
+        .sort((a, b) => {
+            if (!a.candJobExp.quitYear) return -1
+            else if (!b.candJobExp.quitYear) return 1
+            return b.candJobExp.quitYear - a.candJobExp.quitYear
+        })
 
     // semantic takes the field value as the key. we guaranteed that they will be different by giving a unique key
     const renderBodyRow = ({candJobExp}, i) => ({
@@ -149,7 +153,7 @@ function CandJobExpsTable
                         <div>
                             <SDropdown options={candJobExpOption} name="candJobExpIds" placeholder="Job experiences"
                                        formik={formik} loading={false} disabled={candJobExpOption.length === 0}
-                                       style={{marginRight: 10, color: "rgba(30,170,30,0.9)"}}/>
+                                       style={{marginRight: 10, color: "rgba(30,170,30,0.9)", backgroundColor: "rgba(255,255,255,0.7)"}}/>
                             <Button icon="plus" color="blue" content={"Add"} onClick={addJobExpsToCv}
                                     disabled={formik.values.candJobExpIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
                         </div> : null}

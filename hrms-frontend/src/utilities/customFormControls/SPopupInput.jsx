@@ -1,5 +1,4 @@
 import {Input, Popup, Transition} from "semantic-ui-react";
-import {defErrPopupStyle, defInfoPopupStyle, defInputStyle} from "../Utils";
 
 function SPopupInput({name, formik, popupposition = "bottom center", popupsize, jiggle, ...props}) {
 
@@ -9,16 +8,15 @@ function SPopupInput({name, formik, popupposition = "bottom center", popupsize, 
         <Popup
             trigger={
                 <Transition visible={jiggle} animation={!meta.error ? "" : "jiggle"} duration={250}>
-                    <Input name={name} onChange={formik.handleChange} value={meta.value} iconPosition={props.iconposition}
-                           style={props.inputstyle ? props.inputstyle : defInputStyle} {...props}/>
+                    <Input name={name} onChange={formik.handleChange} value={meta.value}
+                           iconPosition={props.iconposition} id="wrapper" {...props}/>
                 </Transition>
             }
             size={popupsize}
             position={popupposition}
             open={meta.error && meta.touched}
             content={meta.error ? meta.error : props.placeholder}
-            style={meta.error ? defErrPopupStyle : defInfoPopupStyle}
-            {...props}
+            className={meta.error ? "error-popup" : "info-popup"}
         />
     )
 }

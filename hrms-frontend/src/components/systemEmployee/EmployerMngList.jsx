@@ -31,7 +31,7 @@ function EmployerMngList({employers, waitingResp}) {
         )
 
     return (
-        <Table style={{borderRadius: 0, opacity: loading ? 0.8 : 1}} padded>
+        <Table style={{borderRadius: 0, opacity: loading ? 0.8 : 1, backgroundColor: "rgba(241,241,241,0.5)"}} padded>
             <Table.Body>
                 {employers.map((employer) => (
                     <Table.Row style={{backgroundColor: getEmployerColor(employer)}} key={employer.id}>

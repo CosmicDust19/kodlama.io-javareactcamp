@@ -111,7 +111,6 @@ function JobAdvertSidebar({itemsPerPage, itemsPerPageClick, setWaitingResp}) {
 
     const headerStyle = {marginBottom: 7, marginTop: 14, textAlign: "left"}
     const deadlineInputStyle = {marginBottom: 7, width: 130}
-    const creationDateCheckBoxStyle = {marginBottom: 7, marginTop: 7, marginRight: 7, marginLeft: 7}
     const salaryInputStyle = {marginBottom: 7, marginRight: 5, marginLeft: 5, width: 70}
     const openPosInputStyle = {...salaryInputStyle}
     const filterDropdownStyle = {marginTop: 10, marginBottom: 10, marginRight: 15}
@@ -157,28 +156,29 @@ function JobAdvertSidebar({itemsPerPage, itemsPerPageClick, setWaitingResp}) {
 
     return (
         <div style={{userSelect: "none"}}>
-            <Sidebar as={Segment} animation={"push"} direction={"left"} visible={visible} textAlign={"center"} padded>
+            <Sidebar as={Segment} animation={"push"} direction={"left"} visible={visible} textAlign={"center"} padded
+            style={{backgroundColor: "rgb(247,247,247)"}}>
 
                 <Label attached={"top right"} onClick={toggle} as={Button} style={{marginTop: 6, marginRight: 5, borderRadius: 20}}
                        icon={<Icon name={"x"} style={{marginRight: -3, marginLeft: 0, marginTop: -2}} size={"large"} color={"black"}/>}/>
 
                 <br/><br/>
-                <Button color={"yellow"} labelPosition={"right"} fluid
+                <Button color={"yellow"} labelPosition={"right"} fluid style={{borderRadius: 7}}
                         content={"Scroll To Top"} icon={"arrow up"} onClick={() => window.scrollTo(0, 0)}/>
 
                 {favoriteJobAdverts ? !favoritesMode ?
-                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 25}}
+                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 25, borderRadius: 7}}
                             onClick={() => toggleFavoritesMode(true)}>
                         <Icon name='heart'/>See Favorites
                     </Button> :
-                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 25}}
+                    <Button icon labelPosition='right' color="violet" fluid style={{marginTop: 25, borderRadius: 7}}
                             onClick={() => toggleFavoritesMode(false)}>
                         <Icon name='arrow left'/>See All
                     </Button> : null}
 
                 {verticalScreen ?
                     <div>
-                        <Button style={{marginTop: 25, marginBottom: 15}} color={"teal"} labelPosition={"right"} fluid icon={"ordered list"}
+                        <Button style={{marginTop: 25, marginBottom: 15, borderRadius: 7}} color={"teal"} labelPosition={"right"} fluid icon={"ordered list"}
                                 content={<span>{getAccordionStatusIcon(jobAdvPerPageOpen)}Adverts Per Page</span>}
                                 onClick={() => setJobAdvPerPageOpen(!jobAdvPerPageOpen)}/>
                         <Transition visible={jobAdvPerPageOpen} duration={150}>
@@ -191,9 +191,9 @@ function JobAdvertSidebar({itemsPerPage, itemsPerPageClick, setWaitingResp}) {
 
                 <JobAdvertSortBar loading={loading} setLoading={setLoading}/>
 
-                <Button style={{marginTop: 25, marginBottom: 20}} color={"linkedin"} labelPosition={"right"} fluid
-                        onClick={() => setFiltersOpen(!filtersOpen)}
-                        content={<span>{getAccordionStatusIcon(filtersOpen)}Filter</span>} icon={"filter"}/>
+                <Button style={{marginTop: 25, marginBottom: 10, borderRadius: 7}} color={"linkedin"} labelPosition={"right"} fluid
+                        onClick={() => setFiltersOpen(!filtersOpen)} icon={"filter"}
+                        content={<span>{getAccordionStatusIcon(filtersOpen)}Filter</span>}/>
                 <Transition visible={filtersOpen} duration={150}>
                     <div>
                         {management ? <SDropdown options={jobAdvertStatusOptions} name="statuses" placeholder="Statuses" fluid
@@ -212,9 +212,9 @@ function JobAdvertSidebar({itemsPerPage, itemsPerPageClick, setWaitingResp}) {
                         <Header size="tiny" style={{...headerStyle, marginTop: 20}} dividing sub>
                             <Icon name={"bullhorn"} color={"yellow"} style={{marginRight: 7}}/>Creation Date
                         </Header>
-                        <Checkbox label='Today' checked={formik.values.today} style={creationDateCheckBoxStyle}
+                        <Checkbox label='Today' checked={formik.values.today} className={"checkbox"}
                                   onChange={() => changeFilter("today", !formik.values.today)}/>
-                        <Checkbox label='This Week' checked={formik.values.thisWeek} style={creationDateCheckBoxStyle}
+                        <Checkbox label='This Week' checked={formik.values.thisWeek} className={"checkbox"}
                                   onChange={() => changeFilter("thisWeek", !formik.values.thisWeek)}/>
 
                         <Header size="tiny" style={headerStyle} dividing sub>
@@ -255,10 +255,10 @@ function JobAdvertSidebar({itemsPerPage, itemsPerPageClick, setWaitingResp}) {
                         <Header dividing style={{marginBottom: 10}} color={"blue"}/>
                         <Button color={"green"} content={"Apply"} labelPosition={"right"} fluid loading={loading}
                                 icon={"filter"} onClick={handleFilter} disabled={loading}
-                                style={{borderRadius: 0, marginTop: 10, marginBottom: 10}} basic/>
+                                style={{borderRadius: 7, marginTop: 10, marginBottom: 10}} basic/>
                         <Button color={"vk"} content={"Reset"} labelPosition={"right"} fluid loading={loading}
                                 icon={"sync alternate"} onClick={handleReset} disabled={loading}
-                                style={{borderRadius: 0}} basic/>
+                                style={{borderRadius: 7}} basic/>
                     </div>
                 </Transition>
             </Sidebar>

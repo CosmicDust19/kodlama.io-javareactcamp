@@ -39,24 +39,25 @@ function ManagementTable
 
     return (
         <div>
-            <Card fluid raised style={{borderRadius: 0, userSelect: "none"}}>
+            <Card fluid raised style={{borderRadius: 0, userSelect: "none", backgroundColor: "rgb(250,250,250, 0.4)"}}>
                 <Card.Header>
                     <Header textAlign={"center"} dividing color={color} content={headerContent} onClick={toggle}
-                            style={{marginBottom: 0, borderRadius: 0}} block/>
+                            style={{marginBottom: -1, marginTop: 0, borderRadius: 0, marginRight: -1,backgroundColor: "rgb(250,250,250, 0.4)"}} block/>
                 </Card.Header>
             </Card>
             <Transition visible={active} duration={200} animation={"slide down"}>
                 <div>
                     <Segment size={segmentSize} raised vertical
-                             style={{marginTop: -16, marginBottom: 10, borderRadius: 0}}>
+                             style={{marginTop: -15, marginBottom: 10, borderRadius: 0}}>
                         <div className={scrollable ? "container__table" : undefined}>
-                            <Table size={tableSize} celled textAlign="center" striped style={tableStyle}
+                            <Table size={tableSize} celled textAlign="center" striped
+                                   style={{...tableStyle, backgroundColor: "rgba(255,255,255,0.85)"}}
                                    tableData={currentTableData} footerRow={footerRow} {...props}/>
                         </div>
                     </Segment>
 
-                    {pageable ? <PaginationBar itemsPerPage={10} listedItemsLength={tableData.length}
-                                               activePage={currentPage} onPageChange={changePage} basic/> : null}
+                    {pageable ? <PaginationBar itemsPerPage={10} listedItemsLength={tableData.length} siblingRange={1}
+                                               activePage={currentPage} onPageChange={changePage}/> : null}
                 </div>
             </Transition>
         </div>

@@ -29,7 +29,7 @@ function JobAdvertMngList({jobAdverts, waitingResp, ...props}) {
         )
 
     return (
-        <Table style={{borderRadius: 0, marginTop: -3, opacity: loading ? 0.8 : 1}} padded {...props}>
+        <Table style={{borderRadius: 0, marginTop: -3, opacity: loading ? 0.8 : 1, backgroundColor: "rgba(241,241,241,0.5)"}} padded {...props}>
             <Table.Body>
                 {jobAdverts.map(jobAdvert => (
                     <Table.Row style={{backgroundColor: getJobAdvertColor(jobAdvert)}} key={jobAdvert.id}>

@@ -19,6 +19,8 @@ function SingleFieldObjMng({service, header, fieldName, color, ...props}) {
         initialValues: {field: ""}
     });
 
+    if (!objects) return null
+
     const add = () => service.add(formik.values.field)
         .then(r => {
             setObjects([...objects, r.data.data])

@@ -6,9 +6,9 @@ import PositionService from "../../services/positionService";
 import * as Yup from "yup";
 import {changeEmplJobAdverts} from "../../store/actions/userActions";
 import {toast} from "react-toastify";
-import {changePropInList, handleCatch} from "../../utilities/Utils";
+import {changePropInList, getCityOption, getPositionOption, handleCatch} from "../../utilities/Utils";
 import {useFormik} from "formik";
-import {Button, Form, Grid, Header, Icon, Popup, Segment, TextArea} from "semantic-ui-react";
+import {Button, Form, Grid, Header, Popup, Segment, TextArea} from "semantic-ui-react";
 import JobAdvertInfoLabels from "../common/JobAdvertInfoLabels";
 import EmplAdvertDropdown from "./EmplAdvertDropdown";
 import SPopupDropdown from "../../utilities/customFormControls/SPopupDropdown";
@@ -23,14 +23,13 @@ export function EmplJobAdvertSeg({...props}) {
 
     const errPopupStyle = {borderRadius: 10, color: "rgba(227,7,7)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10}
     const infoPopupStyle = {borderRadius: 10, color: "rgb(0,0,0)", backgroundColor: "rgba(250,250,250, 0.7)", marginTop: 10}
-    const jobAdvAddDropdownStyle = {marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 35}
-    const jobAdvAddInputStyle = {marginLeft: 20, marginRight: 20, marginTop: 15, marginBottom: 15, width: 200, height: 40}
     const popupSize = "small"
     const popupPosition = !verticalScreen ? undefined : "top center"
 
     const dispatch = useDispatch();
     const user = useSelector(state => state?.user?.userProps.user)
 
+    const [loading, setLoading] = useState(false);
     const [jobAdvert, setJobAdvert] = useState(props.jobAdvert);
     const [cities, setCities] = useState([]);
     const [positions, setPositions] = useState([]);
@@ -40,6 +39,12 @@ export function EmplJobAdvertSeg({...props}) {
         const positionService = new PositionService();
         cityService.getAll().then((result) => setCities(result.data.data));
         positionService.getAll().then((result) => setPositions(result.data.data));
+        return () => {
+            setLoading(undefined)
+            setJobAdvert(undefined)
+            setCities(undefined)
+            setPositions(undefined)
+        }
     }, []);
 
     useEffect(() => {
@@ -84,20 +89,22 @@ export function EmplJobAdvertSeg({...props}) {
     });
 
     const add = (values) => {
+        setLoading(true)
         jobAdvertisementService.add(values).then((result) => {
             user.jobAdvertisements.push(result.data.data)
             dispatch(changeEmplJobAdverts(user.jobAdvertisements))
             toast("Your advert received. It will be published after verification")
-        }).catch(handleCatch)
+        }).catch(handleCatch).finally(() => setLoading(false))
     }
 
     const update = (values) => {
+        setLoading(true)
         jobAdvertisementService.update(values).then((result) => {
             const jobAdverts = changePropInList(values.id, result.data.data, user.jobAdvertisements)
             dispatch(changeEmplJobAdverts(jobAdverts))
             setJobAdvert(result.data.data)
             toast("Your update request received. It will be visible after confirmation")
-        }).catch(handleCatch)
+        }).catch(handleCatch).finally(() => setLoading(false))
     }
 
     const formik = useFormik({
@@ -107,20 +114,12 @@ export function EmplJobAdvertSeg({...props}) {
         onSubmit: values => adding ? add(values) : update(values)
     });
 
-    const cityOption = cities.map((city, index) => ({
-        key: index,
-        text: city.name,
-        value: city.id,
-    }));
-
-    const positionOption = positions.map((position, index) => ({
-        key: index,
-        text: position.title,
-        value: position.id,
-    }));
+    const cityOption = getCityOption(cities)
+    const positionOption = getPositionOption(positions)
 
     return (
-        <Segment raised style={{borderRadius: 0, centered: true}} textAlign={"center"}>
+        <Segment raised textAlign={"center"}
+                 style={{borderRadius: 15, centered: true, backgroundColor: "rgb(250,250,250, 0.7)"}} >
             {adding === false ?
                 <div align={"right"}>
                     <JobAdvertInfoLabels jobAdvert={{...jobAdvert, employer: user}}/>
@@ -131,31 +130,31 @@ export function EmplJobAdvertSeg({...props}) {
                 <Grid padded="vertically">
                     <Grid.Column>
                         <SPopupDropdown name={"cityId"} placeholder={"City"} formik={formik} popupsize={popupSize}
-                                        popupposition={popupPosition} dropdownstyle={jobAdvAddDropdownStyle} options={cityOption}/>
+                                        popupposition={popupPosition} id={"wrapper"} className={"job-advert-add-dropdown"} options={cityOption}/>
                         <SPopupDropdown name={"positionId"} placeholder={"Position"} formik={formik} popupsize={popupSize}
-                                        popupposition={popupPosition} dropdownstyle={jobAdvAddDropdownStyle} options={positionOption}/>
+                                        popupposition={popupPosition} id={"wrapper"} className={"job-advert-add-dropdown"} options={positionOption}/>
                         <SPopupDropdown name={"workModel"} placeholder={"Work Model"} formik={formik} popupsize={popupSize}
-                                        popupposition={popupPosition} dropdownstyle={jobAdvAddDropdownStyle} options={workModelOptions}/>
+                                        popupposition={popupPosition} id={"wrapper"} className={"job-advert-add-dropdown"} options={workModelOptions}/>
                         <SPopupDropdown name={"workTime"} placeholder={"Work Time"} formik={formik} popupsize={popupSize}
-                                        popupposition={popupPosition} dropdownstyle={jobAdvAddDropdownStyle} options={workTimeOptions}/>
-                        <SPopupInput icon="dollar sign" placeholder="Min Salary (Optional)" name="minSalary" type={"number"}
-                                     popupposition={popupPosition} popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
-                        <SPopupInput icon="dollar sign" placeholder="Max Salary (Optional)" name="maxSalary" type={"number"}
-                                     popupposition={popupPosition} popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
-                        <SPopupInput icon="users" placeholder="Open Positions" name="openPositions" type={"number"}
-                                     popupposition={popupPosition} popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
-                        <SPopupInput placeholder="Deadline" name="deadline" type={"date"}
-                                     popupposition={popupPosition} popupsize={popupSize} inputstyle={jobAdvAddInputStyle} formik={formik}/>
+                                        popupposition={popupPosition} id={"wrapper"} className={"job-advert-add-dropdown"} options={workTimeOptions}/>
+                        <SPopupInput icon="dollar sign" placeholder="Min Salary (Optional)" name="minSalary" type={"number"} formik={formik}
+                                     id={"wrapper"} className={"job-advert-add-input"} popupposition={popupPosition} popupsize={popupSize}/>
+                        <SPopupInput icon="dollar sign" placeholder="Max Salary (Optional)" name="maxSalary" type={"number"} formik={formik}
+                                     id={"wrapper"} className={"job-advert-add-input"} popupposition={popupPosition} popupsize={popupSize} />
+                        <SPopupInput icon="users" placeholder="Open Positions" name="openPositions" type={"number"} formik={formik}
+                                     id={"wrapper"} className={"job-advert-add-input"} popupposition={popupPosition} popupsize={popupSize}/>
+                        <SPopupInput placeholder="Deadline" name="deadline" type={"date"} formik={formik}
+                                     id={"wrapper"} className={"job-advert-add-input"} popupposition={popupPosition} popupsize={popupSize}/>
                     </Grid.Column>
                 </Grid>
 
-                <Grid style={{opacity: 0.9}} padded>
+                <Grid padded>
                     <Grid.Column>
                         <Header sub dividing style={{marginBottom: 0}} color={"yellow"} textAlign={"left"}
                                 content={<font style={{color: "rgb(0,0,0)", marginLeft: 10}}>• Job Description</font>}/>
                         <Popup
                             trigger={
-                                <TextArea style={{minHeight: 120, borderRadius: 0}} name="jobDescription"
+                                <TextArea style={{minHeight: 120, borderRadius: 0}} id={"wrapper"} name="jobDescription"
                                           value={formik.values.jobDescription} onChange={formik.handleChange}/>
                             }
                             position={"bottom center"}
@@ -169,15 +168,12 @@ export function EmplJobAdvertSeg({...props}) {
                 <Grid padded>
                     <Grid.Column>
                         {adding ?
-                            <Button animated="fade" positive type="submit" compact floated={"left"} style={{borderRadius: 10}}>
-                                <Button.Content hidden><Icon name='checkmark'/></Button.Content>
-                                <Button.Content visible>Post <Icon name={"plus"}/></Button.Content>
-                            </Button> :
-                            <Button animated="fade" primary type="submit" compact floated={"left"} style={{borderRadius: 10}}>
-                                <Button.Content hidden><Icon name='checkmark'/></Button.Content>
-                                <Button.Content visible>Save <Icon name='save'/></Button.Content>
-                            </Button>
-                        }
+                            <Button positive type="submit" compact floated={"left"} labelPosition={"right"}
+                                    style={{borderRadius: 10}} loading={loading}
+                                    content={"Post"} icon={"plus"}/> :
+                            <Button primary type="submit" compact floated={"left"} labelPosition={"right"}
+                                    style={{borderRadius: 10}} loading={loading}
+                                    content={"Save"} icon={"save"}/>}
                     </Grid.Column>
                 </Grid>
 

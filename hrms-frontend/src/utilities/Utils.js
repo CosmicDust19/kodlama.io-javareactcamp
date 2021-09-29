@@ -5,12 +5,6 @@ export const colors = ['red', 'orange', 'yellow', 'olive', 'green', 'teal', 'blu
 export const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 export const placeholderImageNames = ["elyse", "kristy", "lena", "lindsay", "mark", "matthew", "molly", "patrick", "rachel"]
 
-export const defErrPopupStyle = {borderRadius: 7, color: "rgb(217,8,8)", backgroundColor: "rgba(255,255,255, 0.7)", marginBottom: -1}
-export const defInfoPopupStyle = {...defErrPopupStyle, color: "rgb(0,0,0)"}
-export const defInputStyle = {marginTop: 10, marginBottom: 10, marginRight: 10, marginLeft: 10}
-export const defDropdownStyle = {marginTop: 10, marginBottom: 10, marginRight: 10, marginLeft: 10}
-export const defCheckBoxStyle = {marginTop: 10, marginBottom: 10, marginRight: 10, marginLeft: 10}
-
 export const getCityOption = (cities) => cities?.map((city, index) => ({
     key: index,
     text: city.name,
@@ -72,8 +66,6 @@ export const sort = (objects, field, direction, byDate, alphabetic) => {
     }
 }
 
-export const getObjectById = (id, objects) => objects[objects.findIndex(object => object.id === id)]
-
 export const getValueByFieldName = (object, fieldName) => {
     if (!fieldName) return object
     return Object.values(object)[Object.keys(object).indexOf(fieldName)]
@@ -100,9 +92,8 @@ export const getRemainedDaysAsFont = (deadline) => {
     return <font>Last&nbsp;&nbsp;{remainedDays}&nbsp;&nbsp;days</font>
 }
 
-export const getCreatedAtAsStr = (createdAt, onlyDate = false) => {
-    return `${onlyDate ? "" : "Created at "}${new Date(createdAt).getDate()} ${months[new Date(createdAt).getMonth()]} ${new Date(createdAt).getFullYear()}`
-}
+export const getCreatedAtAsStr = (createdAt, onlyDate = false) =>
+    `${onlyDate ? "" : "Created at "}${new Date(createdAt).getDate()} ${months[new Date(createdAt).getMonth()]} ${new Date(createdAt).getFullYear()}`
 
 export const getRandomColor = () => colors[Math.floor(Math.random() * 12)]
 

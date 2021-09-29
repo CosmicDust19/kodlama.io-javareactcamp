@@ -10,22 +10,20 @@ export default function CandidateDetail() {
 
     const {id} = useParams();
     const [visible, setVisible] = useState(false);
-    const [candidate, setCandidate] = useState({});
+    const [candidate, setCandidate] = useState();
 
     useEffect(() => {
-        setVisible(true)
+        const candidateService = new CandidateService();
+        candidateService.getById(id)
+            .then((result) => setCandidate(result.data.data))
+            .finally(() => setVisible(true));
         return () => {
             setVisible(undefined)
             setCandidate(undefined)
         }
-    }, []);
-
-    useEffect(() => {
-        const candidateService = new CandidateService();
-        candidateService.getById(id).then((result) => setCandidate(result.data.data));
     }, [id]);
 
-    if (candidate === {}) return <Loader active inline='centered' size={"large"}/>
+    if (!candidate) return <Loader active inline='centered' size={"large"}/>
 
     return (
         <Transition visible={visible} duration={300}>

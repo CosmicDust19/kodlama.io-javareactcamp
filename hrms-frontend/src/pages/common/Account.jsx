@@ -32,6 +32,7 @@ function Account() {
             String(userProps.userType) === "candidate" ? ["email", "accountLinks"] :
                 String(userProps.userType) === "systemEmployee" ? ["email", "name"] : null
 
+    const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
     const [user, setUser] = useState(userProps.user);
     const [deletePopupOpen, setDeletePopupOpen] = useState(false)
@@ -41,6 +42,7 @@ function Account() {
     useEffect(() => {
         setTimeout(() => setVisible(true), 50)
         return () => {
+            setLoading(undefined)
             setVisible(undefined)
             setUser(undefined)
             setDeletePopupOpen(undefined)
@@ -62,6 +64,8 @@ function Account() {
         }
     });
 
+    const handleFinalActs = () => setLoading(false)
+
     const handleItemClick = (activeItem) => setActiveItem(activeItem)
     const handleDeleteClick = () => setDeletePopupOpen(true)
 
@@ -72,6 +76,7 @@ function Account() {
                 toast("Saved")
             })
             .catch(handleCatch)
+            .finally(handleFinalActs)
 
     const checkCurrentPassword = () =>
         userService.existsByEmailAndPW(user.email, formik.values.currentPassword)
@@ -82,6 +87,7 @@ function Account() {
                 } else toast.warning("Wrong password");
             })
             .catch(handleCatch)
+            .finally(handleFinalActs)
 
     const updatePassword = () => {
         if (formik.values.password === formik.values.passwordRepeat)
@@ -92,6 +98,7 @@ function Account() {
                     formik.setFieldValue("currentPassword", formik.values.password)
                 })
                 .catch(handleCatch)
+                .finally(handleFinalActs)
         else toast.warning("Passwords do not match")
     }
 
@@ -103,30 +110,31 @@ function Account() {
                 toast("Good Bye 👋")
             })
             .catch(handleCatch)
+            .finally(handleFinalActs)
 
-    const updateGithub = (githubAccount) => {
+    const updateGithub = (githubAccount) =>
         candidateService.updateGithubAccount(user.id, githubAccount)
             .then(r => onUpdate(dispatch, r, "Saved"))
             .catch(handleCatch)
-    }
+            .finally(handleFinalActs)
 
-    const updateLinkedin = (linkedinAccount) => {
+    const updateLinkedin = (linkedinAccount) =>
         candidateService.updateLinkedinAccount(user.id, linkedinAccount)
             .then(r => onUpdate(dispatch, r, "Saved"))
             .catch(handleCatch)
-    }
+            .finally(handleFinalActs)
 
-    const updateEmailAndWebsite = () => {
+    const updateEmailAndWebsite = () =>
         employerService.updateEmailAndWebsite(user.id, formik.values.email, formik.values.website)
             .then(r => onUpdate(dispatch, r, "Sent"))
             .catch(handleCatch)
-    }
+            .finally(handleFinalActs)
 
-    const updateCompanyName = () => {
+    const updateCompanyName = () =>
         employerService.updateCompanyName(user.id, formik.values.companyName)
             .then(r => onUpdate(dispatch, r, "Sent"))
             .catch(handleCatch)
-    }
+            .finally(handleFinalActs)
 
     const updatePhoneNumber = () => {
         let phoneNumber = formik.values.phoneNumber
@@ -134,25 +142,30 @@ function Account() {
         employerService.updatePhoneNumber(user.id, phoneNumber)
             .then(r => onUpdate(dispatch, r, "Sent"))
             .catch(handleCatch)
+            .finally(handleFinalActs)
     }
 
-    const updateFirstName = () => {
+    const updateFirstName = () =>
         sysEmplService.updateFirstName(user.id, formik.values.firstName)
             .then(r => onUpdate(dispatch, r, "Saved"))
             .catch(handleCatch)
-    }
+            .finally(handleFinalActs)
 
-    const updateLastName = () => {
+    const updateLastName = () =>
         sysEmplService.updateLastName(user.id, formik.values.lastName)
             .then(r => onUpdate(dispatch, r, "Saved"))
             .catch(handleCatch)
-    }
+            .finally(handleFinalActs)
 
     function AccountSubmitButton({onClick, color, request = false, remove = false, ...props}) {
+        const handleClick = () => {
+            onClick()
+            setLoading(true)
+        }
         return (
             <Button color={color} icon={request ? "paper plane outline" : remove ? "x" : "save"} labelPosition={"right"}
-                    onClick={onClick} content={request ? "Send Request" : remove ? "Remove" : "Save"}
-                    style={{marginTop: 10, marginBottom: 10}} {...props}/>
+                    content={request ? "Send Request" : remove ? "Remove" : "Save"} onClick={handleClick}
+                    style={{marginTop: 10, marginBottom: 10}} loading={loading} disabled={loading} {...props}/>
         )
     }
 
@@ -162,7 +175,7 @@ function Account() {
                 return (
                     <div>
                         <Segment basic>
-                            <SInput name="firstName" placeholder="First Name" formik={formik} style={{}}
+                            <SInput name="firstName" placeholder="First Name" formik={formik} style={{}} id="wrapper"
                                     icon={<Icon name={"user outline"} color={"yellow"}/>} iconPosition="left"/><br/>
                             <AccountSubmitButton color={"yellow"} onClick={updateFirstName}/>
                         </Segment>
@@ -176,10 +189,10 @@ function Account() {
             case "emailAndWebsite":
                 return (
                     <Segment basic>
-                        <SInput name="email" placeholder="Email" type="email" formik={formik} style={{}}
+                        <SInput name="email" placeholder="Email" type="email" formik={formik} id="wrapper"
                                 icon={<Icon name={"mail outline"} color={"red"}/>} iconPosition="left"/><br/>
                         <SInput name="website" placeholder="Website" type="website" formik={formik} style={{marginTop: 10}}
-                                icon={<Icon name={"world"} color={"red"}/>} iconPosition="left"/><br/>
+                                icon={<Icon name={"world"} color={"red"}/>} iconPosition="left" /><br/>
                         <AccountSubmitButton color={"red"} onClick={updateEmailAndWebsite} request/>
                     </Segment>
                 )
@@ -300,7 +313,7 @@ function Account() {
                         </Menu>
                     </Grid.Column>
                     <Grid.Column width={12}>
-                        <Segment basic content={menuSegments()}/>
+                        <Segment basic style={{opacity: 0.9}} content={menuSegments()}/>
                     </Grid.Column>
                 </Grid>
             </div>

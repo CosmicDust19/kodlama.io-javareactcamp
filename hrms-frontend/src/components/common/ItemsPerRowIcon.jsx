@@ -18,7 +18,7 @@ function ItemsPerRowIcon({visible, itemsPerRow, ...props}) {
     }
 
     return (
-        <span style={{float: "right"}}>
+        <span style={{float: "right", marginLeft: -60}}>
             <Transition visible={itemsPerRow === 1 && thLargeVisible} duration={duration} onHide={toggleVisible} animation={"drop"}>
                 <Icon name={"th large"} style={iconStyle} {...props}/>
             </Transition>

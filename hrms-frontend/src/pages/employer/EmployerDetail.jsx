@@ -22,7 +22,6 @@ export default function EmployerDetail() {
     const [jobAdverts, setJobAdverts] = useState();
 
     useEffect(() => {
-        setTimeout(() => setVisible(true), 50)
         return () => {
             setEmployer(undefined)
             setJobAdverts(undefined)
@@ -34,9 +33,13 @@ export default function EmployerDetail() {
         const jobAdvertService = new JobAdvertisementService();
         employerService.getById(id).then((result) => setEmployer(result.data.data));
         if (String(userProps.userType) === "systemEmployee" && employer?.id)
-            jobAdvertService.getAllByEmployerId(employer.id).then(result => setJobAdverts(result.data.data))
+            jobAdvertService.getAllByEmployerId(employer.id)
+                .then(result => setJobAdverts(result.data.data))
+                .finally(() => setVisible(true))
         else if (employer?.id)
-            jobAdvertService.getPublicByEmployerId(employer.id).then(result => setJobAdverts(result.data.data))
+            jobAdvertService.getPublicByEmployerId(employer.id)
+                .then(result => setJobAdverts(result.data.data))
+                .finally(() => setVisible(true))
     }, [employer?.id, id, userProps.userType]);
 
     if (!employer) return <Loader active inline='centered' size={"large"} style={{marginTop: 300}}/>
@@ -54,16 +57,18 @@ export default function EmployerDetail() {
     const tableInfosUpdated = emailUpdated || phoneNumberUpdated || websiteUpdated
 
     return (
-        <Transition visible={visible} duration={200}>
+        <Transition visible={visible} duration={300}>
             <div>
-                <Card raised fluid style={{borderRadius: 0, marginBottom: -1, marginTop: -1, backgroundColor: "rgba(0,0,0,0.02)"}}>
+                <Card raised fluid
+                      style={{borderRadius: 0, marginBottom: -1, marginTop: -1, backgroundColor: "rgba(240,240,240,0.35)"}}>
                     <Card.Content>
                         <Grid columns={"equal"} stackable>
                             <Grid.Column verticalAlign={"middle"}>
                                 <EmployerLogo user={employer} size={"mini"} defImgSize={34}/> &nbsp;&nbsp;
                                 <font style={{fontSize: "large"}}>{employer.companyName}</font> &nbsp;
-                                <SInfoLabel content={<div>{updateIcon}{employer.employerUpdate?.companyName}</div>} size={"large"}
-                                            visible={(systemEmployee || self) && compNameUpdated} backgroundColor={updateColor}/>
+                                <SInfoLabel content={<div>{updateIcon}{employer.employerUpdate?.companyName}</div>}
+                                            size={"large"} visible={(systemEmployee || self) && compNameUpdated}
+                                            backgroundColor={updateColor}/>
                             </Grid.Column>
                             <Grid.Column verticalAlign={"middle"} textAlign={"right"}>
                                 <EmployerInfoLabels employer={employer}/>
@@ -74,21 +79,20 @@ export default function EmployerDetail() {
                     </Card.Content>
                 </Card>
 
-                <Table celled size={"large"} padded striped style={{marginTop: 1, marginBottom: 23, borderRadius: 0}}>
+                <Table celled size={"large"} padded striped style={{marginTop: 1, marginBottom: 23, borderRadius: 0, backgroundColor: "rgb(250,250,250, 0.7)"}}>
                     <Table.Body>
                         <Table.Row>
                             <Table.Cell width={2}><Icon name={"mail outline"} color={"red"}/>Email</Table.Cell>
                             <Table.Cell content={employer.email}/>
-                            <SUpdateTableCell infoAuthorized={systemEmployee || self} visible={emailUpdated} emptyCell={tableInfosUpdated}
-                                              content={employer.employerUpdate?.email}/>
+                            <SUpdateTableCell infoAuthorized={systemEmployee || self} visible={emailUpdated}
+                                              emptyCell={tableInfosUpdated} content={employer.employerUpdate?.email}/>
                         </Table.Row>
 
                         <Table.Row>
                             <Table.Cell width={2}><Icon name={"phone"} color={"yellow"}/>Phone</Table.Cell>
                             <Table.Cell content={employer.phoneNumber}/>
                             <SUpdateTableCell infoAuthorized={systemEmployee || self} visible={phoneNumberUpdated}
-                                              emptyCell={tableInfosUpdated}
-                                              content={employer.employerUpdate?.phoneNumber}/>
+                                              emptyCell={tableInfosUpdated} content={employer.employerUpdate?.phoneNumber}/>
                         </Table.Row>
 
                         <Table.Row>
@@ -96,7 +100,8 @@ export default function EmployerDetail() {
                             <Table.Cell content={<a href={"https://" + employer.website}>{employer.website}</a>}/>
                             <SUpdateTableCell
                                 content={<a href={"https://" + employer.employerUpdate?.website}>{employer.employerUpdate?.website}</a>}
-                                infoAuthorized={systemEmployee || self} visible={websiteUpdated} emptyCell={tableInfosUpdated}/>
+                                infoAuthorized={systemEmployee || self} visible={websiteUpdated}
+                                emptyCell={tableInfosUpdated}/>
                         </Table.Row>
                     </Table.Body>
                 </Table>

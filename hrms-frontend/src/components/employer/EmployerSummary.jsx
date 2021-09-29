@@ -15,7 +15,7 @@ function EmployerSummary({employer}) {
 
     return (
         <Card onClick={() => handleEmployerDetailClick(employer?.id)} fluid raised
-              style={{borderRadius: 0, backgroundColor: "rgba(0,0,0,0.02)"}}>
+              style={{borderRadius: 0, backgroundColor: "rgba(240,240,240,0.35)"}}>
             <Card.Content>
                 <Card.Header style={{marginBottom: -20}}>
                     <EmployerLogo user={employer} size={"mini"} defImgSize={28}/> &nbsp;
@@ -26,7 +26,8 @@ function EmployerSummary({employer}) {
                 </Card.Header>
             </Card.Content>
             <Segment vertical style={{marginBottom: -14}} basic>
-                <Table striped onClick={() => handleEmployerDetailClick(employer?.id)} style={{borderRadius: 0}} celled>
+                <Table striped onClick={() => handleEmployerDetailClick(employer?.id)}
+                       style={{borderRadius: 0, backgroundColor: "rgb(250,250,250, 0.7)"}} celled>
                     <Table.Body>
                         <Table.Row>
                             <Table.Cell collapsing> <Icon name={"mail outline"} color={"red"}/> E-mail</Table.Cell>

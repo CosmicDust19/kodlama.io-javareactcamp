@@ -7,6 +7,7 @@ import JobAdvertListPublic from "../../components/common/JobAdvertListPublic";
 import ItemsPerRowIcon from "../../components/common/ItemsPerRowIcon";
 import JobAdvertSidebar from "../../components/common/JobAdvertSidebar";
 import JobAdvertMngList from "../../components/systemEmployee/JobAdvertMngList";
+import JobAdvertSyncButton from "../../components/systemEmployee/JobAdvertSyncButton";
 
 export default function JobAdverts() {
 
@@ -77,6 +78,7 @@ export default function JobAdverts() {
                                activePage={currentPage} disabled={noJobAdvertsListing || waitingResp} onPageChange={changePage}/>
                 <ItemsPerRowIcon visible={!verticalScreen && !management} itemsPerRow={itemsPerRow}
                                  onClick={itemsPerRowClick} disabled={noJobAdvertsListing || waitingResp}/>
+                <JobAdvertSyncButton visible={management}/>
             </div>
         )
     }

@@ -1,4 +1,3 @@
-import {defDropdownStyle} from "../Utils";
 import {Dropdown} from "semantic-ui-react";
 import React from "react";
 
@@ -9,8 +8,7 @@ function SDropdown({name, formik, ...props}) {
     return (
         <Dropdown clearable item search selection multiple selectOnBlur={false}
                   loading={props.options?.length === 0}
-                  value={meta.value}
-                  style={defDropdownStyle}
+                  value={meta.value} id="wrapper"
                   onChange={(event, data) => formik.setFieldValue(name, data.value)}
                   {...props}
         />

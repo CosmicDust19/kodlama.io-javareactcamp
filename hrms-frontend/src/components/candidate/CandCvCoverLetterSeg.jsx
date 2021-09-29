@@ -1,4 +1,4 @@
-import {Accordion, Button, Card, Form, Grid, Header, Icon, Modal, Segment} from "semantic-ui-react";
+import {Button, Card, Form, Grid, Header, Icon, Modal, Segment, Transition} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import {onCVUpdate} from "../../utilities/CandidateUtils";
 import {handleCatch} from "../../utilities/Utils";
@@ -46,28 +46,28 @@ function CandCvCoverLetterSeg({user, cv, width = 16}) {
                     <Button color="blue" size="large" style={{borderRadius: 10}} content="Save" onClick={updateCoverLetter}/>
                 </Form>
             </Modal>
-            <Accordion>
-                <Accordion.Title active={open}>
-                    <Card fluid raised color={"blue"} style={{borderRadius: 0, marginBottom: 0, backgroundColor: "rgba(0,0,0,0.02)"}}>
-                        <Card.Content>
-                            <Card.Header style={{userSelect: "none"}}>
-                                <font style={{fontSize: 14, marginLeft: 10}} onClick={() => setOpen(!open)}>Cover Letter</font>
-                                <span style={{marginRight: 10, marginBottom: -1, float: "right"}}
-                                      onClick={() => setPopupOpen(true)}>
+            <Card fluid raised color={"blue"} style={{borderRadius: 0, marginBottom: 0, backgroundColor: "rgb(250,250,250, 0.7)"}}>
+                <Card.Content>
+                    <Card.Header style={{userSelect: "none"}}>
+                        <font style={{fontSize: 14, marginLeft: 10}} onClick={() => setOpen(!open)}>Cover Letter</font>
+                        <span style={{marginRight: 10, marginBottom: -1, float: "right"}}
+                              onClick={() => setPopupOpen(true)}>
                                         <Icon name={"edit"} color={"black"}/>
-                                        <font className={"handWriting"} color={"black"} style={{fontSize: 16}}>
+                                        <font className={"hand-writing"} color={"black"} style={{fontSize: 16}}>
                                             {cv.coverLetter ? "Edit" : "Add"}
                                         </font>
                                     </span>
-                            </Card.Header>
-                        </Card.Content>
-                    </Card>
-                </Accordion.Title>
-                <Accordion.Content active={open && cv.coverLetter} as={Segment} raised padded secondary
-                                   style={{marginTop: -5, marginBottom: 10, borderRadius: 0}}>
-                    <p className={"paragraph"}>{cv.coverLetter}</p>
-                </Accordion.Content>
-            </Accordion>
+                    </Card.Header>
+                </Card.Content>
+            </Card>
+            <Transition visible={open && !!cv.coverLetter} duration={200} animation={"slide down"}>
+                <div>
+                    <Segment raised padded secondary
+                             style={{marginTop: 2, marginBottom: 10, borderRadius: 0, backgroundColor: "rgb(250,250,250, 0.7)"}}>
+                        <p className={"paragraph"}>{cv.coverLetter}</p>
+                    </Segment>
+                </div>
+            </Transition>
         </Grid.Column>
     )
 }

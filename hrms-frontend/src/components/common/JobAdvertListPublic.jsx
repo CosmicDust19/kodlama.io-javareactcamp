@@ -47,7 +47,7 @@ function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, waitingRes
     return (
         <Card.Group itemsPerRow={itemsPerRow} stackable doubling {...props}>
             {jobAdverts.map((jobAdvert) => (
-                <Card color={"red"} key={jobAdvert.id} style={{borderRadius: 0, textAlign: "left"}} raised fluid>
+                <Card color={"red"} key={jobAdvert.id} id={"job-advert-public-card"} raised fluid>
                     <Card.Content>
                         <Card.Header>
                             {jobAdvert.position.title}
@@ -64,9 +64,9 @@ function JobAdvertListPublic({jobAdverts, itemsPerRow, noMsg = false, waitingRes
                         <Card.Description style={{marginTop: 5}}>
                             <Icon name={"map marker alternate"} color={"blue"} size={"large"} style={{marginLeft: -1.5, marginRight: 5}}/>
                             &nbsp;{jobAdvert.city.name}
-                            <Button compact icon labelPosition='right' disabled={loading} floated={"right"} inverted
-                                    onClick={() => handleAdvertisementClick(jobAdvert.id)}
-                                    style={{borderRadius: 0, marginTop: -4, marginBottom: -4}}>
+                            <Button compact icon labelPosition='right' disabled={loading} floated={"right"}
+                                    onClick={() => handleAdvertisementClick(jobAdvert.id)} basic color={"red"}
+                                    style={{borderRadius: 0, marginTop: -4, marginBottom: -4, opacity: 0.8}}>
                                 <Icon name='right arrow' color={"red"}/>See detail
                             </Button>
                         </Card.Description>

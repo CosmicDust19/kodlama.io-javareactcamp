@@ -5,6 +5,7 @@ import ItemsPerPageBar from "../../components/common/ItemsPerPageBar";
 import PaginationBar from "../../components/common/PaginationBar";
 import EmployerMngFilterSeg from "../../components/systemEmployee/EmployerMngFilterSeg";
 import EmployerMngList from "../../components/systemEmployee/EmployerMngList";
+import EmployerSyncButton from "../../components/systemEmployee/EmployerSyncButton";
 
 export default function SysEmplEmployerMng() {
 
@@ -58,10 +59,11 @@ export default function SysEmplEmployerMng() {
     function listingOptions() {
         return (
             <div align={"center"} style={{marginBottom: 30, marginTop: 30}}>
-                <ItemsPerPageBar itemPerPage={employersPerPage} handleClick={itemsPerPageClick} compact style={{marginTop: 15}}
+                <ItemsPerPageBar itemPerPage={employersPerPage} handleClick={itemsPerPageClick} compact
                                  disabled={noEmployersListing || waitingResp} listedItemsLength={filteredEmployers.length}/>
                 <PaginationBar itemsPerPage={employersPerPage} listedItemsLength={filteredEmployers.length} activePage={currentPage}
-                               disabled={noEmployersListing || waitingResp} onPageChange={changePage} style={{marginTop: 15}}/>
+                               disabled={noEmployersListing || waitingResp} onPageChange={changePage}/>
+                <EmployerSyncButton/>
             </div>
         )
     }

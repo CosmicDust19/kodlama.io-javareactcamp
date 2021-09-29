@@ -15,7 +15,11 @@ function JobAdvertSortBar({loading, setLoading}) {
     const [ascVisible, setAscVisible] = useState(true);
 
     useEffect(() => {
-        return () => setOpen(undefined)
+        return () => {
+            setOpen(undefined)
+            setAscVisible(undefined)
+            setDescVisible(undefined)
+        }
     }, []);
 
     const initialValues = {object: "", field: "", direction: 1, date: false, alphabetic: false}
@@ -24,7 +28,6 @@ function JobAdvertSortBar({loading, setLoading}) {
     });
 
     const dropdownStyle = {marginTop: 10, marginBottom: 10}
-    const checkBoxStyle = {marginBottom: 7, marginTop: 7, marginRight: 7, marginLeft: 7}
 
     const getSortingOptions = () => {
         if (formik.values.date) return [
@@ -76,13 +79,14 @@ function JobAdvertSortBar({loading, setLoading}) {
 
     return (
         <div>
-            <Button style={{marginTop: 25, marginBottom: 10}} color={"red"} labelPosition={"right"} fluid icon={"sort"}
-                    content={<span>{getAccordionStatusIcon(open)}Sort</span>} onClick={() => setOpen(!open)}/>
+            <Button style={{marginTop: 25, marginBottom: 10, borderRadius: 7}} color={"red"} labelPosition={"right"}
+                    fluid icon={"sort"} content={<span>{getAccordionStatusIcon(open)}Sort</span>}
+                    onClick={() => setOpen(!open)}/>
             <Transition visible={open} duration={150}>
                 <div>
-                    <Checkbox label='Date' checked={formik.values.date} style={checkBoxStyle}
+                    <Checkbox label='Date' checked={formik.values.date} className={"checkbox"}
                               onChange={() => changeSortType("date", !formik.values.date)}/>
-                    <Checkbox label='Alphabetic' checked={formik.values.alphabetic} style={checkBoxStyle}
+                    <Checkbox label='Alphabetic' checked={formik.values.alphabetic} className={"checkbox"}
                               onChange={() => changeSortType("alphabetic", !formik.values.alphabetic)}/>
                     <SDropdown options={sortingOption} name="field" placeholder="Field"
                                fluid multiple={false} formik={formik} style={dropdownStyle}/>
@@ -91,9 +95,9 @@ function JobAdvertSortBar({loading, setLoading}) {
                             <Button.Group>
                                 <Button color={"red"} content={"Apply"} compact labelPosition={"right"} floated={"left"}
                                         loading={loading} disabled={loading} icon={"sort numeric down"} onClick={sortJobAdverts}
-                                        style={{borderRadius: 0}} basic/>
+                                        style={{borderBottomLeftRadius: 7, borderTopLeftRadius: 7}} basic/>
                                 <Button color={"red"} compact floated={"left"} disabled={loading} icon={"sync"} onClick={reset}
-                                        style={{borderRadius: 0}}/>
+                                        style={{borderBottomRightRadius: 7, borderTopRightRadius: 7}}/>
                             </Button.Group>
                         </Grid.Column>
                         <Grid.Column width={6}>

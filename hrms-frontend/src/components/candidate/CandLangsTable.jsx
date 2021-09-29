@@ -136,7 +136,7 @@ function CandLangsTable
                         <div>
                             <SDropdown options={candLangOption} name="candLangIds" placeholder="Languages"
                                        formik={formik} loading={false} disabled={candLangOption.length === 0}
-                                       style={{marginRight: 10, color: "rgba(90,20,200,0.9)"}}/>
+                                       style={{marginRight: 10, color: "rgba(90,20,200,0.9)", backgroundColor: "rgba(255,255,255,0.7)"}}/>
                             <Button icon="plus" color="blue" content={"Add"} onClick={addLangsToCv}
                                     disabled={formik.values.candLangIds.length === 0} style={{marginTop: 10, borderRadius: 10}}/>
                         </div> : null}

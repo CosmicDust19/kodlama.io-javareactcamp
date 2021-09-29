@@ -2,7 +2,7 @@ import {useDispatch, useSelector} from "react-redux";
 import React, {useEffect, useState} from "react";
 import {changeCandCVs} from "../../store/actions/userActions";
 import {useFormik} from "formik";
-import {Button, Form, Grid, Header, Input, Menu, Popup, Transition} from "semantic-ui-react";
+import {Button, Form, Grid, Header, Icon, Input, Menu, Popup, Transition} from "semantic-ui-react";
 import CandidateCvService from "../../services/candidateCvService";
 import {getRandomColor, handleCatch} from "../../utilities/Utils";
 import {toast} from "react-toastify";
@@ -15,6 +15,7 @@ export function CandidateCVs() {
     const dispatch = useDispatch();
     const userProps = useSelector(state => state?.user?.userProps)
 
+    const [adding, setAdding] = useState(false);
     const [visible, setVisible] = useState(false);
     const [user, setUser] = useState(userProps.user);
     const [index, setIndex] = useState(userProps.user.cvs.length === 0 ? -1 : 0);
@@ -25,6 +26,7 @@ export function CandidateCVs() {
     useEffect(() => {
         setVisible(true)
         return () => {
+            setAdding(undefined)
             setVisible(undefined)
             setUser(undefined)
             setIndex(undefined)
@@ -56,6 +58,7 @@ export function CandidateCVs() {
     const handleMenuItemClick = (cvIndex) => setIndex(cvIndex === index ? -1 : cvIndex)
 
     const addCv = () => {
+        setAdding(true)
         const CV = {title: formik.values.cvAddTitle, candidateId: user.id}
         candidateCvService.add(CV).then(response => {
             user.cvs.push(response.data.data.CV.data)
@@ -67,14 +70,15 @@ export function CandidateCVs() {
                     autoClose: 8000
                 })
             window.scrollTo(0, 0)
-        }).catch(handleCatch)
+        }).catch(handleCatch).finally(() => setAdding(false))
     }
 
     return (
         <Transition visible={visible} duration={200}>
             <Grid stackable padded>
                 <Grid.Column width={4}>
-                    <Header content={"Manage Your CVs"} sub style={{userSelect: "none"}}/>
+                    <Header content={"Manage Your CVs"} sub style={{userSelect: "none"}} as="font"/>&nbsp;&nbsp;
+                    {adding ? <Icon loading name={"spinner"}/> : null}
                     <Menu fluid vertical secondary>
                         {user?.cvs?.map(cv =>
                             <Menu.Item key={cv?.id} name={cv?.title} active={activeItem === cv?.title} color={getRandomColor()}
@@ -90,7 +94,7 @@ export function CandidateCVs() {
                                     <Input placeholder="Title" value={formik.values.cvAddTitle} name="cvAddTitle"
                                            onChange={formik.handleChange} onBlur={formik.handleBlur}
                                            actionPosition={"left"} transparent size="large"/>
-                                    <Button content={"Save"} circular style={{marginTop: 10}} onClick={() => addCv()}
+                                    <Button content={"Save"} circular style={{marginTop: 10}} onClick={addCv}
                                             secondary compact fluid type="submit"/>
                                 </Form>}
                             on='focus' open={cvAddPopupOpen} position='bottom center' pinned

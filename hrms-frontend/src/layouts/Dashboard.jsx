@@ -1,4 +1,4 @@
-import {Container, Transition} from 'semantic-ui-react'
+import {Container, Segment, Transition} from 'semantic-ui-react'
 import {Route} from "react-router-dom";
 import JobAdverts from "../pages/common/JobAdverts";
 import JobAdvertDetail from "../pages/common/JobAdvertDetail";
@@ -43,8 +43,12 @@ export default function Dashboard() {
         }
     }
 
+    window.onbeforeunload = function () {
+        window.scrollTo(0, 0);
+    }
+
     return (
-        <div className="dashboard">
+        <Segment className="dashboard" vertical>
             <Navi/>
             <ToastContainer position={"bottom-left"} pauseOnFocusLoss={false} style={{width: "24em"}} closeButton={null}/>
             <Transition visible={visible}>
@@ -70,7 +74,7 @@ export default function Dashboard() {
                 </Container>
             </Transition>
             <Footer/>
-        </div>
+        </Segment>
     )
 }
 
