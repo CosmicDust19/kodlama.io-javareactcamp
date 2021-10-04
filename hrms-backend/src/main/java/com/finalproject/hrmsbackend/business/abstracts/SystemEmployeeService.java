@@ -3,7 +3,7 @@ package com.finalproject.hrmsbackend.business.abstracts;
 import com.finalproject.hrmsbackend.core.utilities.results.DataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import com.finalproject.hrmsbackend.entities.concretes.SystemEmployee;
-import com.finalproject.hrmsbackend.entities.concretes.dtos.SystemEmployeesAddDto;
+import com.finalproject.hrmsbackend.entities.concretes.dtos.SystemEmployeeAddDto;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public interface SystemEmployeeService {
 
     DataResult<SystemEmployee> getByEmailAndPW(String email, String password);
 
-    Result add(SystemEmployeesAddDto systemEmployeesAddDto);
+    Result add(SystemEmployeeAddDto systemEmployeeAddDto);
 
     Result updateFirstName(String firstName, int sysEmplId);
 

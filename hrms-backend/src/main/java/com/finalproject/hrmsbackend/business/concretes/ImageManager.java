@@ -2,9 +2,10 @@ package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.ImageService;
 import com.finalproject.hrmsbackend.core.adapters.abstracts.CloudinaryService;
-import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
-import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
+import com.finalproject.hrmsbackend.core.business.abstracts.UserCheckService;
+import com.finalproject.hrmsbackend.core.dataAccess.abstracts.UserDao;
 import com.finalproject.hrmsbackend.core.entities.User;
+import com.finalproject.hrmsbackend.core.utilities.CheckUtils;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.ImageDao;
@@ -22,10 +23,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ImageManager implements ImageService {
 
-    private final UserDao userDao;
     private final ImageDao imageDao;
+    private final UserCheckService userCheck;
     private final CloudinaryService cloudinaryService;
-    private final CheckService check;
 
     @Override
     public DataResult<Image> getById(int imgId) {
@@ -39,11 +39,10 @@ public class ImageManager implements ImageService {
 
     @Override
     public Result upload(MultipartFile multipartFile, int userId) {
-        if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
+        userCheck.existsUserById(userId);
         if (multipartFile == null || multipartFile.isEmpty()) return new ErrorResult(Msg.NOT_FOUND.get("File"));
 
-        int width;
-        int height;
+        int width, height;
         try {
             BufferedImage bufferedImage = ImageIO.read(multipartFile.getInputStream());
             if (bufferedImage == null) return new ErrorResult(Msg.NOT_AN_IMAGE.get());
@@ -64,7 +63,7 @@ public class ImageManager implements ImageService {
 
     @Override
     public Result deleteById(int imgId) {
-        if (check.notExistsById(imageDao, imgId)) return new ErrorResult(Msg.NOT_EXIST.get("imgId"));
+        if (CheckUtils.notExistsById(imageDao, imgId)) return new ErrorResult(Msg.NOT_EXIST.get("imgId"));
         Image image = imageDao.getById(imgId);
 
         Map<?, ?> uploadRes = cloudinaryService.delete(image.getPublicId());

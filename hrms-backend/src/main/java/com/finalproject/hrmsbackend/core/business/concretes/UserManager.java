@@ -2,10 +2,14 @@ package com.finalproject.hrmsbackend.core.business.concretes;
 
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.EmailService;
+import com.finalproject.hrmsbackend.core.business.abstracts.UserCheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.UserService;
-import com.finalproject.hrmsbackend.core.dataAccess.UserDao;
+import com.finalproject.hrmsbackend.core.dataAccess.abstracts.UserDao;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.entities.User;
+import com.finalproject.hrmsbackend.core.utilities.CheckUtils;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.EmployerDao;
@@ -26,6 +30,7 @@ public class UserManager implements UserService {
     private final EmployerDao employerDao;
     private final SystemEmployeeDao sysEmplDao;
     private final ImageDao imageDao;
+    private final UserCheckService userCheck;
     private final CheckService check;
     private final EmailService emailService;
 
@@ -41,6 +46,7 @@ public class UserManager implements UserService {
 
     @Override
     public Result deleteById(int userId) {
+        userCheck.existsUserById(userId);
         userDao.deleteById(userId);
         return new SuccessResult(Msg.DELETED.get());
     }
@@ -58,14 +64,10 @@ public class UserManager implements UserService {
 
     @Override
     public Result updateEmail(String email, int userId) {
-        if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
-
+        userCheck.existsUserById(userId);
         User user = userDao.getById(userId);
-        if (user.getEmail().equals(email))
-            return new ErrorResult(Msg.IS_THE_SAME.get("Email"));
-        if (userDao.existsByEmail(email))
-            return new ErrorResult(Msg.IS_IN_USE.get("Email"));
-
+        check.notTheSame(user.getEmail(), email, "Email");
+        userCheck.notExistsUserByEmail(email, null);
         user.setEmail(email);
         emailService.sendVerificationMail(email);
         return execLastUpdAct(user);
@@ -73,11 +75,8 @@ public class UserManager implements UserService {
 
     @Override
     public Result updatePW(String password, String oldPassword, int userId) {
-        if (!userDao.existsByIdAndPassword(userId, oldPassword))
-            return new ErrorResult(Msg.WRONG.getCustom("%s password"));
-        if (password.equals(oldPassword))
-            return new ErrorResult(Msg.IS_THE_SAME.get("Password"));
-
+        userCheck.existsUserByIdAndPW(oldPassword, userId);
+        check.notTheSame(password, oldPassword, "Password");
         User user = userDao.getById(userId);
         user.setPassword(password);
         return execLastUpdAct(user);
@@ -85,21 +84,20 @@ public class UserManager implements UserService {
 
     @Override
     public Result updateProfileImg(Integer imgId, int userId) {
-        if (check.notExistsById(userDao, userId)) return new ErrorResult(Msg.NOT_EXIST.get("userId"));
-
+        userCheck.existsUserById(userId);
         User user = userDao.getById(userId);
-        if (user.getProfileImg() != null && check.equals(user.getProfileImg().getId(), imgId))
-            return new ErrorResult(Msg.IS_THE_SAME.get("Profile photo"));
+        check.notTheSame(user.getProfileImg() != null ? user.getProfileImg().getId() : null, imgId, "Profile photo");
         for (Image img : user.getImages())
-            if (imgId == null || check.equals(img.getId(), imgId)) {
+            if (imgId == null || CheckUtils.equals(img.getId(), imgId)) {
                 user.setProfileImg(imgId == null ? null : imageDao.getById(imgId));
                 return execLastUpdAct(user);
             }
-
         return new ErrorResult(Msg.NOT_HAVE.get("User"));
     }
 
     private Result execLastUpdAct(User user) {
+        ErrorDataResult<ApiError> errors = Utils.getErrorsIfExist(check, userCheck);
+        if (errors != null) return errors;
         user.setLastModifiedAt(LocalDateTime.now());
         User savedUser = userDao.save(user);
         savedUser.setPassword(null);

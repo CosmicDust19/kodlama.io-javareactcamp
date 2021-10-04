@@ -1,12 +1,17 @@
 package com.finalproject.hrmsbackend.core.utilities;
 
+import com.finalproject.hrmsbackend.business.abstracts.check.BaseCheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
+import com.finalproject.hrmsbackend.core.utilities.results.ErrorDataResult;
 import com.finalproject.hrmsbackend.core.utilities.results.Result;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 @UtilityClass
 public class Utils {
@@ -74,7 +79,6 @@ public class Utils {
     }
 
     public Sort getSortByDirection(Short sortDirection, String propName) {
-
         if (sortDirection == null || sortDirection < 0) return Sort.by(Sort.Direction.DESC, propName);
         else return Sort.by(Sort.Direction.ASC, propName);
     }
@@ -94,6 +98,15 @@ public class Utils {
         if (countryCode.length() == 0) countryCode.insert(0, "0");
         countryCode.append(body);
         return countryCode.toString();
+    }
+
+    public ErrorDataResult<ApiError> getErrorsIfExist(BaseCheckService... baseCheckServices) {
+        Map<String, String> errors = new HashMap<>();
+        for (BaseCheckService baseCheckService : baseCheckServices) {
+            errors.putAll(baseCheckService.getErrors());
+        }
+        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
+        else return null;
     }
 
 }

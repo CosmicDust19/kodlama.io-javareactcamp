@@ -75,22 +75,22 @@ public class CvsController {
 
     @PutMapping(value = "/update/jobExps/add")
     public ResponseEntity<?> addJobExpsToCv(@RequestParam Set<@NotNull Integer> candJobExpIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candJobExpIds, candidateJobExpDao, Utils.CheckType.ALL, CandidateJobExperience.class));
+        return Utils.getResponseEntity(cvService.addCandidatePropsToCv(cvId, candJobExpIds, candidateJobExpDao, Utils.CheckType.ALL, CandidateJobExperience.class));
     }
 
     @PutMapping(value = "/update/langs/add")
     public ResponseEntity<?> addLangsToCv(@RequestParam Set<@NotNull Integer> candLangIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candLangIds, candidateLangDao, Utils.CheckType.ALL, CandidateLanguage.class));
+        return Utils.getResponseEntity(cvService.addCandidatePropsToCv(cvId, candLangIds, candidateLangDao, Utils.CheckType.ALL, CandidateLanguage.class));
     }
 
     @PutMapping(value = "/update/schools/add")
     public ResponseEntity<?> addSchoolsToCv(@RequestParam Set<@NotNull Integer> candSchoolIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candSchoolIds, candidateSchoolDao, Utils.CheckType.ALL, CandidateSchool.class));
+        return Utils.getResponseEntity(cvService.addCandidatePropsToCv(cvId, candSchoolIds, candidateSchoolDao, Utils.CheckType.ALL, CandidateSchool.class));
     }
 
     @PutMapping(value = "/update/skills/add")
     public ResponseEntity<?> addSkillsToCv(@RequestParam Set<@NotNull Integer> candSkillIds, @RequestParam int cvId) {
-        return Utils.getResponseEntity(cvService.addPropsToCv(cvId, candSkillIds, candidateSkillDao, Utils.CheckType.ALL, CandidateSkill.class));
+        return Utils.getResponseEntity(cvService.addCandidatePropsToCv(cvId, candSkillIds, candidateSkillDao, Utils.CheckType.ALL, CandidateSkill.class));
     }
 
     @PutMapping(value = "/update/jobExps/remove")

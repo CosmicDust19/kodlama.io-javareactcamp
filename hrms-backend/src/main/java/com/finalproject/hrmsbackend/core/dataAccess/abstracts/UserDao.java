@@ -1,4 +1,4 @@
-package com.finalproject.hrmsbackend.core.dataAccess;
+package com.finalproject.hrmsbackend.core.dataAccess.abstracts;
 
 import com.finalproject.hrmsbackend.core.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

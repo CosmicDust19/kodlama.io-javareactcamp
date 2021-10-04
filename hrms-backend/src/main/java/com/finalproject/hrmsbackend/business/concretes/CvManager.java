@@ -1,7 +1,11 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CvService;
+import com.finalproject.hrmsbackend.business.abstracts.check.CandidateCheckService;
+import com.finalproject.hrmsbackend.business.abstracts.check.CvCheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
+import com.finalproject.hrmsbackend.core.entities.ApiError;
+import com.finalproject.hrmsbackend.core.utilities.CheckUtils;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
@@ -24,21 +28,21 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CvManager implements CvService {
 
-    private final CandidateDao candidateDao;
     private final CvDao cvDao;
     private final CandidateJobExperienceDao candidateJobExpDao;
     private final CandidateLanguageDao candidateLangDao;
     private final CandidateSchoolDao candidateSchoolDao;
     private final CandidateSkillDao candidateSkillDao;
     private final ImageDao imageDao;
-    private final ModelMapper modelMapper;
     private final CheckService check;
+    private final CandidateCheckService candidateCheck;
+    private final CvCheckService cvCheck;
+    private final ModelMapper modelMapper;
 
     @Override
     public boolean existsCandidatePropInCv(Class<?> propType, int propId, int cvId) {
         if (propId <= 0) return false;
-        else if (CandidateJobExperience.class.equals(propType) && cvDao.existsCandidateJobExpInCv(propId, cvId))
-            return true;
+        else if (CandidateJobExperience.class.equals(propType) && cvDao.existsCandidateJobExpInCv(propId, cvId)) return true;
         else if (CandidateLanguage.class.equals(propType) && cvDao.existsCandidateLangInCv(propId, cvId)) return true;
         else if (CandidateSchool.class.equals(propType) && cvDao.existsCandidateSchoolInCv(propId, cvId)) return true;
         else return CandidateSkill.class.equals(propType) && cvDao.existsCandidateSkillInCv(propId, cvId);
@@ -50,71 +54,63 @@ public class CvManager implements CvService {
     }
 
     @Override
-    public DataResult<Cv> getById(int id) {
-        return new SuccessDataResult<>(cvDao.getById(id));
+    public DataResult<Cv> getById(int cvId) {
+        cvCheck.existsCvById(cvId);
+        return new SuccessDataResult<>(cvDao.getById(cvId));
     }
 
     @Override
     public Result add(CvAddDto cvAddDto) {
-        if (check.notExistsById(candidateDao, cvAddDto.getCandidateId()))
-            return new ErrorResult(Msg.NOT_EXIST.get("candidateId"));
-        if (cvDao.existsByTitleAndCandidate(cvAddDto.getTitle(), new Candidate(cvAddDto.getCandidateId())))
-            return new ErrorResult(Msg.USED.get("Title"));
+        candidateCheck.existsCandidateById(cvAddDto.getCandidateId());
+        cvCheck.notExistsCvByTitleAndCandidateId(cvAddDto.getTitle(), cvAddDto.getCandidateId());
+        ErrorDataResult<ApiError> errors = Utils.getErrorsIfExist(cvCheck);
+        if (errors != null) return errors;
 
         Cv cv = modelMapper.map(cvAddDto, Cv.class);
         Cv savedCv = cvDao.save(cv);
 
         Map<String, Result> results = new LinkedHashMap<>();
-        results.put("candidateJobExperiences", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateJobExperienceIds(), candidateJobExpDao, Utils.CheckType.PARTLY, CandidateJobExperience.class));
-        results.put("candidateLanguages", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateLanguageIds(), candidateLangDao, Utils.CheckType.PARTLY, CandidateLanguage.class));
-        results.put("candidateSchools", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateSchoolIds(), candidateSchoolDao, Utils.CheckType.PARTLY, CandidateSchool.class));
-        results.put("candidateSkills", addPropsToCv(savedCv.getId(), cvAddDto.getCandidateSkillIds(), candidateSkillDao, Utils.CheckType.PARTLY, CandidateSkill.class));
+        results.put("candidateJobExperiences", addCandidatePropsToCv(savedCv.getId(), cvAddDto.getCandidateJobExperienceIds(), candidateJobExpDao, Utils.CheckType.PARTLY, CandidateJobExperience.class));
+        results.put("candidateLanguages", addCandidatePropsToCv(savedCv.getId(), cvAddDto.getCandidateLanguageIds(), candidateLangDao, Utils.CheckType.PARTLY, CandidateLanguage.class));
+        results.put("candidateSchools", addCandidatePropsToCv(savedCv.getId(), cvAddDto.getCandidateSchoolIds(), candidateSchoolDao, Utils.CheckType.PARTLY, CandidateSchool.class));
+        results.put("candidateSkills", addCandidatePropsToCv(savedCv.getId(), cvAddDto.getCandidateSkillIds(), candidateSkillDao, Utils.CheckType.PARTLY, CandidateSkill.class));
         results.put("CV", new SuccessDataResult<>(Msg.SAVED.getCustom("%s"), cvDao.getById(savedCv.getId())));
         return new SuccessDataResult<>(Msg.SUCCESS.get(), results);
     }
 
     @Override
     public Result deleteById(int cvId) {
+        cvCheck.existsCvById(cvId);
         cvDao.deleteById(cvId);
         return new SuccessResult(Msg.DELETED.get());
     }
 
     @Override
     public Result updateTitle(String title, int cvId) {
-        if (check.notExistsById(cvDao, cvId))
-            return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
-        if (cvDao.existsByTitleAndCandidate(title, cvDao.getById(cvId).getCandidate()))
-            return new ErrorResult(Msg.USED.get("Title"));
-
+        cvCheck.existsCvById(cvId);
         Cv cv = cvDao.getById(cvId);
-        if (cv.getTitle().equals(title))
-            return new ErrorResult(Msg.IS_THE_SAME.get("Title"));
-
+        check.notTheSame(cv.getTitle(), title, "Title");
+        cvCheck.notExistsCvByTitleAndCandidateId(title, cvDao.getById(cvId).getCandidate().getId());
         cv.setTitle(title);
         return execLastUpdAct(cv);
     }
 
     @Override
     public Result updateCoverLetter(String coverLetter, int cvId) {
-        if (check.notExistsById(cvDao, cvId)) return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
-
+        cvCheck.existsCvById(cvId);
         Cv cv = cvDao.getById(cvId);
-        if (check.equals(cv.getCoverLetter(), coverLetter))
-            return new ErrorResult(Msg.IS_THE_SAME.get("Cover letter"));
-
+        check.notTheSame(cv.getCoverLetter(), coverLetter, "Cover letter");
         cv.setCoverLetter(coverLetter);
         return execLastUpdAct(cv);
     }
 
     @Override
     public Result updateImg(Integer imgId, int cvId) {
-        if (check.notExistsById(cvDao, cvId)) return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
-
+        cvCheck.existsCvById(cvId);
         Cv cv = cvDao.getById(cvId);
-        if ((cv.getImage() == null && imgId == null) || (cv.getImage() != null && check.equals(cv.getImage().getId(), imgId)))
-            return new ErrorResult(Msg.IS_THE_SAME.get("Profile photo"));
+        check.notTheSame(cv.getImage() != null ? cv.getImage().getId() : null, imgId, "CV photo");
         for (Image img : cv.getCandidate().getImages())
-            if (imgId == null || check.equals(img.getId(), imgId)) {
+            if (imgId == null || CheckUtils.equals(img.getId(), imgId)) {
                 cv.setImage(imgId == null ? null : imageDao.getById(imgId));
                 return execLastUpdAct(cv);
             }
@@ -122,10 +118,10 @@ public class CvManager implements CvService {
     }
 
     @Override
-    public Result addPropsToCv(int cvId, Set<Integer> cvPropIds, JpaRepository<?, Integer> cvPropDao, String checkType, Class<?> propType) {
+    public Result addCandidatePropsToCv(int cvId, Set<Integer> cvPropIds, JpaRepository<?, Integer> cvPropDao, String checkType, Class<?> propType) {
         if (cvPropIds == null || cvPropIds.size() == 0)
             return new ErrorResult(Msg.NO_ID_FOUND.get());
-        if (checkType.equals(Utils.CheckType.ALL) && check.notExistsById(cvDao, cvId))
+        if (checkType.equals(Utils.CheckType.ALL) && CheckUtils.notExistsById(cvDao, cvId))
             return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
 
         Cv cv = cvDao.getById(cvId);
@@ -135,7 +131,7 @@ public class CvManager implements CvService {
         for (Integer propId : cvPropIds) {
             counter++;
             //exists prop
-            if (check.notExistsById(cvPropDao, propId)) {
+            if (CheckUtils.notExistsById(cvPropDao, propId)) {
                 errors.put(String.format("%sIds[%d](id: %d)", propType.getSimpleName(), counter, propId), Msg.NOT_EXIST.get());
                 continue;
             }
@@ -165,7 +161,7 @@ public class CvManager implements CvService {
 
         // check ?
         if (checkType.equals(Utils.CheckType.ALL)) {
-            if (check.notExistsById(cvDao, cvId))
+            if (CheckUtils.notExistsById(cvDao, cvId))
                 return new ErrorResult(Msg.NOT_EXIST.get("cvId"));
 
             Map<String, Object> errors = new LinkedHashMap<>();
@@ -230,6 +226,8 @@ public class CvManager implements CvService {
     }
 
     private Result execLastUpdAct(Cv cv) {
+        ErrorDataResult<ApiError> errors = Utils.getErrorsIfExist(cvCheck);
+        if (errors != null) return errors;
         cv.setLastModifiedAt(LocalDateTime.now());
         Cv savedCv = cvDao.save(cv);
         return new SuccessDataResult<>(Msg.UPDATED.get(), savedCv);

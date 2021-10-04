@@ -1,12 +1,17 @@
 package com.finalproject.hrmsbackend.core.business.abstracts;
 
-public interface UserCheckService {
+import com.finalproject.hrmsbackend.business.abstracts.check.BaseCheckService;
+import com.finalproject.hrmsbackend.core.entities.User;
 
-    boolean invalidEmail(String email);
+import java.util.Map;
 
-    boolean invalidWebsite(String website);
+public interface UserCheckService extends BaseCheckService {
 
-    boolean invalidPhone(String phone);
+    Map<String, String> getErrors();
 
-    boolean emailWebsiteDiffDomain(String email, String website);
+    void existsUserById(Integer userId);
+
+    void notExistsUserByEmail(String email, User user);
+
+    void existsUserByIdAndPW(String password, int userId);
 }

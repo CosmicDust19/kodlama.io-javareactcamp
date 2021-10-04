@@ -1,6 +1,5 @@
 package com.finalproject.hrmsbackend.dataAccess.abstracts;
 
-import com.finalproject.hrmsbackend.entities.concretes.Candidate;
 import com.finalproject.hrmsbackend.entities.concretes.Cv;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,12 +10,11 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 
-
 @Transactional
 @Repository
 public interface CvDao extends JpaRepository<Cv, Integer> {
 
-    boolean existsByTitleAndCandidate(String title, Candidate candidate);
+    boolean existsByTitleAndCandidate_Id(String title, Integer candId);
 
     @Query(value = "select exists(select 1 from cvs_job_experiences where cv_id= :cvId and candidate_job_exp_id = :candidateJobExperienceId)", nativeQuery = true)
     boolean existsCandidateJobExpInCv(@Param(value = "candidateJobExperienceId") Integer candidateJobExperienceId, @Param(value = "cvId") Integer cvId);

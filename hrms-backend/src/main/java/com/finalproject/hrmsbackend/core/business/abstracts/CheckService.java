@@ -1,28 +1,30 @@
 package com.finalproject.hrmsbackend.core.business.abstracts;
 
-import org.springframework.data.repository.CrudRepository;
+import com.finalproject.hrmsbackend.business.abstracts.check.BaseCheckService;
 
-import java.time.LocalDate;
+import java.util.Map;
 
-public interface CheckService {
-    boolean notExistsById(CrudRepository<?, Integer> dao, Integer id);
+public interface CheckService extends BaseCheckService {
 
-    boolean notExistsById(CrudRepository<?, Short> dao, Short id);
+    Map<String, String> getErrors();
 
-    boolean invalidDateFormat(String date);
+    void notTheSame(Number oldItem, Number newItem, String itemName);
 
-    boolean startEndConflict(short start, Short end);
+    void notTheSame(String oldItem, String newItem, String itemName);
 
-    boolean equals(String x, String y);
+    void existsPositionById(Short positionId);
 
-    boolean equals(Integer x, Integer y);
+    void existsSchoolById(Integer schoolId);
 
-    boolean equals(Double num1, Double num2);
+    void existsDepartmentById(Short departmentId);
 
-    boolean equals(Short x, Short y);
+    void existsLanguageById(Short languageId);
 
-    boolean equals(LocalDate x, LocalDate y);
+    void existsSkillById(Short skillId);
 
-    boolean greater(Double num1, Double num2);
+    void existsCityById(Short cityId);
 
+    void noStartEndYearConflict(Short startYear, Short graduationYear);
+
+    void noMinMaxConflict(Double min, Double max);
 }

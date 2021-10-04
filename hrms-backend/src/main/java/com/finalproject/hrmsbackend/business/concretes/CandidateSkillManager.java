@@ -1,11 +1,13 @@
 package com.finalproject.hrmsbackend.business.concretes;
 
 import com.finalproject.hrmsbackend.business.abstracts.CandidateSkillService;
+import com.finalproject.hrmsbackend.business.abstracts.check.CandidateCheckService;
+import com.finalproject.hrmsbackend.business.abstracts.check.CandidateSkillCheckService;
 import com.finalproject.hrmsbackend.core.business.abstracts.CheckService;
 import com.finalproject.hrmsbackend.core.entities.ApiError;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
+import com.finalproject.hrmsbackend.core.utilities.Utils;
 import com.finalproject.hrmsbackend.core.utilities.results.*;
-import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.CandidateSkillDao;
 import com.finalproject.hrmsbackend.dataAccess.abstracts.SkillDao;
 import com.finalproject.hrmsbackend.entities.concretes.CandidateSkill;
@@ -14,17 +16,21 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class CandidateSkillManager implements CandidateSkillService {
 
     private final CandidateSkillDao candidateSkillDao;
-    private final CandidateDao candidateDao;
     private final SkillDao skillDao;
-    private final ModelMapper modelMapper;
     private final CheckService check;
+    private final CandidateCheckService candidateCheck;
+    private final CandidateSkillCheckService candidateSkillCheck;
+    private final ModelMapper modelMapper;
 
     @Override
     public DataResult<List<CandidateSkill>> getAll() {
@@ -33,17 +39,10 @@ public class CandidateSkillManager implements CandidateSkillService {
 
     @Override
     public DataResult<?> add(CandidateSkillAddDto candSkillAddDto) {
-        Map<String, String> errors = new HashMap<>();
-        if (check.notExistsById(candidateDao, candSkillAddDto.getCandidateId()))
-            errors.put("candidateId", Msg.NOT_EXIST.get("Candidate"));
-        if (check.notExistsById(skillDao, candSkillAddDto.getSkillId()))
-            errors.put("skillId", Msg.NOT_EXIST.get("Skill"));
-        if (violatesUk(candSkillAddDto))
-            errors.put("uk", Msg.UK_CAND_SKILL.get());
-        if (!errors.isEmpty()) return new ErrorDataResult<>(Msg.FAILED.get(), new ApiError(errors));
-
+        candidateCheck.existsCandidateById(candSkillAddDto.getCandidateId());
+        check.existsSkillById(candSkillAddDto.getSkillId());
+        candidateSkillCheck.checkIfViolatesUk(candSkillAddDto);
         CandidateSkill candidateSkill = modelMapper.map(candSkillAddDto, CandidateSkill.class);
-
         CandidateSkill savedCandSkill = candidateSkillDao.save(candidateSkill);
         savedCandSkill.setSkill(skillDao.getById(savedCandSkill.getSkill().getId()));
         return new SuccessDataResult<>(Msg.SAVED.get(), savedCandSkill);
@@ -67,13 +66,9 @@ public class CandidateSkillManager implements CandidateSkillService {
 
     @Override
     public Result deleteById(int candSkillId) {
+        candidateSkillCheck.existsCandidateSkillById(candSkillId);
         candidateSkillDao.deleteById(candSkillId);
         return new SuccessResult(Msg.DELETED.get());
-    }
-
-    private boolean violatesUk(CandidateSkillAddDto candSkillAddDto) {
-        return candidateSkillDao.existsBySkill_IdAndCandidate_Id
-                (candSkillAddDto.getSkillId(), candSkillAddDto.getCandidateId());
     }
 
 }

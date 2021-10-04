@@ -27,7 +27,7 @@ public interface CvService {
 
     Result updateImg(Integer imgId, int cvId);
 
-    Result addPropsToCv(int cvId, Set<Integer> cvPropIds, JpaRepository<?, Integer> cvPropDao, String checkType, Class<?> propType);
+    Result addCandidatePropsToCv(int cvId, Set<Integer> cvPropIds, JpaRepository<?, Integer> cvPropDao, String checkType, Class<?> propType);
 
     Result removePropsFromCv(int cvId, Set<Integer> cvPropIds, String checkType, Class<?> propType);
 

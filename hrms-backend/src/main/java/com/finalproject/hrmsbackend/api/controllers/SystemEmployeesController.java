@@ -3,7 +3,7 @@ package com.finalproject.hrmsbackend.api.controllers;
 import com.finalproject.hrmsbackend.business.abstracts.SystemEmployeeService;
 import com.finalproject.hrmsbackend.core.utilities.Msg;
 import com.finalproject.hrmsbackend.core.utilities.Utils;
-import com.finalproject.hrmsbackend.entities.concretes.dtos.SystemEmployeesAddDto;
+import com.finalproject.hrmsbackend.entities.concretes.dtos.SystemEmployeeAddDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -38,8 +38,8 @@ public class SystemEmployeesController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> add(@Valid @RequestBody SystemEmployeesAddDto systemEmployeesAddDto) {
-        return Utils.getResponseEntity(systemEmployeeService.add(systemEmployeesAddDto));
+    public ResponseEntity<?> add(@Valid @RequestBody SystemEmployeeAddDto systemEmployeeAddDto) {
+        return Utils.getResponseEntity(systemEmployeeService.add(systemEmployeeAddDto));
     }
 
     @PutMapping(value = "/update/firstName")

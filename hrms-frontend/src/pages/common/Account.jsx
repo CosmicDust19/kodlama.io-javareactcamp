@@ -99,7 +99,10 @@ function Account() {
                 })
                 .catch(handleCatch)
                 .finally(handleFinalActs)
-        else toast.warning("Passwords do not match")
+        else {
+            toast.warning("Passwords do not match")
+            handleFinalActs()
+        }
     }
 
     const deleteAccount = () =>

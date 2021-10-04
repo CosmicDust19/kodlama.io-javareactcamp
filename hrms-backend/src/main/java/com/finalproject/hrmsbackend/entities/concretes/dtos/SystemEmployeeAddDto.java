@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SystemEmployeesAddDto extends UserAddDto {
+public class SystemEmployeeAddDto extends UserAddDto {
 
     @NotBlank(message = Msg.Annotation.REQUIRED)
     @Size(min = Utils.Const.MIN_FN, max = Utils.Const.MAX_FN, message = Msg.Annotation.SIZE)
